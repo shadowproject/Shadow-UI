@@ -635,7 +635,7 @@ var overviewPage = {
                  },
                  {
                      name: 'Key Management',
-                     fa: 'fa-keyboard-o red fa-fw',
+                     fa: 'fa-key red fa-fw',
                      fun: function () {
                         $("#navitems [href=#keymanagement]").click();
                      }                                                                                                                                
@@ -2725,8 +2725,8 @@ function setupWizard(section) {
     // I just did this to make using 's and "s easier in the below prepend and append.
     backbtnjs = '$("#key-options").show(); $("#wizards").hide();';
     fwdbtnjs  = 'gotoWizard("new-key-wizard", 1);';
-    $("#" + section).prepend("<div id='backWiz'   class='wizardback' onclick='" + backbtnjs + "' ><img src='icons/backbtn.png' alt='Back'/></div>")
-    $("#" + section).prepend("<div id='fwdWiz'    class='wizardfwd'  onclick='" + fwdbtnjs  + "' ><img src='icons/fwdbtn.png' alt='Forward'/></div>")
+    $("#" + section).prepend("<div id='backWiz' class='wizardback' onclick='" + backbtnjs + "' ></div>")
+    $("#" + section).prepend("<div id='fwdWiz' class='wizardfwd'  onclick='" + fwdbtnjs  + "' ></div>")
 
     steps.each(function (i) {
             $(this).addClass("step" + i)

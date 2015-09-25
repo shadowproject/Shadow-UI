@@ -37,18 +37,21 @@
     src: url("fonts/OpenSans-BoldItalic.ttf");
     font-style: italic;
 }
+
+@import url(https://fonts.googleapis.com/css?family=Noto+Sans:400,400italic);
+
 @font-face { 
-    font-family: "NotoCJK"; 
+    font-family: "NotoCJK Japanese"; 
     font-weight: 400; 
     src: url("fonts/japanese.otf"); 
 }
 @font-face { 
-    font-family: "NotoCJK"; 
+    font-family: "NotoCJK Chinese simplified"; 
     font-weight: 400; 
     src: url("fonts/chinese_s.otf"); 
 }
 @font-face { 
-    font-family: "NotoCJK"; 
+    font-family: "NotoCJK Chinese traditional"; 
     font-weight: 400; 
     src: url("fonts/chinese_t.otf"); 
 }
@@ -1993,6 +1996,11 @@ label.recipient {
     font-size: 32px !important;
 }
 
+.font-150px {
+    font-size: 150px !important;
+}
+
+
 
 /* -- Responsive Styles (Media Queries) ------------------------------------- */
 @media (min-width: 735px) {
@@ -2530,15 +2538,16 @@ input[type=checkbox]:checked + label:before {
     color:#999;
     text-transform: uppercase;
     text-decoration: none;  
-    cursor: pointer;  
+    cursor: pointer; 
 }
 
 .optionblock {
-    width: 300px;
+    width: 150px;
     height: 350px;
     float: left;   
     text-align: center;
-    margin: 5px;
+    margin: 50px;
+    cursor: pointer;
 }
 
 .wizardback {
@@ -2548,12 +2557,16 @@ input[type=checkbox]:checked + label:before {
     width: 40px;
     height:100%;
     top:0;
-    margin-right: 5px
+    margin-right: 5px;
+    cursor: pointer;
 }
 
-.wizardback img {
-    position: relative;
-    top: 25%;
+.wizardback:before {
+    content: "\f053";
+    font-family: "FontAwesome";
+    font-size: 30px;
+    margin-top: 100px;
+    float: left;
 }
 
 .wizardfwd {
@@ -2563,11 +2576,16 @@ input[type=checkbox]:checked + label:before {
     width: 40px;
     height:100%;
     top:0;
-    margin-left: 5px
+    margin-left: 5px;
+    cursor: pointer;
 }
-.wizardfwd img {
-    position: relative;
-    top: 25%;
+
+.wizardfwd:after {
+    content: "\f054";
+    font-family: "FontAwesome";
+    font-size: 30px;
+    margin-top: 100px;
+    float: left;
 }
 
 .wizardblock {
@@ -2576,6 +2594,10 @@ input[type=checkbox]:checked + label:before {
     height: 600px;
     width: 800px;
     margin: 0px 25px 0px 25px;
+}
+
+#wizards p {
+    line-height: 20px;
 }
 
 .wizardblock label {
@@ -2603,4 +2625,14 @@ input[type=checkbox]:checked + label:before {
     border-radius: 20px;   
     text-align: center;
 
+}
+
+.fa.green {
+    color: rgb(73, 151, 73);
+}
+.fa.red {
+    color: rgb(187, 53, 53);
+}
+.fa.blue {
+    color: rgb(86, 86, 165);
 }

@@ -1006,9 +1006,9 @@
                 <div class="content">
                     <div id="key-options"> 
                         <h3> Please select one of the following options: </h3>
-                        <div class="optionblock"><img src="images/extkey_new.png"     alt="New Account"     onclick="$('#key-options').hide(); $('#wizards').show();gotoWizard('new-key-wizard', 0, true);resizeFooter();"/>New Account </div>
-                        <div class="optionblock"><img src="images/extkey_recover.png" alt="Recover Account" onclick="$('#key-options').hide(); $('#wizards').show();gotoWizard('recover-key-wizard', 0, true);resizeFooter();"/>Recover     </div>
-                        <div class="optionblock"><img src="images/extkey_open.png"    alt="Advanced Management" onclick="$('#key-options').hide(); $('#wizards').hide(); $('#keymanagement-advanced').show(); keyManagementPage.updateKeyList(); keyManagementPage.updateAccountList(); resizeFooter(); "/>Advanced management</div>
+                        <div class="optionblock" alt="New Account"     onclick="$('#key-options').hide(); $('#wizards').show();gotoWizard('new-key-wizard', 0, true);resizeFooter();"/><i class="fa green font-150px fa-plus-square"></i>New Account </div>
+                        <div class="optionblock" onclick="$('#key-options').hide(); $('#wizards').show();gotoWizard('recover-key-wizard', 0, true);resizeFooter();"/><i class="fa red font-150px fa-ambulance"></i>Recover     </div>
+                        <div class="optionblock" onclick="$('#key-options').hide(); $('#wizards').hide(); $('#keymanagement-advanced').show(); keyManagementPage.updateKeyList(); keyManagementPage.updateAccountList(); resizeFooter(); "/><i class="fa blue font-150px fa-laptop"></i> Advanced management</div>
                     </div>
     
                     <div id="wizards" style="display:none">    
@@ -1033,12 +1033,12 @@
                             </div>
                             <div stepJS="keyManagementPage.newMnemonic();"> 
                                 <h3>Here is your 24 word account mnemonic </h3>                            
-                                <textarea id="new-key-mnemonic" style="width:90%; height:100px; font-family: 'NotoCJK';" class="input_box" placeholder="24 word mnemonic" data-title="Your 24 word mnemonic ( Keep this safe! )" readonly></textarea><br/>
+                                <textarea id="new-key-mnemonic" style="line-height: 20px; width:90%; height:100px; font-family: 'Open Sans', 'NotoCJK Japanese', 'NotoCJK Chinese simplified', 'NotoCJK Chinese traditional';" class="input_box" placeholder="24 word mnemonic" data-title="Your 24 word mnemonic ( Keep this safe! )" readonly></textarea><br/>
                                 <p>It is very important to write this down as this is the only backup you will need for your wallet. You will be asked to confirm the seed in the next screen to ensure it has been copied down correctly</p>
                             </div>
                             <div validateJS="keyManagementPage.compareMnemonics();"> 
                                 <h3>Please re-enter your 24 word mnemonic from earlier</h3>
-                                <textarea id="validate-key-mnemonic" style="width:90%; height:100px; font-family: 'NotoCJK';" class="input_box" placeholder="24 word mnemonic" data-title="24 word mnemonic"></textarea><br/>
+                                <textarea id="validate-key-mnemonic" style="line-height: 20px; width:90%; height:100px; font-family: 'Open Sans', 'NotoCJK Japanese', 'NotoCJK Chinese simplified', 'NotoCJK Chinese traditional';" class="input_box" placeholder="24 word mnemonic" data-title="24 word mnemonic"></textarea><br/>
                                 <p>We really want to make sure that you have copied these 24 words down correctly as this will serve as a means to recover your wallet if you should ever lose it. </p>
                             </div>
                             <div stepJS="keyManagementPage.newKey();" endWiz=" keyManagementPage.gotoPage('overview'); " >
