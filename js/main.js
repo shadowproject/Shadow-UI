@@ -2,6 +2,14 @@
 
 $("[href='#qrcode-modal']").leanModal({top : 10, overlay : 0.5, closeButton: "#qrcode-modal .modal_close"});
 $("#start-conversation").leanModal({top : 200, overlay : 0.5, closeButton: "#new-contact-modal .modal_close"});
+$("#add-new-address").leanModal({top : 200, overlay : 0.5, closeButton: "#add-address-modal .modal_close"});
+$("#add-new-send-address").leanModal({top : 200, overlay : 0.5, closeButton: "#add-address-modal .modal_close"});
+$("#sign-addlkp-btn").leanModal({  top : 110, overlay : 1,  zindex:11001, closeButton: "#address-lookup-modal .modal_close", childPopup: true});
+$("#verify-addlkp-btn").leanModal({ top : 110, overlay : 1, zindex:11001, closeButton: "#address-lookup-modal .modal_close", childPopup: true});
+$("#verify-message-button").leanModal({top : 50, overlay : 0.5, closeButton: "#verify-sign-modal .modal_close"});
+$("#sign-message-button").leanModal({top : 50, overlay : 0.5, closeButton: "#verify-sign-modal .modal_close"});
+$("#import-key-button").leanModal({top : 50, overlay : 0.5, closeButton: "#import-key-modal .modal_close"});
+
 
 var qrcode = new QRCode("qrcode", {colorDark:'#E51C39', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H, width: 220, height: 220,});
 
@@ -90,13 +98,13 @@ $(function() {
         editable.on("dblclick", function (event) {
            event.stopPropagation();
            updateValue($(this));
-        }).attr("title", "Double click to edit").on('mouseenter', tooltip);
+        }).attr("data-title", "Double click to edit").on('mouseenter', tooltip);
     }});
 
     $(".editable").on("dblclick", function (event) {
        event.stopPropagation();
        updateValue($(this));
-    }).attr("title", "Double click to edit %column%");
+    }).attr("data-title", "Double click to edit %column%");
 
     $(document).ready(function() {
         resizeFooter();
@@ -126,10 +134,9 @@ $(function() {
     addressBookInit();
     shadowChatInit();
     chainDataPage.init();
-    blockExplorerPage.init();
-
+    keyManagementPage.init();
     // Tooltip
-    $('[title]').on('mouseenter', tooltip);
+    $('[data-title]').on('mouseenter', tooltip);
 
     $(".footable tr").on('click', function() {
         $(this).addClass("selected").siblings("tr").removeClass("selected");
@@ -139,20 +146,20 @@ $(function() {
 var prevPage = null;
 
 function changePage(event) {
-            var toPage = $($(this).attr('href'));
+    var toPage = $($(this).attr('href'));
 
-            prevPage = $("#navitems li.selected a");
+    prevPage = $("#navitems li.selected a");
 
-            $("#navitems li").removeClass("selected");
-            $(this).parent("li").addClass("selected");
+    $("#navitems li").removeClass("selected");
+    $(this).parent("li").addClass("selected");
 
-            if(toPage.length == 1 && toPage[0].tagName.toLowerCase() == "article") {
-                event.preventDefault();
-                $(window).scrollTop(0);
-                $("article").hide();
-                toPage.show();
-                $(document).resize();
-            }
+    if(toPage.length == 1 && toPage[0].tagName.toLowerCase() == "article") {
+        event.preventDefault();
+        $(window).scrollTop(0);
+        $("article").hide();
+        toPage.show();
+        $(document).resize();
+    }
 }
 
 function tooltip (event) {
@@ -168,9 +175,9 @@ function tooltip (event) {
     $("#tooltip").click();
 
     target  = $(this);
-    tip     = target.attr('title');
+    tip     = target.attr('data-title');
     tooltip = $('<div id="tooltip"></div>');
-
+    
     if(!tip || tip == '')
         return false;
 
@@ -184,7 +191,6 @@ function tooltip (event) {
         return target.children($1).text();
     });
 
-    target.removeAttr('title');
     tooltip.css('opacity', 0)
            .html(tip)
            .appendTo('body');
@@ -240,8 +246,6 @@ function tooltip (event) {
 
     var remove_tooltip = function()
     {
-        target.attr('title', tip);
-
         tooltip.animate({top: '-=10', opacity: 0}, 100, function() {
             $(this).remove();
         });
@@ -584,14 +588,15 @@ var overviewPage = {
                     name: 'Sign&nbsp;Message...',
                     fa: 'fa-pencil-square-o red fa-fw',
                     fun: function () {
-                       bridge.userAction({'signMessage': $('#receive .footable .selected .address').text()});
+
+                       $('#sign-message-button').click();
                     }
                 },
                 {
                     name: 'Verify&nbsp;Message...',
                     fa: 'fa-check red fa-fw',
                     fun: function () {
-                       bridge.userAction({'verifyMessage': $('#addressbook .footable .selected .address').text()});
+                        $('#verify-message-button').click();
                     }
                 },
                 {
@@ -629,6 +634,13 @@ var overviewPage = {
                      }
                  },
                  {
+                     name: 'Key Management',
+                     fa: 'fa-keyboard-o red fa-fw',
+                     fun: function () {
+                        $("#navitems [href=#keymanagement]").click();
+                     }                                                                                                                                
+                 },
+                 {
                      name: 'Options',
                      fa: 'fa-wrench red fa-fw',
                      fun: function () {
@@ -636,9 +648,9 @@ var overviewPage = {
                      }
                  }];
 
-         $('#settings').contextMenu(menu, {onOpen:function(data,e){openContextMenu(data.menu);}, onClose:function(data,e){data.menu.isOpen = 0;}, triggerOn: 'click', displayAround: 'trigger', position: 'bottom', mouseClick: 'left', sizeStyle: 'content'});
+        $('#settings').contextMenu(menu, {onOpen:function(data,e){openContextMenu(data.menu);}, onClose:function(data,e){data.menu.isOpen = 0;}, triggerOn: 'click', displayAround: 'trigger', position: 'bottom', mouseClick: 'left', sizeStyle: 'content'});
 
-         menu = [{
+        menu = [{
                      name: 'Debug&nbsp;Window...',
                      fa: 'fa-bug red fa-fw',
                      fun: function () {
@@ -734,12 +746,12 @@ var overviewPage = {
         for(var i = 0;i < transactions.length;i++)
             overviewPage.updateTransaction(transactions[i]);
 
-        $("#recenttxns [title]").off("mouseenter").on("mouseenter", tooltip)
+        $("#recenttxns [data-title]").off("mouseenter").on("mouseenter", tooltip)
     },
     updateTransaction: function(txn) {
         var format = function(tx) {
 
-            return "<a id='"+tx.id.substring(0,17)+"' title='"+tx.tt+"' class='transaction-overview' href='#' onclick='$(\"#navitems [href=#transactions]\").click();$(\"#"+tx.id+"\").click();'>\
+            return "<a id='"+tx.id.substring(0,17)+"' data-title='"+tx.tt+"' class='transaction-overview' href='#' onclick='$(\"#navitems [href=#transactions]\").click();$(\"#"+tx.id+"\").click();'>\
                                                 <span class='"+(tx.t == 'input' ? 'received' : (tx.t == 'output' ? 'sent' : (tx.t == 'inout' ? 'self' : 'stake')))+" icon no-padding'>\
                                                   <i class='fa fa-"+(tx.t == 'input' ? 'angle-left' : (tx.t == 'output' ? 'angle-right' : (tx.t == 'inout' ? 'angle-down' : 'money')))+" font-26px margin-right-10'></i>"
                                                 +unit.format(tx.am)+" </span> <span> "+unit.display+" </span> <span class='overview_date' data-value='"+tx.d+"'>"+tx.d_s+"</span></a>";
@@ -748,7 +760,7 @@ var overviewPage = {
 
         var sid = txn.id.substring(0,17);
 
-        if($("#"+sid).attr("title", txn.tt).length==0)
+        if($("#"+sid).attr("data-title", txn.tt).length==0)
         {
             var set = $('#recenttxns a');
             var txnHtml = format(txn);
@@ -806,7 +818,7 @@ var overviewPage = {
     },
     clientInfo: function() {
         $('#version').text(bridge.info.build.replace(/\-[\w\d]*$/, ''));
-        $('#clientinfo').attr('title', 'Build Desc: ' + bridge.info.build + '\nBuild Date: ' + bridge.info.date).on('mouseenter', tooltip);
+        $('#clientinfo').attr('data-title', 'Build Desc: ' + bridge.info.build + '\nBuild Date: ' + bridge.info.date).on('mouseenter', tooltip);
     },
     encryptionStatusChanged: function(status) {
         switch(status)
@@ -851,9 +863,8 @@ var optionsPage = {
 
                         for(var i=0;i<values[prop].length;i++)
                             element.append("<option>" + values[prop][i] + "</option>");
-                    }
-                    else
-                            element.append("<option" + ($.isNumeric(prop) ? '' : " value='"+prop+"'") + ">" + values[prop] + "</option>");
+                    } else
+                        element.append("<option" + ($.isNumeric(prop) ? '' : " value='"+prop+"'") + ">" + values[prop] + "</option>");
             }
 
             function toggleLinked(el) {
@@ -934,10 +945,11 @@ function sendPageInit() {
     toggleCoinControl(); // TODO: Send correct option value...
     addRecipient();
     changeTxnType();
+    $("#cust-add-lkp").leanModal({top : 200, overlay : 0.5, closeButton: "#address-lookup-modal .modal_close"});
 }
 
 var recipients = 0;
-
+var returnto = "";
 function addRecipient() {
 
     $("#recipients").append((
@@ -945,18 +957,18 @@ function addRecipient() {
         +  '<div id="recipient[count]" class="recipient"> \
             <div class="flex-right"> \
                 <label for="pay_to[count]" class="recipient">Pay To:</label> \
-                <input id="pay_to[count]" class="pay_to input_box" title="The address to send the payment to  (e.g. SXywGBZBowrppUwwNUo1GCRDTibzJi7g2M)" placeholder="Enter a Shadow address (e.g. SXywGBZBowrppUwwNUo1GCRDTibzJi7g2M)" maxlength="128" oninput="base58.check(this);" onchange="$(\'#label[count]\').val(bridge.getAddressLabel(this.value));"/> \
-                <a class="button is-inverse has-fixed-icon" title="Choose address from address book" style="margin-right:10px; margin-left:10px; height:43px; width:43px;" onclick="openAddressBook(\'#pay_to[count]\', \'#label[count]\', true)"><i class="fa fa-book"></i></a> \
-                <a class="button is-inverse has-fixed-icon" title="Paste address from clipboard" style="margin-right:10px; height:43px; width:43px;" onclick="paste(\'#pay_to[count]\')"><i class="fa fa-files-o"></i></a> \
-                <a class="button is-inverse has-fixed-icon" title="Remove this recipient" style="height:43px; width:43px;" onclick="if($(\'div.recipient\').length == 1) clearRecipients(); else {var recipient=$(\'#recipient[count]\');if(recipient.next(\'hr\').remove().length==0)recipient.prev(\'hr\').remove();$(\'#recipient[count]\').remove();resizeFooter();}"><i class="fa fa-times"></i></a> \
+                <input id="pay_to[count]" class="pay_to input_box" data-title="The address to send the payment to  (e.g. SXywGBZBowrppUwwNUo1GCRDTibzJi7g2M)" placeholder="Enter a Shadow address (e.g. SXywGBZBowrppUwwNUo1GCRDTibzJi7g2M)" maxlength="128" oninput="base58.check(this);" onchange="$(\'#label[count]\').val(bridge.getAddressLabel(this.value));"/> \
+                <a id="address_lookup[count]" class="button is-inverse has-fixed-icon" data-title="Choose from address book" style="margin-right:10px; margin-left:10px; height:43px; width:43px;" href="#address-lookup-modal" onclick="returnto=\'pay_to[count]\,label[count]\';prepAddressLookup(false); " ><i class="fa fa-book"></i></a> \
+                <a class="button is-inverse has-fixed-icon" data-title="Paste address from clipboard" style="margin-right:10px; height:43px; width:43px;" onclick="paste(\'#pay_to[count]\')"><i class="fa fa-files-o"></i></a> \
+                <a class="button is-inverse has-fixed-icon" data-title="Remove this recipient" style="height:43px; width:43px;" onclick="if($(\'div.recipient\').length == 1) clearRecipients(); else {var recipient=$(\'#recipient[count]\');if(recipient.next(\'hr\').remove().length==0)recipient.prev(\'hr\').remove();$(\'#recipient[count]\').remove();resizeFooter();}"><i class="fa fa-times"></i></a> \
             </div> \
             <div class="flex-right"> \
                 <label for="label[count]" class="recipient">Label:</label> \
-                <input id="label[count]" class="label input_box" title="Enter a label for this address to add it to your address book" placeholder="Enter a label for this address to add it to your address book" maxlength="128"/> \
+                <input id="label[count]" class="label input_box" data-title="Enter a label for this address to add it to your address book" placeholder="Enter a label for this address to add it to your address book" maxlength="128"/> \
             </div> \
             <div class="flex-right"> \
                 <label for="narration[count]" class="recipient">Narration:</label> \
-                <input id="narration[count]" class="narration input_box" title="Enter a short note to send with payment (max 24 characters)" placeholder="Enter a short note to send with a payment (max 24 characters)" maxlength="24" /> \
+                <input id="narration[count]" class="narration input_box" data-title="Enter a short note to send with payment (max 24 characters)" placeholder="Enter a short note to send with a payment (max 24 characters)" maxlength="24" /> \
             </div> \
             <div class="flex-left"> \
                 <label for="amount[count]" class="recipient">Amount:</label> \
@@ -974,6 +986,8 @@ function addRecipient() {
         // Don't allow characters in numeric fields
         $("#amount"+(recipients-1).toString()).on("keydown", unit.keydown).on("paste",  unit.paste);
 
+        $("#address_lookup"+(recipients-1)).leanModal({top : 200, overlay : 0.5, closeButton: "#address-lookup-modal .modal_close"});
+
         // Addressbook Modal
         $("#addressbook"+(recipients-1).toString()).leanModal({ top : 10, left: 5, overlay : 0.5, closeButton: ".modal_close" });
 
@@ -985,6 +999,7 @@ function clearRecipients() {
     recipients = 0;
     addRecipient();
     resizeFooter();
+    returnto = "";
 }
 
 function addRecipientDetail(address, label, narration, amount) {
@@ -1247,21 +1262,79 @@ function receivePageInit() {
             fun: function () {
                 $("#receive [href='#qrcode-modal']").click();
             }
-        },
-        {
-            name: 'Sign&nbsp;Message',
-            img: 'icons/edit.png',
-            fun: function () {
-                bridge.userAction({'signMessage': $('#receive .footable .selected .address').text()});
-            }
         }];
 
     //Calling context menu
      $('#receive .footable tbody').on('contextmenu', function(e) {
         $(e.target).closest('tr').click();
      }).contextMenu(menu, {triggerOn:'contextmenu', sizeStyle: 'content'});
+
+    // Deal with the receive table filtering
+    // On any input update the filter 
+    $('#filter-address').on('input', function () {
+        var receiveTable =  $('#receive-table');
+
+        if($('#filter-address').val() == "")
+        {
+            receiveTable.data('footable-filter').clearFilter();
+        }
+        $('#receive-filter').val($('#filter-address').val() + " " + $('#filter-addresstype').val() ) ;
+        receiveTable.trigger('footable_filter', {filter: $('#receive-filter').val()});
+    });
+
+    $('#filter-addresstype').change(function () {
+        var receiveTable =  $('#receive-table');
+        if($('#filter-addresstype').val() == "")
+        {
+            receiveTable.data('footable-filter').clearFilter();
+        }
+        $('#receive-filter').val($('#filter-address').val() + " " + $('#filter-addresstype').val() ) ;
+        receiveTable.trigger('footable_filter', {filter: $('#receive-filter').val()});
+    });
 }
 
+function clearRecvAddress()
+{
+    $("#new-address-label").val('');
+    $("#new-addresstype").val(1);
+}
+
+function addAddress()
+{
+    newAdd = bridge.newAddress($("#new-address-label").val(), $("#new-addresstype").val());
+    
+    //TODO: Highlight address
+    $("#add-address-modal .modal_close").click();    
+}
+
+function clearSendAddress()
+{
+    $("#new-send-label").val('');
+    $("#new-send-address").val('');
+    $("#new-send-address-error").text('');
+    $("#new-send-address").removeClass('inputError');
+}
+
+function addSendAddress()
+{
+    var sendLabel, sendAddress, result;
+
+    sendLabel   = $("#new-send-label").val();
+    sendAddress = $("#new-send-address").val();
+    
+    var addType = 0; // not used
+    result = bridge.newAddress(sendLabel, addType, sendAddress, true);
+    
+    if (result == "")
+    {
+        var errorMsg = bridge.lastAddressError();
+        $("#new-send-address-error").text("Error: " + errorMsg);
+        $("#new-send-address").addClass('inputError');
+    } else
+    {
+        $("#add-address-modal .modal_close").click();
+    };
+}
 
 function addressBookInit() {
     var menu = [{
@@ -1322,6 +1395,29 @@ function addressBookInit() {
      $('#addressbook .footable tbody').on('contextmenu', function(e) {
         $(e.target).closest('tr').click();
      }).contextMenu(menu, {triggerOn:'contextmenu', sizeStyle: 'content'});
+
+    // Deal with the addressbook table filtering
+    // On any input update the filter 
+    $('#filter-addressbook').on('input', function () {
+        var addressbookTable =  $('#addressbook-table');
+
+        if($('#filter-addressbook').val() == "")
+        {
+            addressbookTable.data('footable-filter').clearFilter();
+        }
+        $('#addressbook-filter').val($('#filter-addressbook').val() + " " + $('#filter-addressbooktype').val() ) ;
+        addressbookTable.trigger('footable_filter', {filter: $('#addressbook-filter').val()});
+    });
+
+    $('#filter-addressbooktype').change(function () {
+        var addressbookTable =  $('#addressbook-table');
+        if($('#filter-addresstype').val() == "")
+        {
+            addressbookTable.data('footable-filter').clearFilter();
+        }
+        $('#addressbook-filter').val($('#filter-addressbook').val() + " " + $('#filter-addressbooktype').val() ) ;
+        addressbookTable.trigger('footable_filter', {filter: $('#addressbook-filter').val()});
+    });
 }
 
 
@@ -1329,7 +1425,6 @@ var Name = 'Me';
 var initialAddress = true;
 
 function appendAddresses(addresses) {
-
     if(typeof addresses == "string")
     {
         if(addresses == "[]")
@@ -1343,7 +1438,7 @@ function appendAddresses(addresses) {
         var address = addresses[i];
         var addrRow = $("#"+address.address);
         var page = (address.type == "S" ? "#addressbook" : "#receive");
-
+            
         if(address.type == "R" && address.address.length < 75) {
             if(addrRow.length==0)
                 $("#message-from-address").append("<option title='"+address.address+"' value='"+address.address+"'>"+address.label+"</option>");
@@ -1352,41 +1447,86 @@ function appendAddresses(addresses) {
 
             if(initialAddress) {
                 $("#message-from-address").prepend("<option title='Anonymous' value='anon' selected>Anonymous</option>");
-
                 $(".user-name")   .text(Name);
                 $(".user-address").text(address.address);
                 initialAddress = false;
             }
         }
-
-        if(addrRow.length==0)
+        
+        if (addrRow.length==0)
         {
-            $(page + " .footable tbody").append("<tr id='"+address.address+"'>\
-                                                   <td class='label editable' data-value='"+address.label_value+"'>"+address.label+"</td>\
-                                                   <td class='address'>"+address.address+"</td>\
-                                                   <td class='pubkey'>"+address.pubkey+"</td></tr>");
-
+            $( page + " .footable tbody").append(
+                "<tr id='"+address.address+"' lbl='"+address.label+"'>\
+               <td class='label editable' data-value='"+address.label_value+"'>"+address.label+"</td>\
+               <td class='address'>"+address.address+"</td>\
+               <td class='pubkey'>"+address.pubkey+"</td>\
+               <td class='addresstype'>"+(address.at == 3 ? "BIP32" : address.at == 2 ? "Stealth" : "Normal")+"</td></tr>");
+            
             $("#"+address.address)
-
             .on('click', function() {
                 $(this).addClass("selected").siblings("tr").removeClass("selected");
             }).find(".editable").on("dblclick", function (event) {
                 event.stopPropagation();
                 updateValue($(this));
-            }).attr("title", "Double click to edit").on('mouseenter', tooltip);
+            }).attr("data-title", "Double click to edit").on('mouseenter', tooltip);
         }
         else
         {
-
             $("#"+address.address+" .label") .data("value", address.label_value).text(address.label);
             $("#"+address.address+" .pubkey").text(address.pubkey);
         }
 
     }
-
+    
     var table = $('#addressbook .footable,#receive .footable').trigger("footable_setup_paging");
+
 }
 
+function prepAddressLookup(lReceiveAddresses)
+{
+    var page = (lReceiveAddresses ? "#receive" : "#addressbook");
+    var table =  $(page + "-table"); 
+    var lookupTable = $("#address-lookup-table");
+
+    lookupTable.data().pageSize = 5;
+    lookupTable.trigger('footable_initialize');
+    lookupTable.html( table.html() );
+    lookupTable.data('footable-filter').clearFilter();
+
+    $("#address-lookup-table > tbody tr")
+        .on('click', function() {
+            $(this).addClass("selected").siblings("tr").removeClass("selected");
+        })
+        .on('dblclick', function() {
+            var retfields = returnto.split(',');
+            $("#" + retfields[0]).val( $(this).attr("id").trim() );
+            if(retfields[1] != undefined )
+            {
+                $("#" + retfields[1]).val( $(this).attr("lbl").trim() ); 
+            }
+            $("#address-lookup-modal .modal_close").click();
+        })
+
+    // Deal with the lookup table filtering
+    // On any input update the filter 
+    $('#lookup-addressfilter').on('input', function () {
+        if($('#lookup-addressfilter').val() == "")
+        {
+            lookupTable.data('footable-filter').clearFilter();
+        }
+        $('#lookup-filter').val($('#lookup-addressfilter').val() + " " + $('#lookup-addresstype').val() ) ;
+        lookupTable.trigger('footable_filter', {filter: $('#lookup-filter').val()});
+    });
+
+    $('#lookup-addresstype').change(function () {
+        if($('#filter-addresstype').val() == "")
+        {
+            lookupTable.data('footable-filter').clearFilter();
+        }
+        $('#lookup-filter').val($('#lookup-addressfilter').val() + " " + $('#lookup-addresstype').val() ) ;
+        lookupTable.trigger('footable_filter', {filter: $('#lookup-filter').val()});
+    });
+}
 function transactionPageInit() {
     var menu = [{
             name: 'Copy&nbsp;Address',
@@ -1535,7 +1675,7 @@ var Transactions = [],
     filteredTransactions = [];
 
 function formatTransaction(transaction) {
-    return "<tr id='"+transaction.id+"' title='"+transaction.tt+"'>\
+    return "<tr id='"+transaction.id+"' data-title='"+transaction.tt+"'>\
                     <td data-value='"+transaction.c+"'><i class='fa fa-lg "+transaction.s+" margin-right-10'></td>\
                     <td data-value='"+transaction.d+"'>"+transaction.d_s+"</td>\
                     <td>"+transaction.t_l+"</td>\
@@ -1578,7 +1718,7 @@ function bindTransactionTableEvents() {
       event.stopPropagation();
       event.preventDefault();
       updateValue($(this));
-   }).attr("title", "Double click to edit").on('mouseenter', tooltip);
+   }).attr("data-title", "Double click to edit").on('mouseenter', tooltip);
 }
 
 function appendTransactions(transactions) {
@@ -1800,18 +1940,19 @@ function appendContact (key, newcontact) {
     var unread_count = $.grep(contact.messages, function(a){return a.type=="R"&&a.read==false}).length;
 
     if(contact_el.length == 0) {
-        contact_list.append("<li id='contact-"+ key +"' class='contact' title='"+contact.label+"'>\
-                                        <img src='"+ contact.avatar +"' />\
-                                        <span class='contact-info'>\
-                                            <span class='contact-name'>"+contact.label+"</span>\
-                                            <span class='contact-address'>"+contact.messages[0].them+"</span>\
-                                        </span>\
-                                        <span class='contact-options'>\
-                                                <span class='message-notifications"+(unread_count==0?' none':'')+"'>"+unread_count+"</span>\
-                                                <span class='delete' onclick='deleteMessages(\""+key+"\")'></span>\
-                                                " //<span class='favorite favorited'></span>\ //TODO: Favourites
-                                     + "</span>\
-                                      </li>");
+        contact_list.append(
+            "<li id='contact-"+ key +"' class='contact' data-title='"+contact.label+"'>\
+                <img src='"+ contact.avatar +"' />\
+                <span class='contact-info'>\
+                    <span class='contact-name'>"+contact.label+"</span>\
+                    <span class='contact-address'>"+contact.messages[0].them+"</span>\
+                </span>\
+                <span class='contact-options'>\
+                        <span class='message-notifications"+(unread_count==0?' none':'')+"'>"+unread_count+"</span>\
+                        <span class='delete' onclick='deleteMessages(\""+key+"\")'></span>\
+                        " //<span class='favorite favorited'></span>\ //TODO: Favourites
+             + "</span>"
+             + "</li>");
 
         contact_el = $("#contact-"+key).on('click', function(e) {
             $(this).addClass("selected").siblings("li").removeClass("selected");
@@ -1843,18 +1984,19 @@ function appendContact (key, newcontact) {
                 }
 
                 //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
-                discussion.append("<li id='"+message.id+"' class='"+(message.type=='S'?'user-message':'other-message')+"' contact-key='"+contact.key+"'>\
-                                    <span class='info'>\
-                                        <img src='"+contact.avatar+"' />\
-                                        <span class='user-name'>"
-                                            +(message.type=='S'? (message.self == 'anon' ? 'anon' : Name) : contact.label)+"\
-                                        </span>\
-                                    </span>\
-                                    <span class='message-content'>\
-                                        <span class='timestamp'>"+(new Date(message.received*1000).toLocaleString())+"</span>\
-                                        <span class='message-text'>"+micromarkdown.parse(message.message)+"</span>\
-                                        <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'></span>\
-                                    </span></li>");
+                discussion.append(
+                    "<li id='"+message.id+"' class='"+(message.type=='S'?'user-message':'other-message')+"' contact-key='"+contact.key+"'>\
+                    <span class='info'>\
+                        <img src='"+contact.avatar+"' />\
+                        <span class='user-name'>"
+                            +(message.type=='S'? (message.self == 'anon' ? 'anon' : Name) : contact.label)+"\
+                        </span>\
+                    </span>\
+                    <span class='message-content'>\
+                        <span class='timestamp'>"+(new Date(message.received*1000).toLocaleString())+"</span>\
+                        <span class='message-text'>"+micromarkdown.parse(message.message)+"</span>\
+                        <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'></span>\
+                    </span></li>");
 
             }
 
@@ -1957,28 +2099,28 @@ function deleteMessages(key, messageid) {
                 return false;
         }
         else
-            if(contact.messages[i].id == messageid)
-                if(bridge.deleteMessage(messageid)) {
-                    $("#"+messageid).remove();
+        if(contact.messages[i].id == messageid)
+            if(bridge.deleteMessage(messageid)) {
+                $("#"+messageid).remove();
 
-                    if(contact.messages[i].type=="R" && contact.messages[i].read == false)
-                    {
-                        message_count_val--
-                        message_count.text(message_count_val);
-                        if(message_count_val==0)
-                            message_count.hide();
-                        else
-                            message_count.show();
-                    }
-
-                    contact.messages.splice(i, 1);
-                    i--;
-                    var notifications = $("#contact-"+ key).find(".message-notifications");
-                    notifications.text(parseInt(notifications.text())-1);
-                    break;
+                if(contact.messages[i].type=="R" && contact.messages[i].read == false)
+                {
+                    message_count_val--
+                    message_count.text(message_count_val);
+                    if(message_count_val==0)
+                        message_count.hide();
+                    else
+                        message_count.show();
                 }
-                else
-                    return false;
+
+                contact.messages.splice(i, 1);
+                i--;
+                var notifications = $("#contact-"+ key).find(".message-notifications");
+                notifications.text(parseInt(notifications.text())-1);
+                break;
+            }
+            else
+                return false;
     }
 
     if(contact.messages.length == 0)
@@ -1990,6 +2132,59 @@ function deleteMessages(key, messageid) {
         iscrollReload();
 }
 
+function signMessage() {
+    //Clear any signature to avoid confusion with a previous signature being displayed with errors relating to the current values
+    $('#sign-signature').val("");
+    var address, message, error, signature = "";
+    address = $('#sign-address').val().trim();
+    message = $('#sign-message').val().trim();
+
+    var result = bridge.signMessage(address, message);
+
+    error = result.error_msg;
+    signature = result.signed_signature;
+
+    if(error != "" )
+    {
+        $('#sign-result').removeClass('green');
+        $('#sign-result').addClass('red');
+        $('#sign-result').html(error);
+        return false;
+    }
+    else
+    {
+        $('#sign-signature').val(result.signed_signature);
+        $('#sign-result').removeClass('red');
+        $('#sign-result').addClass('green');
+        $('#sign-result').html("Message signed successfully");
+    }
+}
+
+function verifyMessage() {
+
+    var address, message, error, signature = "";
+    address = $('#verify-address').val().trim();
+    message = $('#verify-message').val().trim();
+    signature = $('#verify-signature').val().trim();
+    
+    var result = bridge.verifyMessage(address, message, signature);
+
+    error = result.error_msg;
+    
+    if(error != "" )
+    {
+        $('#verify-result').removeClass('green');
+        $('#verify-result').addClass('red');
+        $('#verify-result').html(error);
+        return false;
+    }
+    else
+    {
+        $('#verify-result').removeClass('red');
+        $('#verify-result').addClass('green');
+        $('#verify-result').html("Message verified successfully");
+    }
+}
 
 var contactScroll = new IScroll('#contact-list', {
     mouseWheel: true,
@@ -2097,7 +2292,6 @@ var chainDataPage = {
 }
 var blockExplorerPage = 
 {
-    init: function() {},
     blockHeader: {},
     findBlock: function(searchID) {
 
@@ -2174,8 +2368,8 @@ var blockExplorerPage =
                                     <td>' +  blkTx.transaction_value + '</td>\
                                     </tr>'); 
                     }
-                    $("#block-txs-table").removeClass("none");
 
+                    $("#block-txs-table").removeClass("none");
                     $("#block-txs-table > tbody tr")
                         .on('click', function() {
                             $(this).addClass("selected").siblings("tr").removeClass("selected");
@@ -2214,7 +2408,8 @@ var blockExplorerPage =
                             
                             var txnInputs = $('#txn-detail-inputs > tbody');
                             txnInputs.html('');
-                            for (value in selectedTxn.transaction_inputs) {
+                            for (value in selectedTxn.transaction_inputs) 
+                            {
 
                               
                               
@@ -2283,4 +2478,317 @@ var blockExplorerPage =
                 })
             }).find(".editable")
     }
+}
+
+var keyManagementPage = {
+    init: function() {
+        setupWizard('new-key-wizard');    
+        setupWizard('recover-key-wizard');
+        setupWizard('open-key-wizard');
+    },
+
+    newMnemonic: function () {
+        var result = bridge.getNewMnemonic( $("#new-account-passphrase").val(), $("#new-account-language").val() );
+        var error  = result.error_msg;
+        var mnemonic = result.mnemonic;
+
+        if(error != "")
+        {
+            alert(error);
+        }
+        else
+        {
+            $("#new-key-mnemonic").val(mnemonic);
+        }
+    },
+    compareMnemonics: function () {
+        var original = $("#new-key-mnemonic").val().trim();
+        var typed    = $("#validate-key-mnemonic").val().trim();
+
+        if (original == typed) {
+            $("#validate-key-mnemonic").removeClass("red");
+            $("#validate-key-mnemonic").val("");
+            return true;
+        }
+        else
+        {
+            $("#validate-key-mnemonic").addClass("red");
+            alert("The mnemonic you provided does not match the mnemonic that was generated eariler - please go back and check to make sure you've copied it down correctly.")
+            return false;
+        }
+    },
+    gotoPage: function(page) {
+        $("#navitems a[href='#" + page + "']").trigger('click');
+    },
+    prepareAccountTable: function()
+    {
+        $("#extkey-account-table  > tbody tr")
+            .on('click', function()
+            { 
+                $(this).addClass("selected").siblings("tr").removeClass("selected");
+                var otherTableRows = $('#extkey-table > tbody > tr');
+                otherTableRows.removeClass("selected");
+            })   
+    },
+    updateAccountList: function() {
+        keyManagementPage.accountList = bridge.extKeyAccList();
+        
+        var tbody = $('#extkey-account-table  > tbody');
+        tbody.html('');
+        for (value in keyManagementPage.accountList) {
+
+            var acc = keyManagementPage.accountList[value];
+
+            tbody.append('<tr data-value='+acc.id+' active-flag=' + acc.active + '>\
+                         <td>' +  acc.id   + '</td>\
+                         <td>' +  acc.label + '</td>\
+                         <td>' +  acc.created_at + '</td>\
+                         <td><div ' + ((acc.active == 'true') ? 'class="green-circle"' : 'class="red-circle"') + ' ></td>\
+                         <td style="font-size: 2em; margin: auto;">' +  ((acc.default_account != undefined ? "&#x2611;" : "")) + '</td>\
+                         </tr>'); 
+        }
+        keyManagementPage.prepareAccountTable();
+    },
+    prepareKeyTable: function()
+    {
+        $("#extkey-table  > tbody tr")
+            .on('click', function()
+            { 
+                $(this).addClass("selected").siblings("tr").removeClass("selected"); 
+                var otherTableRows = $('#extkey-account-table > tbody > tr');
+                otherTableRows.removeClass("selected");
+            })   
+    },
+    updateKeyList: function() {
+        keyManagementPage.keyList = bridge.extKeyList();
+
+        var tbody = $('#extkey-table  > tbody');
+        tbody.html('');
+        for (value in keyManagementPage.keyList) {
+
+            var key = keyManagementPage.keyList[value];
+            tbody.append('<tr data-value='+key.id+' active-flag=' + key.active + '>\
+                         <td>' +  key.id   + '</td>\
+                         <td>' +  key.label + '</td>\
+                         <td>' +  key.path + '</td>\
+                         <td><div ' + ((key.active == 'true') ? 'class="green-circle"' : 'class="red-circle"') + ' ></td>\
+                         <td style="font-size: 2em; margin: auto;">' +  ((key.current_master != undefined ? "&#x2611;" : "")) + '</td>\
+                         </tr>'); 
+        }
+        keyManagementPage.prepareKeyTable();
+    },
+    newKey: function()
+    {
+        newMnemonic   = $('#new-key-mnemonic').val().trim();
+        newPassphrase = $('#new-account-passphrase').val().trim();
+        newLabel      = $('#new-account-label').val().trim();
+
+        result = bridge.importFromMnemonic(newMnemonic, newPassphrase, newLabel);
+        
+        if(result.error_msg != '' )
+        { 
+            alert(result.error_msg);
+            return false;
+        }
+    },
+    recoverKey: function()
+    {
+        var recMnemonic = $("#recover-key-mnemonic").val().trim();
+        var recPassword = $("#recover-passphrase").val().trim();
+        var recLabel = $("#recover-account-label").val().trim();
+
+        result = bridge.importFromMnemonic(recMnemonic, recPassword , recLabel);
+        
+        if(result.error_msg != '' )
+        { 
+            alert(result.error_msg);
+            return false;
+        }
+        else return true;
+    },
+    setMaster: function()
+    {
+        var keySelector = $("#extkey-table tr.selected");
+        if( !keySelector.length )
+        {
+            alert("Please select a key to set it as master.");
+            return false;
+        }
+
+        selected = $("#extkey-table tr.selected").attr("data-value").trim();
+        if(selected != undefined && selected != "")
+        {
+            result = bridge.extKeySetMaster(selected);
+            if(result.error_msg != '' )
+            { 
+                alert(result.error_msg);
+                return false;
+            }
+            else
+            {
+                keyManagementPage.updateKeyList();
+            }
+        }
+        else
+        {
+            alert("Select a key from the table to set a Master.");
+            return false;
+        }
+    },
+    setDefault: function()
+    {
+        var accSelector = $("#extkey-account-table tr.selected");
+
+        if( !accSelector.length )
+        {
+            alert("Please select an account to set it as default.");
+            return false;
+        }        
+
+        selected = $("#extkey-account-table tr.selected").attr("data-value").trim();
+        if(selected != undefined && selected != "")
+        {
+            result = bridge.extKeySetDefault(selected);
+            if(result.error_msg != '' )
+            { 
+                alert(result.error_msg);
+                return false;
+            }
+            else
+            {
+                keyManagementPage.updateKeyList();
+            }
+        }
+        else
+        {
+            alert("Select an account from the table to set a default.");
+            return false;
+        }
+    },
+    changeActiveFlag: function()
+    {
+        var forAcc = false;
+
+        //Check whats selected - if anything.
+        var accSelector = $("#extkey-account-table tr.selected");
+        var keySelector = $("#extkey-table tr.selected");
+        if( !accSelector.length && !keySelector.length )
+        {
+            alert("Please select an account or key to change the active status.");
+            return false;
+        }
+
+        if( accSelector.length )
+        {
+            selected = accSelector.attr("data-value").trim();
+            active   = accSelector.attr("active-flag").trim();
+            forAcc   = true;
+        }
+        else
+        {
+            selected = keySelector.attr("data-value").trim();
+            active   = keySelector.attr("active-flag").trim();            
+        }
+
+        if(selected != undefined && selected != "")
+        {
+            result = bridge.extKeySetActive(selected, active);
+            if(result.error_msg != '' )
+            { 
+                alert(result.error_msg);
+                return false;
+            }
+            else
+            {
+                if(forAcc)
+                {
+                    keyManagementPage.updateAccountList();
+                }
+                else
+                {
+                    keyManagementPage.updateKeyList();    
+                }
+            }
+        }
+        else
+        {
+            alert("Please select an account or key to change the active status.");
+            return false;
+        }
+    }    
+}
+
+function setupWizard(section) {
+    
+    var steps = $("#" + section + " > div");
+
+    // I just did this to make using 's and "s easier in the below prepend and append.
+    backbtnjs = '$("#key-options").show(); $("#wizards").hide();';
+    fwdbtnjs  = 'gotoWizard("new-key-wizard", 1);';
+    $("#" + section).prepend("<div id='backWiz'   class='wizardback' onclick='" + backbtnjs + "' ><img src='icons/backbtn.png' alt='Back'/></div>")
+    $("#" + section).prepend("<div id='fwdWiz'    class='wizardfwd'  onclick='" + fwdbtnjs  + "' ><img src='icons/fwdbtn.png' alt='Forward'/></div>")
+
+    steps.each(function (i) {
+            $(this).addClass("step" + i)
+            $(this).hide();
+        }
+    );
+}
+
+function gotoWizard(section, step, runStepJS) {
+    // Hide all wizards 
+    var sections = $("#wizards > div"); 
+
+    // Run validation on the wizard step - any error messages can be set there as well
+    // TODO:  enhance these wizard functions to cater for validation fields etc.
+    validateJS = $("#" + section + " .step" + (step - 1) ).attr("validateJS");
+
+    // We check runStepJS because we must only validate when moving forward in the wizard
+    if(runStepJS && validateJS != undefined)
+    {
+        var valid = eval(validateJS);
+        if(!valid) {return false;}
+    }
+
+    sections.each(function (i) {
+        $(this).hide();
+        sections.width( $("#keymanagement > .bottom").width() - 100 );
+    })
+
+    var steps = $("#" + section + " > div[class^=step]");
+    var gotoStep = step;
+    if (gotoStep == null) { gotoStep = 0; }
+
+    if(gotoStep == 0) {
+        $("#" + section + " #backWiz").attr( 'onclick', '$("#key-options").show(); $("#wizards").hide();' )
+        $("#" + section + " #fwdWiz").attr( 'onclick', 'gotoWizard("' + section + '", 1, true);' )
+    }
+    else
+    {
+        $("#" + section + " #backWiz").attr( 'onclick', 'gotoWizard("' + section + '", ' + (gotoStep - 1) + ' , false);' )
+        $("#" + section + " #fwdWiz").attr( 'onclick',  'gotoWizard("' + section + '", ' + (gotoStep + 1) + ' , true);' )        
+    }
+
+    // If we're at the end of the wizard then change the forward button to do whatever
+    endWiz = $("#" + section + " .step" + (step) ).attr("endWiz");
+    if(endWiz != undefined && endWiz != "")
+    {
+      $("#" + section + " #fwdWiz").attr( 'onclick',  endWiz );
+    }
+
+    // Hide all wizard steps - if we want cross wizards/steps etc.
+    steps.each(function (i) {
+        $(this).hide();
+    });
+
+    //Show the correct section and the step.
+    $("#" + section).show();
+    stepJS = $("#" + section + " .step" + gotoStep ).attr("stepJS");
+
+    // Run the JS we want for this step we're about to start - 
+    if(runStepJS && stepJS != undefined)
+    {
+        eval(stepJS);
+    }    
+    $("#" + section + " .step" + gotoStep ).fadeIn(500);
 }
