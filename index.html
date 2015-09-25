@@ -52,12 +52,16 @@
             <li><a href="#transactions">transactions</a></li>
             <li><a href="#addressbook">address book</a></li>
             <li><a href="#messages" onclick="iscrollReload(true);">ShadowChat</a></li>
+            <li><a href="#chaindata" onclick="chainDataPage.updateAnonOutputs();">Chain Data</a></li>
+            <li><a href="#blockdata" onclick="blockExplorerPage.updateLatestBlocks();">Block Explorer</a></li>
+            <li class="none"><a href="#options">Options</a></li>
             <!--li><a href="#news">news</a></li-->
         </ul>
 
         <div id="navinfo">
-            <a id="version" href="#about">Shadow v1.2.0.0</a>
-            <progress id="syncProgressBar" max=100 value=1 title="Catching up...&#013; downloaded 0 blocks of history..."></progress>
+            <a id="clientinfo" href="#about">Shadow v1.3.3.x<span id="version"></span></a>
+            <progress id="syncProgressBar" max=100 value=1 title="Catching up...
+                                                                  downloaded 0 blocks of history..."></progress>
         </div>
     </nav><!-- /navpanel -->
 
