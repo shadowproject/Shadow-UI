@@ -119,9 +119,9 @@
             var ft = p.footable,
                 $table = $(ft.table);
 
-            $table.find('> tbody > tr:not(.footable-row-detail)').removeClass('footable-filtered').each(function () {
-                p.showRow(this, ft);
-            });
+                $table.find('> tbody > tr:not(.footable-row-detail)').removeClass('footable-filtered').each(function () {
+                    p.showRow(this, ft);
+                });
             $table.removeData('filter-string');
             ft.raise('footable_filtered', { clear: true });
         };
