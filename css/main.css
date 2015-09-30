@@ -1989,6 +1989,9 @@ label.recipient {
 .font-16px {
     font-size: 16px !important;
 }
+.font-20px {
+    font-size: 20px !important;
+}
 .font-26px {
     font-size: 26px !important;
 }
@@ -2374,9 +2377,13 @@ Hides the menu at `56.625em`, but modify this based on your app's needs.
     display: none;
 }
 
+.iw-contextMenu {
+    font-size: 0.9em;
+}
+
 .iw-mIcon {
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    height: 20px;
     padding-right: 4px;
     top: 3px;
     padding-left: 1px;
@@ -2538,7 +2545,7 @@ input[type=checkbox]:checked + label:before {
     color:#999;
     text-transform: uppercase;
     text-decoration: none;  
-    cursor: pointer; 
+    cursor: pointer;  
 }
 
 .optionblock {

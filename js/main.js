@@ -572,7 +572,7 @@ var overviewPage = {
 
         var menu = [{
                 name: 'Backup&nbsp;Wallet...',
-                fa: 'fa-save red fa-fw',
+                fa: 'fa-save red fa-fw font-20px',
                 fun: function () {
                    bridge.userAction(['backupWallet']);
                 }
@@ -586,7 +586,7 @@ var overviewPage = {
                 }, */
                 {
                     name: 'Sign&nbsp;Message...',
-                    fa: 'fa-pencil-square-o red fa-fw',
+                    fa: 'fa-pencil-square-o red fa-fw font-20px',
                     fun: function () {
 
                        $('#sign-message-button').click();
@@ -594,14 +594,14 @@ var overviewPage = {
                 },
                 {
                     name: 'Verify&nbsp;Message...',
-                    fa: 'fa-check red fa-fw',
+                    fa: 'fa-check red fa-fw font-20px',
                     fun: function () {
                         $('#verify-message-button').click();
                     }
                 },
                 {
                     name: 'Exit',
-                    fa: 'fa-times red fa-fw',
+                    fa: 'fa-times red fa-fw font-20px',
                     fun: function () {
                        bridge.userAction(['close']);
                     }
@@ -612,7 +612,7 @@ var overviewPage = {
         menu = [{
                      id: 'encryptWallet',
                      name: 'Encrypt&nbsp;Wallet...',
-                     fa: 'fa-lock red fa-fw',
+                     fa: 'fa-lock red fa-fw font-20px',
                      fun: function () {
                         bridge.userAction(['encryptWallet']);
                      }
@@ -620,7 +620,7 @@ var overviewPage = {
                  {
                      id: 'changePassphrase',
                      name: 'Change&nbsp;Passphrase...',
-                     fa: 'fa-key red fa-fw',
+                     fa: 'fa-user-secret red fa-fw font-20px',
                      fun: function () {
                         bridge.userAction(['changePassphrase']);
                      }
@@ -628,21 +628,21 @@ var overviewPage = {
                  {
                      id: 'toggleLock',
                      name: '(Un)Lock&nbsp;Wallet...',
-                     fa: 'fa-unlock red pad fa-fw',
+                     fa: 'fa-unlock red pad fa-fw font-20px',
                      fun: function () {
                         bridge.userAction(['toggleLock']);
                      }
                  },
                  {
                      name: 'Key Management',
-                     fa: 'fa-key red fa-fw',
+                     fa: 'fa-key red fa-fw font-20px',
                      fun: function () {
                         $("#navitems [href=#keymanagement]").click();
                      }                                                                                                                                
                  },
                  {
                      name: 'Options',
-                     fa: 'fa-wrench red fa-fw',
+                     fa: 'fa-wrench red fa-fw font-20px',
                      fun: function () {
                         $("#navitems [href=#options]").click();
                      }
@@ -652,14 +652,14 @@ var overviewPage = {
 
         menu = [{
                      name: 'Debug&nbsp;Window...',
-                     fa: 'fa-bug red fa-fw',
+                     fa: 'fa-bug red fa-fw font-20px',
                      fun: function () {
                         bridge.userAction(['debugClicked']);
                      }
                  },
                  {
                      name: 'Developer&nbsp;Tools...',
-                     fa: 'fa-edit red fa-fw',
+                     fa: 'fa-edit red fa-fw font-20px',
                      fun: function () {
                         bridge.userAction(['developerConsole']);
                      }
@@ -673,7 +673,7 @@ var overviewPage = {
                  },
                  {
                      name: 'About&nbsp;Qt...',
-                     fa: 'fa-question red fa-fw',
+                     fa: 'fa-question red fa-fw font-20px',
                      fun: function () {
                         bridge.userAction(['aboutQtClicked']);
                      }
