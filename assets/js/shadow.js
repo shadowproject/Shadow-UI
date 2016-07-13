@@ -50,10 +50,18 @@ function updateValue(element) {
                   (element             .data("value") != undefined ? element             .data("value") : element.text()))));
 
     var address = element.parents(".selected").find(".address");
-
+    var addresstype = element.parents(".selected").find(".addresstype");
+    
     address = address.data("value") ? address.data("value") : address.text();
-
-    element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + address + '\', this.value);" value="' + value + '" size=60 />');
+    addresstype = addresstype.data("value") ? addresstype.data("value") : addresstype.text();
+    
+ 
+    
+    var prefix = (addresstype == "Group" ? "group_" : "" );
+    if(addresstype == "Group")
+        value.replace("group_", "");
+        
+   element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + address + '\', \'' + prefix + '\' +this.value);" value="' + value + '" size=60 />'); //
 
     $(".newval").focus();
     $(".newval").on("contextmenu", function(e) {
@@ -1421,10 +1429,14 @@ function appendAddresses(addresses) {
                 initialAddress = false;
             }
         }
+        
+            if(address.at == 4){
+                address.label = address.label.replace("group_", "");
+                address.label_value = address.label_value.replace("group_", "");
+            }
 
         if (addrRow.length==0)
-        {
-            alert(address.label+ " typ=" + address.at); //remove
+        {                
             $( page + " .footable tbody").append(
                 "<tr id='"+address.address+"' lbl='"+address.label+"'>\
                <td style='padding-left:18px;' class='label2 editable' data-value='"+address.label_value+"'>"+address.label+"</td>\
@@ -1813,6 +1825,12 @@ function shadowChatInit() {
     $('#message-text').contextMenu(menu, {triggerOn:'contextmenu', sizeStyle: 'content'});
 }
 
+    $("#message-text").keypress(function (e) {
+        if (e.which == 13) {
+            sendMessage();
+        }
+     });
+    
 var contacts = {};
 var contact_list;
 var contact_group_list;
@@ -1867,7 +1885,7 @@ function appendMessages(messages, reset) {
 }
 
 function appendMessage(id, type, sent_date, received_date, label_value, label, labelTo, to_address, from_address, read, message, initial) {
-    if(type=="R"&&read==false) {
+    if(read==false) { //type=="R"&&
         $(".user-notifications").show();
         $("#message-count").text(parseInt($("#message-count").text())+1);
     }
@@ -1894,7 +1912,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     } else if(labelTo.lastIndexOf("group_", 0) === 0){ //sent by group, should not be possible but yeah anything can happen.
         group = true;
     }
-    //alert("Debug label=" + label_value + " labelTo=" + labelTo + " group=" + group + " key (me)=" + key);
+    alert("Debug label=" + label_value + " label_msg=" + label_msg + " labelTo=" + labelTo + " group=" + group + " key=" + key + " them=" + them + " self=" + self );
     /* 
     Basically I seperated the sender of the message (label_msg) from the contact[key].
     So we can still group by the key, but the messages in the chat have the right sender label.
@@ -2006,7 +2024,7 @@ function appendContact (key, newcontact, new_group) {
                     "<li id='"+message.id+"' class='"+(message.type=='S'?'user-message':'other-message')+"' contact-key='"+contact.key+"'>\
                     <span class='message-content'>\
 					    <span class='user-name'>"
-                            +(message.type=='S'? (message.self == 'anon' ? 'anon' : Name) : contact.label)+"\
+                            +(message.label_msg)+"\
                         </span>\
                         <span class='timestamp'>"+(new Date(message.received_date*1000).toLocaleString())+"</span>\
 						<span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
@@ -2064,7 +2082,7 @@ function appendContact (key, newcontact, new_group) {
     } else {
         var received_message = contact.messages[contact.messages.length-1];
 
-        if(received_message.type=="R"&&received_message.read==false) {
+        if(received_message.read==false) { //received_message.type=="R"&&
             var notifications = contact_el.find(".message-notifications");
             notifications.text(unread_count);
         }
