@@ -42,6 +42,7 @@ function resizeFooter() {
 };
 
 function updateValue(element) {
+    //TODO: add prefix label group_ when addresstype AT = 4. So we can remove it from the label being shown and handle it in the background..
     var curhtml = element.html(),
         value   = (element.parent("td").data("label") != undefined ? element.parent("td").data("label") :
                   (element.parent("td").data("value") != undefined ? element.parent("td").data("value") :
@@ -1286,6 +1287,7 @@ function clearRecvAddress()
 
 function addAddress()
 {
+    alert("addAddress with type=" + $("#new-addresstype").val());
     newAdd = bridge.newAddress($("#new-address-label").val(), $("#new-addresstype").val());
 
     //TODO: Highlight address
@@ -1404,9 +1406,9 @@ function appendAddresses(addresses) {
     {
         var address = addresses[i];
         var addrRow = $("#"+address.address);
-        var page = (address.type == "S" ? "#addressbook" : "#receive");
+        var page = (address.type == "S" ? "#addressbook" : (address.label.lastIndexOf("group_", 0) !== 0 ? "#receive" : "#addressbook"));
 
-        if(address.type == "R" && address.address.length < 75) {
+        if(address.type == "R" && address.address.length < 75 && address.label.lastIndexOf("group_", 0) !== 0) {
             if(addrRow.length==0)
                 $("#message-from-address").append("<option title='"+address.address+"' value='"+address.address+"'>"+address.label+"</option>");
             else
@@ -1422,12 +1424,13 @@ function appendAddresses(addresses) {
 
         if (addrRow.length==0)
         {
+            alert(address.label+ " typ=" + address.at); //remove
             $( page + " .footable tbody").append(
                 "<tr id='"+address.address+"' lbl='"+address.label+"'>\
                <td style='padding-left:18px;' class='label2 editable' data-value='"+address.label_value+"'>"+address.label+"</td>\
                <td class='address'>"+address.address+"</td>\
                <td class='pubkey'>"+address.pubkey+"</td>\
-               <td class='addresstype'>"+(address.at == 3 ? "BIP32" : address.at == 2 ? "Stealth" : "Normal")+"</td></tr>");
+               <td class='addresstype'>"+(address.at == 4 ? "Group" : address.at == 3 ? "BIP32" : address.at == 2 ? "Stealth" : "Normal")+"</td></tr>");
 
             $("#"+address.address)
             .on('click', function() {
@@ -1812,16 +1815,20 @@ function shadowChatInit() {
 
 var contacts = {};
 var contact_list;
+var contact_group_list;
 
 function appendMessages(messages, reset) {
     contact_list = $("#contact-list ul");
-
+    contact_group_list = $("#contact-group-list ul");
+    
     if(reset)
     {
         contacts = null;
         contacts = {};
         contact_list.html("");
+        contact_group_list.html("");
         $("#contact-list").removeClass("in-conversation");
+        $("#contact-group-list").removeClass("in-conversation");
         $(".contact-discussion ul").html("");
         $(".user-notifications").hide();
         $("#message-count").text(0);
@@ -1859,7 +1866,7 @@ function appendMessages(messages, reset) {
 
 }
 
-function appendMessage(id, type, sent_date, received_date, label_value, label, to_address, from_address, read, message, initial) {
+function appendMessage(id, type, sent_date, received_date, label_value, label, labelTo, to_address, from_address, read, message, initial) {
     if(type=="R"&&read==false) {
         $(".user-notifications").show();
         $("#message-count").text(parseInt($("#message-count").text())+1);
@@ -1867,53 +1874,102 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, t
 
     var them = type == "S" ? to_address   : from_address;
     var self = type == "S" ? from_address : to_address;
-
+    
+    var label_msg = type == "S" ? (labelTo == "(no label)" ? self : labelTo) : (label == "(no label)" ? them : label);
     var key = (label_value == "" ? them : label_value).replace(/\s/g, '');
-
+    
+    var group = false;
+    //Setup instructions: make sure the receiving address is named 'group_ANYTHING'. 
+    //It's best to add the sender of the message with a label so you get a nice overview!
+    
+    /* This is just a cheat to test the formatting, because the if clause down below is always returning false.
+    It will put all messages under the same contact*/
+    
+    if(type == "R" && labelTo.lastIndexOf("group_", 0) === 0){ //Received, to group
+        key = labelTo.replace('group_', '');
+        group = true;
+    } else if(label_value.lastIndexOf("group_", 0) === 0){ //sent to group, 
+        key = label_value.replace('group_', '');
+        group = true;
+    } else if(labelTo.lastIndexOf("group_", 0) === 0){ //sent by group, should not be possible but yeah anything can happen.
+        group = true;
+    }
+    //alert("Debug label=" + label_value + " labelTo=" + labelTo + " group=" + group + " key (me)=" + key);
+    /* 
+    Basically I seperated the sender of the message (label_msg) from the contact[key].
+    So we can still group by the key, but the messages in the chat have the right sender label.
+    */
+    
+    //INVITE TO GROUP CODE
+    if(message.lastIndexOf("/invite", 0) === 0 && message.length >= 61){
+       var group_key = message.substring(8, 60).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex whitelist only a-z, A-Z, 0-9
+       var group_label = message.substring(61, message.length).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex whitelist only a-z, A-Z, 0-9
+        
+        if(group_label.length == 0)
+            group_label = them + "_" + group_key.substring(0, 5);
+         
+        if(type = "R"){ //If message contains /invite privkey label, insert HTML
+            message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a id="add-new-send-address" class="button is-inverse has-icon-spacing" onclick="bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
+        } else if(type = "S"){
+            message = "An invite for group " + group_label + " has been sent.";
+        }
+    }
+    
     var contact = contacts[key];
 
     if(contacts[key] == undefined)
         contacts[key] = {},
         contact = contacts[key],
         contact.key = key,
-        contact.label = label,
+        contact.label = key,
+        contact.group = group,
         contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
         contact.messages  = new Array();
 
     if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
     {
-        contact.messages.push({id:id, them: them, self: self, message: message, type: type, sent: sent_date, received: received_date, read: read});
+        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read});
 
         if(!initial)
-            appendContact(key, true);
+            appendContact(key, true, group);
     }
 }
 
 
-function appendContact (key, newcontact) {
+function appendContact (key, newcontact, new_group) {
     var contact_el = $("#contact-"+key);
     var contact = contacts[key];
 
     var unread_count = $.grep(contact.messages, function(a){return a.type=="R"&&a.read==false}).length;
-	
+    
+    var contact_address = (contact.messages[0].group && contact.messages[0].type != "S") ? contact.messages[0].self : contact.messages[0].them;
     if(contact_el.length == 0) {
-        contact_list.append(
+        //alert("[appendContact] key=" + key + " address=" + contact.messages[0].them + " self=" + contact.messages[0].self + " group=" + contact.messages[0].group + " type=" + contact.messages[0].type);
+        var contact_html =
             "<li id='contact-"+ key +"' class='contact' data-title='"+contact.label+"'>\
                 <span class='contact-info'>\
-				<span class='contact-name'>"+contact.label+"</span>\
-                    <span class='contact-address'>"+contact.messages[0].them+"</span>\
+                    <span class='contact-name'>"+contact.label+"</span>\
+                    <span class='contact-address'>"+ contact_address + "</span>\
                 </span>\
                 <span class='contact-options'>\
                         <span class='message-notifications"+(unread_count==0?' none':'')+"'>"+unread_count+"</span>\
                         <span class='delete' onclick='deleteMessages(\""+key+"\")'><i class='fa fa-minus-circle'></i></span>\
                         " //<span class='favorite favorited'></span>\ //TODO: Favourites
              + "</span>"
-             + "</li>");
-			 
+             + "</li>";
+             
+         if(!new_group)
+            contact_list.append(contact_html);
+         else
+            contact_group_list.append(contact_html);
 
-			contact_el = $("#contact-"+key).on('click', function(e) {
+        contact_el = $("#contact-"+key).on('click', function(e) {
             $(this).addClass("selected").siblings("li").removeClass("selected");
-            $("#contact-list").addClass("in-conversation");
+            if(!new_group)
+                $("#contact-list").addClass("in-conversation");
+            else
+                $("#contact-group-list").addClass("in-conversation");
+            
             var discussion = $(".contact-discussion ul");
             var contact = contacts[e.delegateTarget.id.replace(/^contact\-/, '')];
 
@@ -1924,6 +1980,7 @@ function appendContact (key, newcontact) {
             });
 
             var message;
+            var bSentMessage = false;
 
             for(var i=0;i<contact.messages.length;i++)
             {
@@ -1939,7 +1996,7 @@ function appendContact (key, newcontact) {
                     else
                         message_count.show();
                 }
-				
+                
 					//<span class='info'>\
                         //<img src='"+contact.avatar+"' />\
                     //</span>\
@@ -1955,7 +2012,14 @@ function appendContact (key, newcontact) {
 						<span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
 						<span class='message-text'>"+micromarkdown.parse(message.message)+"</span>\
                     </span></li>");
-
+                    
+                if(message.group && message.type == 'S' && !bSentMessage){ //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
+                        bSentMessage = true;
+                        $("#message-from-address").val(message.self);
+                        $("#message-to-address").val(message.them);
+                }
+                
+            
             }
 
 
@@ -1983,9 +2047,15 @@ function appendContact (key, newcontact) {
             setTimeout(scrollerBottom, 5000);
 
             //discussion.children("[title]").on("mouseenter", tooltip);
-
-            $("#message-from-address").val(message.self);
-            $("#message-to-address").val(message.them);
+            
+            if(!bSentMessage){
+                if(!message.group){ //normal procedure
+                    $("#message-from-address").val(message.self);
+                    $("#message-to-address").val(message.them); //them
+                } else if(message.type == "R") { //if it's a group, and no messages were sent from it yet, then we have not sent a message to it.
+                    $("#message-to-address").val(message.self);
+                }
+            }
 
         }).on("mouseenter", tooltip);
 
@@ -2015,6 +2085,9 @@ function newConversation() {
     $("#new-contact-pubkey").val("");
     $("#contact-list ul li").removeClass("selected");
     $("#contact-list").addClass("in-conversation");
+    
+    $("#contact-group-list ul li").removeClass("selected");
+    $("#contact-group-list").addClass("in-conversation");
 }
 
 
@@ -2085,6 +2158,7 @@ function deleteMessages(key, messageid) {
     {
         $("#contact-"+ key).remove();
         $("#contact-list").removeClass("in-conversation");
+        $("#contact-group-list").removeClass("in-conversation");
     }
     else
         iscrollReload();
