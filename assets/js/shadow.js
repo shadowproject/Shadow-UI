@@ -1912,7 +1912,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     } else if(labelTo.lastIndexOf("group_", 0) === 0){ //sent by group, should not be possible but yeah anything can happen.
         group = true;
     }
-    alert("Debug label=" + label_value + " label_msg=" + label_msg + " labelTo=" + labelTo + " group=" + group + " key=" + key + " them=" + them + " self=" + self );
+    //alert("Debug label=" + label_value + " label_msg=" + label_msg + " labelTo=" + labelTo + " group=" + group + " key=" + key + " them=" + them + " self=" + self );
     /* 
     Basically I seperated the sender of the message (label_msg) from the contact[key].
     So we can still group by the key, but the messages in the chat have the right sender label.
