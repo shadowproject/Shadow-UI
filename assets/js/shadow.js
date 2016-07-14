@@ -1827,6 +1827,10 @@ function shadowChatInit() {
 
     $("#message-text").keypress(function (e) {
         if (e.which == 13) {
+            e.preventDefault();
+            if($("#message-text").val() == "")
+                return 0;
+                
             sendMessage();
         }
      });
@@ -1859,6 +1863,7 @@ function appendMessages(messages, reset) {
 
     messages = JSON.parse(messages.replace(/,\]$/, "]"));
 
+    
     // Massage data
     for(var i=0; i<messages.length; i++)
     {
@@ -1875,19 +1880,23 @@ function appendMessages(messages, reset) {
                       message.message,
                       true);
     }
-
+    
     for (key in contacts) {
-        appendContact(key);
+        appendContact(key, false);
     }
-
-    contact_list.find("li:first-child").click();
+    
+    openConversation(contacts[0].key, false);
+    //contact_list.find("li:first-child").click();
 
 }
 
 function appendMessage(id, type, sent_date, received_date, label_value, label, labelTo, to_address, from_address, read, message, initial) {
+    alert("appendMessage called! type=" + type)
     if(read==false) { //type=="R"&&
         $(".user-notifications").show();
+        alert("Updating messagecount to = " + parseInt($("#message-count").text()) + parseInt(1));
         $("#message-count").text(parseInt($("#message-count").text())+1);
+        $("#message-count").show();
     }
 
     var them = type == "S" ? to_address   : from_address;
@@ -1944,23 +1953,32 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
         contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
         contact.messages  = new Array();
 
+  
     if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
     {
         contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read});
 
-        if(!initial)
-            appendContact(key, true, group);
+        if(!initial){
+            appendContact(key, true);  
+        }
     }
+                
+       //point of no return
+            
+  
 }
 
 
-function appendContact (key, newcontact, new_group) {
+function appendContact (key, newcontact) {
     var contact_el = $("#contact-"+key);
     var contact = contacts[key];
-
+    alert("appendContact called!");
     var unread_count = $.grep(contact.messages, function(a){return a.type=="R"&&a.read==false}).length;
+    var new_group = contact.messages[0].group;
     
-    var contact_address = (contact.messages[0].group && contact.messages[0].type != "S") ? contact.messages[0].self : contact.messages[0].them;
+
+    
+    var contact_address = (new_group && contact.messages[0].type != "S") ? contact.messages[0].self : contact.messages[0].them;
     if(contact_el.length == 0) {
         //alert("[appendContact] key=" + key + " address=" + contact.messages[0].them + " self=" + contact.messages[0].self + " group=" + contact.messages[0].group + " type=" + contact.messages[0].type);
         var contact_html =
@@ -1970,8 +1988,8 @@ function appendContact (key, newcontact, new_group) {
                     <span class='contact-address'>"+ contact_address + "</span>\
                 </span>\
                 <span class='contact-options'>\
-                        <span class='message-notifications"+(unread_count==0?' none':'')+"'>"+unread_count+"</span>\
-                        <span class='delete' onclick='deleteMessages(\""+key+"\")'><i class='fa fa-minus-circle'></i></span>\
+                        <span class='message-notifications'>0</span>\ " + //"+(unread_count==0?' none':'')+"
+                        "<span class='delete' onclick='deleteMessages(\""+key+"\")'><i class='fa fa-minus-circle'></i></span>\
                         " //<span class='favorite favorited'></span>\ //TODO: Favourites
              + "</span>"
              + "</li>";
@@ -1981,15 +1999,73 @@ function appendContact (key, newcontact, new_group) {
          else
             contact_group_list.append(contact_html);
 
-        contact_el = $("#contact-"+key).on('click', function(e) {
-            $(this).addClass("selected").siblings("li").removeClass("selected");
-            if(!new_group)
-                $("#contact-list").addClass("in-conversation");
-            else
-                $("#contact-group-list").addClass("in-conversation");
+        contact_el = $("#contact-"+key).on('click', 
+            function(e) {
+                $(this).addClass("selected").siblings("li").removeClass("selected");
+                removeNotificationCount(key);
+                openConversation(key, true);
+                
             
+            }).on("mouseenter", tooltip);
+
+        contact_el.find(".delete").on("click", function(e) {e.stopPropagation()});
+
+    } 
+    
+    var received_message = contact.messages[contact.messages.length-1];
+
+    if(received_message.read==false) { //received_message.type=="R"&&
+        addNotificationCount(key, 1);
+    }
+    
+
+    if(newcontact || contact_el.hasClass("selected"))
+        openConversation(key, false);
+}
+
+function addNotificationCount(key, unread_count){
+    var notifications_contact = $("#contact-"+key).find(".message-notifications");
+    var notifications_contact_value = notifications_contact.html();
+    notifications_contact.text(parseInt(notifications_contact_value) + parseInt(unread_count));
+    alert("addNotificationCount called! value=" + notifications_contact_value + " unread_count=" + unread_count);
+    notifications_contact.show();
+}
+
+function removeNotificationCount(key){
+    
+    //NOTIFICATION IN CONTACT LIST
+    var contact = contacts[key];
+    var notifications_contact = $("#contact-"+key).find(".message-notifications");
+    var notifications_contact_value = notifications_contact.html();
+    
+    notifications_contact.text(0);
+    notifications_contact.hide();
+    
+    //NOTIFICATION IN MENU
+    var notifications_menu = $("#message-count"),
+        notifications_menu_value = parseInt(notifications_menu.text())-notifications_contact_value;
+
+    notifications_menu.text(notifications_menu_value);
+    
+    if(notifications_menu_value==0)
+        notifications_menu.hide();
+    else
+        notifications_menu.show();
+        
+    //mark messages as read in JS
+    var i = contact.messages.length;
+    alert("#messages=" + i);
+    
+        
+}
+
+//OpenConversation is split off to allow for opening conversation automatically without removing notification. 
+function openConversation(key, click) {
+            alert("openConversation called!");
+            //TODO: detect wether user is typing, if so do not reload page to other conversation.. 
+            //$(this).addClass("selected").siblings("li").removeClass("selected");
             var discussion = $(".contact-discussion ul");
-            var contact = contacts[e.delegateTarget.id.replace(/^contact\-/, '')];
+            var contact = contacts[key];
 
             discussion.html("");
 
@@ -1997,22 +2073,25 @@ function appendContact (key, newcontact, new_group) {
               return a.received - b.received;
             });
 
+            var is_group = contact.messages[0].group;
+            if(!is_group)
+                $("#contact-list").addClass("in-conversation");
+            else
+                $("#contact-group-list").addClass("in-conversation");
+            
+
             var message;
             var bSentMessage = false;
-
+            
+            if(click)
+                removeNotificationCount(contact.key);
+                
             for(var i=0;i<contact.messages.length;i++)
             {
                 message = contact.messages[i];
-                if(message.read == false && bridge.markMessageAsRead(message.id))
+                if(message.read == false && bridge.markMessageAsRead(message.id) && click)
                 {
-                    var message_count = $("#message-count"),
-                        message_count_val = parseInt(message_count.text())-1;
-
-                    message_count.text(message_count_val);
-                    if(message_count_val==0)
-                        message_count.hide();
-                    else
-                        message_count.show();
+                    alert("Should now append message=" + message.message);      
                 }
                 
 					//<span class='info'>\
@@ -2075,22 +2154,7 @@ function appendContact (key, newcontact, new_group) {
                 }
             }
 
-        }).on("mouseenter", tooltip);
-
-        contact_el.find(".delete").on("click", function(e) {e.stopPropagation()});
-
-    } else {
-        var received_message = contact.messages[contact.messages.length-1];
-
-        if(received_message.read==false) { //received_message.type=="R"&&
-            var notifications = contact_el.find(".message-notifications");
-            notifications.text(unread_count);
         }
-    }
-
-    if(newcontact || contact_el.hasClass("selected"))
-        contact_el.click();
-}
 
 function newConversation() {
 	$('#new-contact-modal').modal('hide');
