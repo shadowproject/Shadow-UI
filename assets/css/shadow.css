@@ -463,21 +463,21 @@ color: #000;
 [Chat]
 */
 
-#contact-list {
+.contact-list {
     width: 285px;
     overflow: hidden;
 	height:100%;
 }
 
-#contact-list.in-conversation {
+.contact-list.in-conversation {
     border-right: 1px solid #CFCFCF;
 }
 
-#contact-list + div + div.contact-discussion {
+.contact-list + div + div.contact-discussion {
     display:none;
 }
 
-#contact-list.in-conversation + div + div.contact-discussion {
+.contact-list.in-conversation + div + div.contact-discussion {
     display:block;
 }
 
@@ -495,13 +495,13 @@ color: #000;
     background-color: #F0F1F3;
 }
 
-#contact-list ul {
+.contact-list ul {
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-#contact-list ul li {
+.contact-list ul li {
     display: block;
     padding: 20px 20px;
     border-bottom: 1px solid #ecf0f1;
@@ -510,26 +510,26 @@ color: #000;
     transition: all 0.15s ease;
 }
 
-#contact-list ul li.selected {
+.contact-list ul li.selected {
   background-color: #F0F1F3;
 }
 
-#contact-list ul li:hover {
+.contact-list ul li:hover {
     cursor:pointer;
 }
 
-#contact-list ul li img {
+.contact-list ul li img {
     height: 40px;
     border-radius: 100%;
     float: left;
 }
 
-#contact-list ul li .contact-info {
+.contact-list ul li .contact-info {
     display: block;
     height: 50px;
 }
 
-#contact-list ul li .contact-info .contact-name {
+.contact-list ul li .contact-info .contact-name {
     display: block;
     font-family: "Open Sans", sans-serif;
     color: #5b6a78;
@@ -541,7 +541,7 @@ color: #000;
     width: 85%;
 }
 
-#contact-list ul li .contact-info .contact-address {
+.contact-list ul li .contact-info .contact-address {
     font-size: 13px;
     font-style: italic;
     color: #92a0ad;
@@ -553,7 +553,7 @@ color: #000;
     white-space: nowrap;
 }
 
-#contact-list ul li .contact-options {
+.contact-list ul li .contact-options {
     display: block;
     width: 80px;
     float: right;
@@ -561,12 +561,12 @@ color: #000;
     top: -50px;
 }
 
-#contact-list ul li .contact-options span {
+.contact-list ul li .contact-options span {
     float: right;
     margin-right: 4px;
 }
 
-#contact-list ul li .contact-options .message-notifications {
+.contact-list ul li .contact-options .message-notifications {
     background: red;
     border-radius: 100%;
     font-size: 10px;
@@ -579,24 +579,24 @@ color: #000;
 	font-weight:bold;
 }
 
-#contact-list ul li .contact-options .favorite {
+.contact-list ul li .contact-options .favorite {
     background-image: url(qrc:///icons/favorite);
     height: 16px;
     width: 16px;
 }
 
-#contact-list ul li .contact-options .favorite.favorited {
+.contact-list ul li .contact-options .favorite.favorited {
     background-image: url(qrc:///icons/favorited);
 }
 
-#contact-list ul li .contact-options .delete, .contact-discussion .delete {
+.contact-list ul li .contact-options .delete, .contact-discussion .delete {
 }
 
 
 .user-message .delete {
 }
 
-#contact-list ul li .contact-options .message-notifications.empty {
+.contact-list ul li .contact-options .message-notifications.empty {
     display: none;
 }
 
