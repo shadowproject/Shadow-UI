@@ -10,7 +10,6 @@
 }
 
 .pg {
-<<<<<<< HEAD
     display: inline-block;
     font: normal normal normal 14px/1 framework-icon;
     font-size: inherit;
@@ -26,23 +25,6 @@
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-=======
-  display: inline-block;
-  font: normal normal normal 14px/1 framework-icon;
-  font-size: inherit;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-[class^="pg-"], [class*=" pg-"] {
-  display: inline-block;
-  font: normal normal normal 14px/1 framework-icon;
-  font-size: inherit;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
->>>>>>> v1.2.0
 }
 
 .pg-signals:before {

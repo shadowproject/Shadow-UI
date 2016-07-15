@@ -458,7 +458,7 @@ body.dashboard .page-container {
   margin-top: 1px;
 }
 .page-sidebar .sidebar-menu .menu-items > li ul.sub-menu > li:hover > .icon-thumbnail {
-  color: #E3223C;;
+  color: #E3223C;
 }
 .page-sidebar .sidebar-menu .menu-items > li ul.sub-menu > li > a {
   display: inline-block;
@@ -1048,10 +1048,6 @@ body.dashboard .page-container {
 .navbar-center > li {
   float: none;
   display: inline-block;
-  *display: inline;
-  /* ie7 fix */
-  *zoom: 1;
-  /* hasLayout ie7 trigger */
   vertical-align: top;
 }
 .navbar-nav li a {
