@@ -51,16 +51,16 @@ function updateValue(element) {
 
     var address = element.parents(".selected").find(".address");
     var addresstype = element.parents(".selected").find(".addresstype");
-    
+
     address = address.data("value") ? address.data("value") : address.text();
     addresstype = addresstype.data("value") ? addresstype.data("value") : addresstype.text();
-    
- 
-    
+
+
+
     var prefix = (addresstype == "Group" ? "group_" : "" );
     if(addresstype == "Group")
         value.replace("group_", "");
-        
+
    element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + address + '\', \'' + prefix + '\' +this.value);" value="' + value + '" size=60 />'); //
 
     $(".newval").focus();
@@ -950,7 +950,7 @@ function addRecipient() {
 </div>\
 </div>\
 </div>\
-<div class="form-group" id="show_nar" style="display:none;border-bottom: 1px solid #F0F1F3">\
+<div class="form-group" id="show_nar" style="border-bottom: 1px solid #F0F1F3">\
 <label class="col-sm-3 control-label option p-l-20 recipient" for="narration[count]" title="Narration:">Narration <a href="#"><i class="p-b-5 fa fa-question-circle" data-title="Shadowcash.. public.." style="color:#626262;"></i></a></label>\
 <div class="col-sm-9">\
 <div class="row">\
@@ -1020,28 +1020,27 @@ function changeTxnType()
         $("#coincontrol,#spend_sdc").show();
 		$(".hide-coin-controle").show();
 		$(".hide-adv-controle").hide();
-		$("#show_nar").hide();
     }
 
     resizeFooter();
 }
 
-//rarw 
+//rarw
 
 
 function toggleADVControl(enable) {
 $('#txn_type').val();
    if( $('#txn_type').val() == "2")
     {
-         $('#tx_ringsize,#suggest_ring_size,#show_nar').toggle(); 
+         $('#tx_ringsize,#suggest_ring_size').toggle();
    }else
    {
-      $('#tx_ringsize,#suggest_ring_size,#show_nar').hide(); 
+      $('#tx_ringsize,#suggest_ring_size').hide();
   }
      resizeFooter();
   }
 
-  
+
 
 function suggestRingSize()
 {
@@ -1429,14 +1428,14 @@ function appendAddresses(addresses) {
                 initialAddress = false;
             }
         }
-        
+
             if(address.at == 4){
                 address.label = address.label.replace("group_", "");
                 address.label_value = address.label_value.replace("group_", "");
             }
 
         if (addrRow.length==0)
-        {                
+        {
             $( page + " .footable tbody").append(
                 "<tr id='"+address.address+"' lbl='"+address.label+"'>\
                <td style='padding-left:18px;' class='label2 editable' data-value='"+address.label_value+"'>"+address.label+"</td>\
@@ -1673,7 +1672,7 @@ function bindTransactionTableEvents() {
         $(this).attr("href", "#transaction-info-modal");
 
 
-		$('#transaction-info-modal').modal('show');
+		$('#transaction-info-modal').appendTo("body").modal('show');
 		
         $("#transaction-info").html(bridge.transactionDetails($(this).attr("id")));
         $(this).click();
@@ -1830,11 +1829,11 @@ function shadowChatInit() {
             e.preventDefault();
             if($("#message-text").val() == "")
                 return 0;
-                
+
             sendMessage();
         }
      });
-    
+
 var contacts = {};
 var contact_list;
 var contact_group_list;
@@ -1842,7 +1841,7 @@ var contact_group_list;
 function appendMessages(messages, reset) {
     contact_list = $("#contact-list ul");
     contact_group_list = $("#contact-group-list ul");
-    
+
     if(reset)
     {
         contacts = null;
@@ -1863,7 +1862,7 @@ function appendMessages(messages, reset) {
 
     messages = JSON.parse(messages.replace(/,\]$/, "]"));
 
-    
+
     // Massage data
     for(var i=0; i<messages.length; i++)
     {
@@ -1880,11 +1879,11 @@ function appendMessages(messages, reset) {
                       message.message,
                       true);
     }
-    
+
     for (key in contacts) {
         appendContact(key, false);
     }
-    
+
     openConversation(contacts[0].key, false);
     //contact_list.find("li:first-child").click();
 
@@ -1901,47 +1900,47 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 
     var them = type == "S" ? to_address   : from_address;
     var self = type == "S" ? from_address : to_address;
-    
+
     var label_msg = type == "S" ? (labelTo == "(no label)" ? self : labelTo) : (label == "(no label)" ? them : label);
     var key = (label_value == "" ? them : label_value).replace(/\s/g, '');
-    
+
     var group = false;
-    //Setup instructions: make sure the receiving address is named 'group_ANYTHING'. 
+    //Setup instructions: make sure the receiving address is named 'group_ANYTHING'.
     //It's best to add the sender of the message with a label so you get a nice overview!
-    
+
     /* This is just a cheat to test the formatting, because the if clause down below is always returning false.
     It will put all messages under the same contact*/
-    
+
     if(type == "R" && labelTo.lastIndexOf("group_", 0) === 0){ //Received, to group
         key = labelTo.replace('group_', '');
         group = true;
-    } else if(label_value.lastIndexOf("group_", 0) === 0){ //sent to group, 
+    } else if(label_value.lastIndexOf("group_", 0) === 0){ //sent to group,
         key = label_value.replace('group_', '');
         group = true;
     } else if(labelTo.lastIndexOf("group_", 0) === 0){ //sent by group, should not be possible but yeah anything can happen.
         group = true;
     }
     //alert("Debug label=" + label_value + " label_msg=" + label_msg + " labelTo=" + labelTo + " group=" + group + " key=" + key + " them=" + them + " self=" + self );
-    /* 
+    /*
     Basically I seperated the sender of the message (label_msg) from the contact[key].
     So we can still group by the key, but the messages in the chat have the right sender label.
     */
-    
+
     //INVITE TO GROUP CODE
     if(message.lastIndexOf("/invite", 0) === 0 && message.length >= 61){
        var group_key = message.substring(8, 60).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex whitelist only a-z, A-Z, 0-9
        var group_label = message.substring(61, message.length).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex whitelist only a-z, A-Z, 0-9
-        
+
         if(group_label.length == 0)
             group_label = them + "_" + group_key.substring(0, 5);
-         
+
         if(type = "R"){ //If message contains /invite privkey label, insert HTML
             message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a id="add-new-send-address" class="button is-inverse has-icon-spacing" onclick="bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
         } else if(type = "S"){
             message = "An invite for group " + group_label + " has been sent.";
         }
     }
-    
+
     var contact = contacts[key];
 
     if(contacts[key] == undefined)
@@ -1953,19 +1952,19 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
         contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
         contact.messages  = new Array();
 
-  
+
     if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
     {
         contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read});
 
         if(!initial){
-            appendContact(key, true);  
+            appendContact(key, true);
         }
     }
-                
+
        //point of no return
-            
-  
+
+
 }
 
 
@@ -1975,9 +1974,9 @@ function appendContact (key, newcontact) {
     alert("appendContact called!");
     var unread_count = $.grep(contact.messages, function(a){return a.type=="R"&&a.read==false}).length;
     var new_group = contact.messages[0].group;
-    
 
-    
+
+
     var contact_address = (new_group && contact.messages[0].type != "S") ? contact.messages[0].self : contact.messages[0].them;
     if(contact_el.length == 0) {
         //alert("[appendContact] key=" + key + " address=" + contact.messages[0].them + " self=" + contact.messages[0].self + " group=" + contact.messages[0].group + " type=" + contact.messages[0].type);
@@ -1993,31 +1992,31 @@ function appendContact (key, newcontact) {
                         " //<span class='favorite favorited'></span>\ //TODO: Favourites
              + "</span>"
              + "</li>";
-             
+
          if(!new_group)
             contact_list.append(contact_html);
          else
             contact_group_list.append(contact_html);
 
-        contact_el = $("#contact-"+key).on('click', 
+        contact_el = $("#contact-"+key).on('click',
             function(e) {
                 $(this).addClass("selected").siblings("li").removeClass("selected");
                 removeNotificationCount(key);
                 openConversation(key, true);
-                
-            
+
+
             }).on("mouseenter", tooltip);
 
         contact_el.find(".delete").on("click", function(e) {e.stopPropagation()});
 
-    } 
-    
+    }
+
     var received_message = contact.messages[contact.messages.length-1];
 
     if(received_message.read==false) { //received_message.type=="R"&&
         addNotificationCount(key, 1);
     }
-    
+
 
     if(newcontact || contact_el.hasClass("selected"))
         openConversation(key, false);
@@ -2032,37 +2031,37 @@ function addNotificationCount(key, unread_count){
 }
 
 function removeNotificationCount(key){
-    
+
     //NOTIFICATION IN CONTACT LIST
     var contact = contacts[key];
     var notifications_contact = $("#contact-"+key).find(".message-notifications");
     var notifications_contact_value = notifications_contact.html();
-    
+
     notifications_contact.text(0);
     notifications_contact.hide();
-    
+
     //NOTIFICATION IN MENU
     var notifications_menu = $("#message-count"),
         notifications_menu_value = parseInt(notifications_menu.text())-notifications_contact_value;
 
     notifications_menu.text(notifications_menu_value);
-    
+
     if(notifications_menu_value==0)
         notifications_menu.hide();
     else
         notifications_menu.show();
-        
+
     //mark messages as read in JS
     var i = contact.messages.length;
     alert("#messages=" + i);
-    
-        
+
+
 }
 
-//OpenConversation is split off to allow for opening conversation automatically without removing notification. 
+//OpenConversation is split off to allow for opening conversation automatically without removing notification.
 function openConversation(key, click) {
             alert("openConversation called!");
-            //TODO: detect wether user is typing, if so do not reload page to other conversation.. 
+            //TODO: detect wether user is typing, if so do not reload page to other conversation..
             //$(this).addClass("selected").siblings("li").removeClass("selected");
             var discussion = $(".contact-discussion ul");
             var contact = contacts[key];
@@ -2078,22 +2077,22 @@ function openConversation(key, click) {
                 $("#contact-list").addClass("in-conversation");
             else
                 $("#contact-group-list").addClass("in-conversation");
-            
+
 
             var message;
             var bSentMessage = false;
-            
+
             if(click)
                 removeNotificationCount(contact.key);
-                
+
             for(var i=0;i<contact.messages.length;i++)
             {
                 message = contact.messages[i];
                 if(message.read == false && bridge.markMessageAsRead(message.id) && click)
                 {
-                    alert("Should now append message=" + message.message);      
+                    alert("Should now append message=" + message.message);
                 }
-                
+
 					//<span class='info'>\
                         //<img src='"+contact.avatar+"' />\
                     //</span>\
@@ -2109,14 +2108,14 @@ function openConversation(key, click) {
 						<span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
 						<span class='message-text'>"+micromarkdown.parse(message.message)+"</span>\
                     </span></li>");
-                    
+
                 if(message.group && message.type == 'S' && !bSentMessage){ //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
                         bSentMessage = true;
                         $("#message-from-address").val(message.self);
                         $("#message-to-address").val(message.them);
                 }
-                
-            
+
+
             }
 
 
@@ -2144,7 +2143,7 @@ function openConversation(key, click) {
             setTimeout(scrollerBottom, 5000);
 
             //discussion.children("[title]").on("mouseenter", tooltip);
-            
+
             if(!bSentMessage){
                 if(!message.group){ //normal procedure
                     $("#message-from-address").val(message.self);
@@ -2167,7 +2166,7 @@ function newConversation() {
     $("#new-contact-pubkey").val("");
     $("#contact-list ul li").removeClass("selected");
     $("#contact-list").addClass("in-conversation");
-    
+
     $("#contact-group-list ul li").removeClass("selected");
     $("#contact-group-list").addClass("in-conversation");
 }
@@ -2492,7 +2491,7 @@ var blockExplorerPage =
 
                         .on("dblclick", function(e) {
 
-							$('#blkexp-txn-modal').modal('show');
+							$('#blkexp-txn-modal').appendTo('body').modal('show');
                             //$(this).leanModal({ top : 10, overlay : 0.5, closeButton: "#blkexp-txn-modal .modal_close" });
 
                             selectedTxn = bridge.txnDetails(blkHash , $(this).attr("data-value").trim());
@@ -2560,7 +2559,7 @@ var blockExplorerPage =
                 })
             .on("dblclick", function(e)
             {
-				$('#block-info-modal').modal('show');
+				$('#block-info-modal').appendTo('body').modal('show');
 
                 //$(this).leanModal({ top : 10, overlay : 0.5, closeButton: "#block-info-modal .modal_close" });
 
@@ -2872,7 +2871,7 @@ function gotoWizard(section, step, runStepJS) {
 
     var steps = $("#" + section + " > div[class^=step]");
     var gotoStep = step;
-    if (gotoStep == null) { gotoStep = 0; 
+    if (gotoStep == null) { gotoStep = 0;
 	}
 
     if(gotoStep == 0) {
