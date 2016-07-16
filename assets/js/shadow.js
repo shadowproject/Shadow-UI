@@ -1859,10 +1859,11 @@ function appendMessages(messages, reset) {
 
     if(messages == "[]")
         return;
-
+        
+    console.log("rawdata=" +messages);
     messages = JSON.parse(messages.replace(/,\]$/, "]"));
 
-
+    console.log("json=" +messages);
     // Massage data
     for(var i=0; i<messages.length; i++)
     {
@@ -1890,7 +1891,8 @@ function appendMessages(messages, reset) {
 }
 
 function appendMessage(id, type, sent_date, received_date, label_value, label, labelTo, to_address, from_address, read, message, initial) {
-    console.log("appendMessage called! type=" + type)
+    console.log("appendMessage called! type=" + type);
+        console.log("notsorawdata=" + received_date);
     if(read==false) { //type=="R"&&
         $(".user-notifications").show();
         console.log("Updating messagecount to = " + parseInt($("#message-count").text()) + parseInt(1));
@@ -2109,14 +2111,14 @@ function openConversation(key, click) {
                     //</span>\
 					
                 //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
-                console.log("timestamp=" + message.sent_date);
+                console.log("timestamp=" + message.received + " typeof=" + typeof message.received);
                 discussion.append(
                     "<li id='"+message.id+"' class='"+(message.type=='S'?'user-message':'other-message')+"' contact-key='"+contact.key+"'>\
                     <span class='message-content'>\
 					    <span class='user-name'>"
                             +(message.label_msg)+"\
                         </span>\
-                        <span class='timestamp'>"+(new Date(message.received_date*1000).toLocaleString())+"</span>\
+                        <span class='timestamp'>"+(new Date(message.received*1000).toLocaleString())+"</span>\
 						<span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
 						<span class='message-text'>"+micromarkdown.parse(message.message)+"</span>\
                     </span></li>");
