@@ -1822,21 +1822,35 @@ function shadowChatInit() {
         }];
 
     $('#message-text').contextMenu(menu, {triggerOn:'contextmenu', sizeStyle: 'content'});
-}
-
+    
+    //ON ENTER SUBMIT MESSAGE
     $("#message-text").keypress(function (e) {
         if (e.which == 13) {
             e.preventDefault();
+                    
             if($("#message-text").val() == "")
                 return 0;
-
+                
             sendMessage();
         }
-     });
+    });
+    
+    //ONCLICK REMOVE NOTIFICATION
+    $("#messages").on('click',
+        function(e) {
+                $(this).addClass("selected").siblings("li").removeClass("selected");
+                
+                if(current_key != "")
+                    removeNotificationCount(current_key);
+        });
+    
+}
+
 
 var contacts = {};
 var contact_list;
 var contact_group_list;
+var current_key = "";
 
 function appendMessages(messages, reset) {
     contact_list = $("#contact-list ul");
@@ -1860,10 +1874,12 @@ function appendMessages(messages, reset) {
     if(messages == "[]")
         return;
         
-    console.log("rawdata=" +messages);
+
+    console.log("message data=" + messages);
     messages = JSON.parse(messages.replace(/,\]$/, "]"));
 
-    console.log("json=" +messages);
+    console.log("for loop through messages = " + messages.length);
+
     // Massage data
     for(var i=0; i<messages.length; i++)
     {
@@ -1874,6 +1890,7 @@ function appendMessages(messages, reset) {
                       message.received_date,
                       message.label_value,
                       message.label,
+                      message.labelTo,
                       message.to_address,
                       message.from_address,
                       message.read,
@@ -1881,24 +1898,28 @@ function appendMessages(messages, reset) {
                       true);
     }
 
-    for (key in contacts) {
-        appendContact(key, false);
-    }
 
     openConversation(contacts[0].key, false);
+    
+    if(!contact[0].messages[0].group)
+        $("#contact-list").addClass("in-conversation");
+    else
+        $("#contact-group-list").addClass("in-conversation");
+
     //contact_list.find("li:first-child").click();
 
 }
 
 function appendMessage(id, type, sent_date, received_date, label_value, label, labelTo, to_address, from_address, read, message, initial) {
     console.log("appendMessage called! type=" + type);
-        console.log("notsorawdata=" + received_date);
+/*
     if(read==false) { //type=="R"&&
         $(".user-notifications").show();
         console.log("Updating messagecount to = " + parseInt($("#message-count").text()) + parseInt(1));
         $("#message-count").text(parseInt($("#message-count").text())+1);
         $("#message-count").show();
-    }
+    }*/ //should be removed but can't test for the moment
+    
 
     var them = type == "S" ? to_address   : from_address;
     var self = type == "S" ? from_address : to_address;
@@ -1927,25 +1948,28 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     Basically I seperated the sender of the message (label_msg) from the contact[key].
     So we can still group by the key, but the messages in the chat have the right sender label.
     */
-
+   console.log("appendMessage: for invite");
     //INVITE TO GROUP CODE
+    
     if(message.lastIndexOf("/invite", 0) === 0 && message.length >= 61){
-       var group_key = message.substring(8, 60).replace(/^[V79e][1-9A-HJ-NP-Za-km-z]{50,51}$/, ""); // regex priv keys
+       var group_key = message.substring(8, 60).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex priv keys ///^[V79e][1-9A-HJ-NP-Za-km-z]{50,51}$/g
        var group_label = message.substring(61, message.length).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex whitelist only a-z, A-Z, 0-9
 
         if(group_label.length == 0)
             group_label = them + "_" + group_key.substring(0, 5);
 
         if(type = "R"){ //If message contains /invite privkey label, insert HTML
-            message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a id="add-new-send-address" class="button is-inverse has-icon-spacing" onclick="bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
+            message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a id="add-new-send-address" class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
         } else if(type = "S"){
             message = "An invite for group " + group_label + " has been sent.";
         }
     }
+    
+
 
     var contact = contacts[key];
-
-    if(contacts[key] == undefined)
+    var isNewContact = false;
+    if(contacts[key] == undefined){
         contacts[key] = {},
         contact = contacts[key],
         contact.key = key,
@@ -1953,21 +1977,26 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
         contact.group = group,
         contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
         contact.messages  = new Array();
-
-
-    if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
-    {
-        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read});
-
-        if(!initial){
-            appendContact(key, true);
-        }
+        isNewContact = true;
     }
 
-       //point of no return
-
-
+    if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
+    {     
+        if(message.type=="R"&& message.read==false) //not a duplicate, received message and not read => addnotification
+            addNotificationCount(key, 1);
+    
+        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read}); 
+        if(current_key == key) //on send of our own message reload convo to add message.
+            openConversation(key, false);
+         
+        if(isNewContact)
+            appendContact(key, true); 
+         
+         if(type == "R" && read == 0)
+            addNotificationCount(key, 1);
+     }
 }
+
 
 
 function appendContact (key, newcontact) {
@@ -2013,21 +2042,23 @@ function appendContact (key, newcontact) {
 
     var received_message = contact.messages[contact.messages.length-1];
 
-    if(received_message.read==false) { //received_message.type=="R"&&
-        addNotificationCount(key, 1);
-    }
 
-
-    if(newcontact || contact_el.hasClass("selected"))
+    if(newcontact ){ //|| contact_el.hasClass("selected")
         openConversation(key, false);
+    }
 }
 
 function addNotificationCount(key, unread_count){
     var notifications_contact = $("#contact-"+key).find(".message-notifications");
     var notifications_contact_value = notifications_contact.html();
     notifications_contact.text(parseInt(notifications_contact_value) + parseInt(unread_count));
-    console.log("[addNotificationCount] called! value=" + notifications_contact_value + " unread_count=" + unread_count);
+    console.log("[addNotificationCount] contact! value=" + notifications_contact_value + " unread_count=" + unread_count);
     notifications_contact.show();
+    
+    $(".user-notifications").show();
+    console.log("[addNotificationCount] menu! value = " + parseInt($("#message-count").text()) + parseInt(1));
+    $("#message-count").text(parseInt($("#message-count").text())+1);
+    $("#message-count").show();
 }
 
 function removeNotificationCount(key){
@@ -2078,6 +2109,7 @@ function removeNotificationCount(key){
 
 //OpenConversation is split off to allow for opening conversation automatically without removing notification.
 function openConversation(key, click) {
+            current_key = key;
             //TODO: detect wether user is typing, if so do not reload page to other conversation..
             //$(this).addClass("selected").siblings("li").removeClass("selected");
             var discussion = $(".contact-discussion ul");
@@ -2111,7 +2143,6 @@ function openConversation(key, click) {
                     //</span>\
 					
                 //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
-                console.log("timestamp=" + message.received + " typeof=" + typeof message.received);
                 discussion.append(
                     "<li id='"+message.id+"' class='"+(message.type=='S'?'user-message':'other-message')+"' contact-key='"+contact.key+"'>\
                     <span class='message-content'>\
@@ -2202,7 +2233,10 @@ function deleteMessages(key, messageid) {
         message_count_val = parseInt(message_count.text());
         
     removeNotificationCount(key);
-
+    
+    if(messageid == undefined)
+        current_key = "";
+        
     for(var i=0;i<contact.messages.length;i++) {
 
         if(messageid == undefined) { //delete all messages of key
