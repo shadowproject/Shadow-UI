@@ -2197,6 +2197,8 @@ function openConversation(key, click) {
                 $("#contact-group-list").addClass("in-conversation");
             }
             
+            $("#chat-header").text(String(contact.label).toUpperCase());
+            
             var message;
             var bSentMessage = false;
 
