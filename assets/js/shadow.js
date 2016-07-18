@@ -1408,13 +1408,17 @@ function appendAddresses(addresses) {
 
         addresses = JSON.parse(addresses.replace(/,\]$/, "]"));
     }
-
+     
+     /* Initialize part of chat */
+     contact_book_list = $("#contact-book-list ul");
+        
     for(var i=0; i< addresses.length;i++)
     {
         var address = addresses[i];
         var addrRow = $("#"+address.address);
         var page = (address.type == "S" ? "#addressbook" : (address.label.lastIndexOf("group_", 0) !== 0 ? "#receive" : "#addressbook"));
 
+        /* add address to chat dropdown box to choose sender from*/
         if(address.type == "R" && address.address.length < 75 && address.label.lastIndexOf("group_", 0) !== 0) {
             if(addrRow.length==0)
                 $("#message-from-address").append("<option title='"+address.address+"' value='"+address.address+"'>"+address.label+"</option>");
@@ -1428,11 +1432,23 @@ function appendAddresses(addresses) {
                 initialAddress = false;
             }
         }
-
-            if(address.at == 4){
-                address.label = address.label.replace("group_", "");
-                address.label_value = address.label_value.replace("group_", "");
-            }
+        /* remove group_ prefix from labels*/
+        var isGroup = (address.at == 4);
+        var isSend = (address.type == "S"); 
+        if(isGroup){
+            address.label = address.label.replace("group_", "");
+            address.label_value = address.label_value.replace("group_", "");
+            isSend = true;
+         } 
+         
+        if(isSend){
+            console.log("adding to addressbook isGroup=" + isGroup);
+            createContact(address.label, address.address, isGroup);
+            appendContact(address.label, false, true);    
+         }
+         
+         /* Fill up addressbook "BOOK" in chat sidebar  */
+     
 
         if (addrRow.length==0)
         {
@@ -1830,8 +1846,10 @@ function shadowChatInit() {
                     
             if($("#message-text").val() == "")
                 return 0;
-                
+            
+            removeNotificationCount();
             sendMessage();
+            
         }
     });
     
@@ -1850,16 +1868,18 @@ function shadowChatInit() {
 var contacts = {};
 var contact_list;
 var contact_group_list;
+var contact_book_list;
 var current_key = "";
 
 function appendMessages(messages, reset) {
     contact_list = $("#contact-list ul");
     contact_group_list = $("#contact-group-list ul");
 
+
     if(reset)
     {
-        contacts = null;
-        contacts = {};
+        //contacts = null;
+        //contacts = {};
         contact_list.html("");
         contact_group_list.html("");
         $("#contact-list").removeClass("in-conversation");
@@ -1880,7 +1900,7 @@ function appendMessages(messages, reset) {
 
     console.log("for loop through messages = " + messages.length);
 
-    // Massage data
+    // Message data
     for(var i=0; i<messages.length; i++)
     {
         var message = messages[i];
@@ -1897,15 +1917,27 @@ function appendMessages(messages, reset) {
                       message.message,
                       true);
     }
-
-
-    openConversation(contacts[0].key, false);
     
-    if(!contact[0].messages[0].group)
-        $("#contact-list").addClass("in-conversation");
-    else
-        $("#contact-group-list").addClass("in-conversation");
+        //console.log("For loop key" + key);
 
+        
+    
+    //openConversation(contacts[0].key, false);
+    
+    console.log("Before contact[current_key].group=" + contacts[current_key].group);
+    if(!contacts[current_key].group)
+    {
+        console.log("setting priv in conversation!");
+        $("#contact-list").addClass("in-conversation");
+        $("#quickview-private").addClass("active");
+        $("#quickview-private-tab").addClass("active");
+    }else{
+        console.log("setting group in conversation!");
+        $("#contact-group-list").addClass("in-conversation");
+        $("#quickview-group").addClass("active");
+        $("#quickview-group-tab").addClass("active");
+    }
+        console.log("After contact[0].group");
     //contact_list.find("li:first-child").click();
 
 }
@@ -1951,13 +1983,24 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
    console.log("appendMessage: for invite");
     //INVITE TO GROUP CODE
     
-    if(message.lastIndexOf("/invite", 0) === 0 && message.length >= 61){
-       var group_key = message.substring(8, 60).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex priv keys ///^[V79e][1-9A-HJ-NP-Za-km-z]{50,51}$/g
+    if(message.lastIndexOf("/invite", 0) === 0 && message.length >= 60){
+        console.log("length of message=" + message.length);
+        var group_key = message.match(/[V79e][1-9A-HJ-NP-Za-km-z]{50,51}/g);
+                       /*
+       var group_key = message.substring(8, 60).replace(/^[V79e][1-9A-HJ-NP-Za-km-z]{50,51}$/, ""); // regex priv keys */
        var group_label = message.substring(61, message.length).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex whitelist only a-z, A-Z, 0-9
-
-        if(group_label.length == 0)
-            group_label = them + "_" + group_key.substring(0, 5);
-
+        
+        if(group_key == null){
+            return 0;
+        } else if(group_label.length == 0){
+            group_label = them + "_" + String(group_key).substring(1, 5);
+        }
+            
+        
+             //+ group_key.substring(0, 5)
+            
+        console.log("GROUP INVITE | key=" + group_key + " label=" + group_label);
+        
         if(type = "R"){ //If message contains /invite privkey label, insert HTML
             message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a id="add-new-send-address" class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
         } else if(type = "S"){
@@ -1966,20 +2009,10 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     }
     
 
-
+   var contact_address = (group && type != "S") ? self : them;
+    createContact(key, contact_address, group);
     var contact = contacts[key];
-    var isNewContact = false;
-    if(contacts[key] == undefined){
-        contacts[key] = {},
-        contact = contacts[key],
-        contact.key = key,
-        contact.label = key,
-        contact.group = group,
-        contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
-        contact.messages  = new Array();
-        isNewContact = true;
-    }
-
+    
     if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
     {     
         if(message.type=="R"&& message.read==false) //not a duplicate, received message and not read => addnotification
@@ -1989,32 +2022,48 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
         if(current_key == key) //on send of our own message reload convo to add message.
             openConversation(key, false);
          
-        if(isNewContact)
-            appendContact(key, true); 
-         
          if(type == "R" && read == 0)
             addNotificationCount(key, 1);
      }
+     
+     appendContact(key, true); 
 }
 
 
+function createContact(key, address, group){
+    var contact = contacts[key];
+    if(contacts[key] == undefined){
+        contacts[key] = {},
+        contact = contacts[key],
+        contact.key = key,
+        contact.label = key,
+        contact.address = address,
+        contact.group = group,
+        contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
+        contact.messages  = new Array();
+    }
+       
+}
 
-function appendContact (key, newcontact) {
+function appendContact (key, newcontact, addressbook) {
     var contact_el = $("#contact-"+key);
     var contact = contacts[key];
-    var unread_count = $.grep(contact.messages, function(a){return a.type=="R"&&a.read==false}).length;
-    var new_group = contact.messages[0].group;
+    var prefix = "";
+    
+    if(addressbook){
+        contact_el = $("#contact-book-"+key);
+        prefix = "book-";
+    }
+    console.log("appendContact key ="+contact.key);        
+    console.log("appending Contact! key=" + key + " group=" + contact.group);
 
-
-
-    var contact_address = (new_group && contact.messages[0].type != "S") ? contact.messages[0].self : contact.messages[0].them;
     if(contact_el.length == 0) {
         //alert("[appendContact] key=" + key + " address=" + contact.messages[0].them + " self=" + contact.messages[0].self + " group=" + contact.messages[0].group + " type=" + contact.messages[0].type);
         var contact_html =
-            "<li id='contact-"+ key +"' class='contact' data-title='"+contact.label+"'>\
+            "<li id='contact-"+ prefix + key +"' class='contact' data-title='"+contact.label+"'>\
                 <span class='contact-info'>\
                     <span class='contact-name'>"+contact.label+"</span>\
-                    <span class='contact-address'>"+ contact_address + "</span>\
+                    <span class='contact-address'>"+ contact.address + "</span>\
                 </span>\
                 <span class='contact-options'>\
                         <span class='message-notifications'>0</span>\ " + //"+(unread_count==0?' none':'')+"
@@ -2022,28 +2071,37 @@ function appendContact (key, newcontact) {
                         " //<span class='favorite favorited'></span>\ //TODO: Favourites
              + "</span>"
              + "</li>";
-
-         if(!new_group)
-            contact_list.append(contact_html);
-         else
+        if(addressbook){
+                console.log("appending to book!");
+                contact_book_list.append(contact_html);
+                console.log("appended to book!");
+                $("#contact-"+ prefix + key).find(".delete").hide();
+         }else if(contact.group){ //if not group
             contact_group_list.append(contact_html);
+         } else 
+            contact_list.append(contact_html);
+         
 
-        contact_el = $("#contact-"+key).on('click',
+            
+         //onClick contact in sidebar list, on hover and on delete.
+        contact_el = $("#contact-"+ prefix + key).on('click',
             function(e) {
                 $(this).addClass("selected").siblings("li").removeClass("selected");
+                if(addressbook)
+                    appendContact(key, false);
                 openConversation(key, true);
 
 
             }).on("mouseenter", tooltip);
-
+            
+            
         contact_el.find(".delete").on("click", function(e) {e.stopPropagation()});
-
+        contact_el.find(".message-notifications").hide();
+        console.log("reached end of append!");
     }
 
-    var received_message = contact.messages[contact.messages.length-1];
 
-
-    if(newcontact ){ //|| contact_el.hasClass("selected")
+    if(newcontact){ //|| contact_el.hasClass("selected")
         openConversation(key, false);
     }
 }
@@ -2062,9 +2120,18 @@ function addNotificationCount(key, unread_count){
 }
 
 function removeNotificationCount(key){
+    
+    if(key == undefined && current_key != ""){
+        key = current_key;
+    }
+    
 
     //NOTIFICATION IN CONTACT LIST
     var contact = contacts[key];
+    
+    if(contact == null)
+        return false;
+        
     var notifications_contact = $("#contact-"+key).find(".message-notifications");
     var notifications_contact_value = notifications_contact.html();
 
@@ -2090,16 +2157,16 @@ function removeNotificationCount(key){
         
     console.log("removeNotificationCount triggered..")
     for(var i=contact.messages.length-1; i >= 0; i--){
-       console.log("#amount of messages=" + i);
+       console.log("[" + key + "]" + " MID=" + i + " read="+contact.messages[i].read);
         
-       if(!contact.messages[i].read){
+       if(!contact.messages[i].read ){
             console.log("[" + i + "] message");
             bridge.markMessageAsRead(contact.messages[i].id);
             contact.messages[i].read = true;
         } else {
             //not group message, = received normal message and was read.. 
             console.log("All messages are now marked as read. key=" + key);
-            break;
+            //break;
         }
         
     }
@@ -2109,6 +2176,7 @@ function removeNotificationCount(key){
 
 //OpenConversation is split off to allow for opening conversation automatically without removing notification.
 function openConversation(key, click) {
+            console.log("opening Conversation key=" + key);
             current_key = key;
             //TODO: detect wether user is typing, if so do not reload page to other conversation..
             //$(this).addClass("selected").siblings("li").removeClass("selected");
@@ -2121,13 +2189,18 @@ function openConversation(key, click) {
               return a.received - b.received;
             });
 
-            var is_group = contact.messages[0].group;
-            if(!is_group)
+            var is_group = contact.group;
+            /*
+            if(!is_group){
                 $("#contact-list").addClass("in-conversation");
-            else
+                $("#quickview-private").addClass("active");
+                $("#quickview-group").removeClass("active");
+            } else {
                 $("#contact-group-list").addClass("in-conversation");
-
-
+                $("#quickview-group").addClass("active");
+                $("#quickview-private").removeClass("active");
+            }
+            */
             var message;
             var bSentMessage = false;
 
@@ -2144,14 +2217,14 @@ function openConversation(key, click) {
 					
                 //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
                 discussion.append(
-                    "<li id='"+message.id+"' class='"+(message.type=='S'?'user-message':'other-message')+"' contact-key='"+contact.key+"'>\
+                    "<li id='"+message.id+"' class='"+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
                     <span class='message-content'>\
 					    <span class='user-name'>"
                             +(message.label_msg)+"\
                         </span>\
                         <span class='timestamp'>"+(new Date(message.received*1000).toLocaleString())+"</span>\
 						<span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-						<span class='message-text'>"+micromarkdown.parse(message.message)+"</span>\
+						<span class='message-text'>"+micromarkdown.parse(message.message)+    "</span>\
                     </span></li>");
 
                 if(message.group && message.type == 'S' && !bSentMessage){ //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
@@ -2159,8 +2232,6 @@ function openConversation(key, click) {
                         $("#message-from-address").val(message.self);
                         $("#message-to-address").val(message.them);
                 }
-
-
             }
 
 
@@ -2189,13 +2260,16 @@ function openConversation(key, click) {
 
             //discussion.children("[title]").on("mouseenter", tooltip);
 
-            if(!bSentMessage){
-                if(!message.group){ //normal procedure
+            if(!bSentMessage && contact.messages.length > 0){
+                if(!contact.group){ //normal procedure
                     $("#message-from-address").val(message.self);
                     $("#message-to-address").val(message.them); //them
                 } else if(message.type == "R") { //if it's a group, and no messages were sent from it yet, then we have not sent a message to it.
                     $("#message-to-address").val(message.self);
                 }
+            } else if(contact.messages.length == 0){
+                 $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li>");
+                 $("#message-to-address").val(contact.address);
             }
 
         }
@@ -2209,6 +2283,7 @@ function newConversation() {
     $("#new-contact-address").val("");
     $("#new-contact-name").val("");
     $("#new-contact-pubkey").val("");
+    
     $("#contact-list ul li").removeClass("selected");
     $("#contact-list").addClass("in-conversation");
 
@@ -2274,8 +2349,6 @@ function deleteMessages(key, messageid) {
         iscrollReload();
         openConversation(key, false);
     }
-    
-    
 }
 
 function signMessage() {
@@ -2372,7 +2445,6 @@ function editorCommand(text, endText) {
 
         scrollTop = editor.scrollTop;
         editor.focus();
-
 
         if (typeof editor.selectionStart !== 'undefined')
         {

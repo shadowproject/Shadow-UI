@@ -723,7 +723,7 @@ left: 10px;
 }
 
 .contact-discussion ul li.user-message .message-content .message-text {
-		color:red;
+		/*color:red;*/
 }
 
 textarea { 
@@ -768,6 +768,12 @@ textarea {
 
 }
 
+.emoji {
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    margin-bottom: -0.25em;
+}
 
 /*------------------------------------------------------------------
 [Scrollbars]
