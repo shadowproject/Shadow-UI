@@ -737,7 +737,7 @@ var overviewPage = {
     },
     updateTransaction: function(txn) {
         var format = function(tx) {
-            return "<tr><td class='text-left' style='border-top: 1px solid rgba(230, 230, 230, 0.7);border-bottom: none;'><center><label style='margin-top:6px;' class='label label-important inline fs-12'>"+(tx.t == 'input' ? 'Send' : (tx.t == 'output' ? 'Received' : (tx.t == 'inout' ? 'In-Out' : 'Stake')))+"</label></center></td><td class='text-left' style='border-top: 1px solid rgba(230, 230, 230, 0.7);border-bottom: none;'><center><a id='"+tx.id.substring(0,17)+"' data-title='"+tx.tt+"' href='#' onclick='$(\"#navitems [href=#transactions]\").click();$(\"#"+tx.id+"\").click();'> "
+            return "<tr><td class='text-left' style='border-top: 1px solid rgba(230, 230, 230, 0.7);border-bottom: none;'><center><label style='margin-top:6px;' class='label label-important inline fs-12'>"+(tx.t == 'input' ? 'Received' : (tx.t == 'output' ? 'Sent' : (tx.t == 'inout' ? 'In-Out' : 'Stake')))+"</label></center></td><td class='text-left' style='border-top: 1px solid rgba(230, 230, 230, 0.7);border-bottom: none;'><center><a id='"+tx.id.substring(0,17)+"' data-title='"+tx.tt+"' href='#' onclick='$(\"#navitems [href=#transactions]\").click();$(\"#"+tx.id+"\").click();'> "
               +unit.format(tx.am)+" "+unit.display+" </a></center></td><td style='border-top: 1px solid rgba(230, 230, 230, 0.7);border-bottom: none;'><span class='overview_date' data-value='"+tx.d+"'><center>"+tx.d_s+"</center></span></td></tr>";
         }
 
