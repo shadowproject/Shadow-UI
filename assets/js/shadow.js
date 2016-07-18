@@ -2190,17 +2190,13 @@ function openConversation(key, click) {
             });
 
             var is_group = contact.group;
-            /*
+            
             if(!is_group){
                 $("#contact-list").addClass("in-conversation");
-                $("#quickview-private").addClass("active");
-                $("#quickview-group").removeClass("active");
             } else {
                 $("#contact-group-list").addClass("in-conversation");
-                $("#quickview-group").addClass("active");
-                $("#quickview-private").removeClass("active");
             }
-            */
+            
             var message;
             var bSentMessage = false;
 
