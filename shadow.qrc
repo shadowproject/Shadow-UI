@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file alias="assets/js/shadow.js">../Shadow-UI/build/assets/js/shadow.js</file>
+        <file alias="assets/js/tooltip.js">../Shadow-UI/build/assets/js/tooltip.js</file>
+        <file alias="assets/js/navigation.js">../Shadow-UI/build/assets/js/navigation.js</file>
         <file alias="assets/fonts/FontAwesome/fontawesome-webfont.woff">../Shadow-UI/build/assets/fonts/FontAwesome/fontawesome-webfont.woff</file>
         <file alias="assets/fonts/FontAwesome/fontawesome-webfont.eot">../Shadow-UI/build/assets/fonts/FontAwesome/fontawesome-webfont.eot</file>
         <file alias="assets/fonts/FontAwesome/fontawesome-webfont.ttf">../Shadow-UI/build/assets/fonts/FontAwesome/fontawesome-webfont.ttf</file>

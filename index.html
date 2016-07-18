@@ -304,8 +304,8 @@
           <!-- start user/wallet info -->
           <div class="visible-lg visible-md m-t-10">
             <div class="dropdown pull-right">
-              <div id="footer" class="b-grey" style="padding-top:3px;">
-                <ul class="no-margin hidden-sm hidden-xs no-style p-l-10 p-r-10 p-b-10" id="footer-icons">
+              <div id="status" class="b-grey">
+                <ul class="no-margin hidden-sm hidden-xs no-style p-l-10 p-r-10 p-b-10">
                   <li class="inline p-l-10">
                     <div id="tor" class="no-tor" data-title="Tor connection offline"></div>
                   </li>
@@ -322,7 +322,8 @@
                     <div id="connectionsIcon" class="no-connection" data-title="0 active connection(s) to ShadowCoin network"></div>
                   </li>
                   <li class="inline p-l-10">
-                    <div id="syncingIcon" class="no-syncing" data-title="Wallet is syncing"></div>
+                    <div id="syncingIcon" class="syncing-spinner" data-title="Wallet is syncing"></div>
+                    <div id="blocksIcon"  class="no-syncing none" data-title="Wallet is syncing"></div>
                   </li>
                 </ul>
               </div>
@@ -1025,7 +1026,7 @@
             </h4>
           </div>
           <div class="p-t-10 pull-right">
-            <div id="test343343">
+            <div class="navigate">
               <a href="#send" class="btn-danger btn btn-cons">Send Payment
                 <i class="fa fa-arrow-right"></i>
               </a>
@@ -1932,7 +1933,7 @@
       <div class="tab-content">
         <div class="tab-pane fade in active no-padding" id="quickview-private">
           <div class="view-port clearfix quickview-private" id="note-views">
-            
+
             <a href="#" data-target="#new-contact-modal" data-toggle="modal" id='start-conversation'>
               <i class="fa fa-plus margin-right-10"></i>
               Start private conversation</a>
@@ -1949,14 +1950,14 @@
             <a href="#" data-target="#new-contact-modal" data-toggle="modal" id='start-conversation'>
               <i class="fa fa-plus margin-right-10"></i>
               Addressbook</a>
-              
+
                 <div id="other-contact-list" class="contact-list">
 
                 <div>
                   <ul></ul>
                 </div>
               </div>
-              
+
             </div> -->
             <!-- end category list -->
           </div>
@@ -1983,7 +1984,7 @@
             <!-- end category list -->
           </div>
         </div>
-        
+
         <div class="tab-pane fade no-padding" id="quickview-book">
           <div class="view-port clearfix" id="alerts">
             <div class="view bg-white">
@@ -1994,10 +1995,10 @@
                 </div>
               </div>
             </div>
-            
+
           </div>
         </div>
-        
+
       </div>
     </div>
     <!--end chatmenu(right) -->
@@ -3154,6 +3155,8 @@
 
 <!-- begin shadow JS -->
 <script src="assets/js/shadow.js" type="text/javascript"></script>
+<script src="assets/js/tooltip.js" type="text/javascript"></script>
+<script src="assets/js/navigation.js" type="text/javascript"></script>
 <!--  <script src="assets/plugins/emojify/emojify.js"></script> -->
 
 <script>
