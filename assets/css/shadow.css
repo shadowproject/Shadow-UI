@@ -184,7 +184,10 @@ background: #fff;
     letter-spacing: 1px;
 }
 
-#footer { margin-top:5px;  }
+#status {
+    margin-top:5px;
+    padding-top: 3px;
+}
 
 /*------------------------------------------------------------------
 [Alert network]
@@ -1152,4 +1155,8 @@ padding: 18px;
 	margin-right:0px;
 }
 
+}
+
+.none {
+    display: none;
 }
