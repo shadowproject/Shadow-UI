@@ -1284,7 +1284,7 @@ function appendAddresses(addresses) {
         if(isSend){
             console.log("adding to addressbook isGroup=" + isGroup);
             createContact(address.label, address.address, isGroup);
-            appendContact(address.address, false, true);    
+            appendContact(address.address, false, true);
          }
 
          /* Fill up addressbook "BOOK" in chat sidebar  */
@@ -1761,9 +1761,9 @@ function appendMessages(messages, reset) {
 
     //console.log("opening first convo=" + contacts[0].address);
     //openConversation(contacts[0].address, false);
-    
+
     console.log("Before contact[current_key].group=" + contacts[current_key].group);
-    
+
     if(!contacts[current_key].group)
     {
         console.log("setting priv in conversation!");
@@ -1828,10 +1828,10 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
                        /*
         var group_key = message.substring(8, 60).replace(/^[V79e][1-9A-HJ-NP-Za-km-z]{50,51}$/, ""); // regex priv keys */
         var group_label = message.substring(61, message.length).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex whitelist only a-z, A-Z, 0-9
-        
+
         if(group_key != null){
             console.log("GROUP INVITE | key=" + group_key + " label=" + group_label);
-        
+
             if(type = "R"){ //If message contains /invite privkey label, insert HTML
                 message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a id="add-new-send-address" class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
             } else if(type = "S"){
@@ -1866,8 +1866,8 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
      }
 
      appendContact(key, false);
-     
-     if(current_key == "") 
+
+     if(current_key == "")
         current_key = key;
 }
 
@@ -1949,10 +1949,10 @@ function appendContact (key, newcontact, addressbook) {
 }
 
 function addNotificationCount(key, unread_count){
-    
+
     if(contacts[key] == undefined)
         return false;
-        
+
     var notifications_contact = $("#contact-"+key).find(".message-notifications");
     var notifications_contact_value = notifications_contact.html();
     notifications_contact.text(parseInt(notifications_contact_value) + parseInt(unread_count));
@@ -1963,7 +1963,7 @@ function addNotificationCount(key, unread_count){
     console.log("[addNotificationCount] menu! value = " + parseInt($("#message-count").text()) + parseInt(1));
     $("#message-count").text(parseInt($("#message-count").text())+1);
     $("#message-count").show();
-    
+
     var whichList = contacts[key].group ? "#contact-group-list ul" : "#contact-list ul";
     $("#contact-"+key).prependTo(whichList);
 }
