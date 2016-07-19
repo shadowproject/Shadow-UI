@@ -1924,17 +1924,15 @@ function appendMessages(messages, reset) {
     //openConversation(contacts[0].address, false);
     
     console.log("Before contact[current_key].group=" + contacts[current_key].group);
+    
     if(!contacts[current_key].group)
     {
         console.log("setting priv in conversation!");
         $("#contact-list").addClass("in-conversation");
-        $("#quickview-private").addClass("active");
-        $("#quickview-private-tab").addClass("active");
     }else{
         console.log("setting group in conversation!");
         $("#contact-group-list").addClass("in-conversation");
-        $("#quickview-group").addClass("active");
-        $("#quickview-group-tab").addClass("active");
+
     }
         console.log("After contact[0].group");
     //contact_list.find("li:first-child").click();
@@ -2112,6 +2110,10 @@ function appendContact (key, newcontact, addressbook) {
 }
 
 function addNotificationCount(key, unread_count){
+    
+    if(contacts[key] == undefined)
+        return false;
+        
     var notifications_contact = $("#contact-"+key).find(".message-notifications");
     var notifications_contact_value = notifications_contact.html();
     notifications_contact.text(parseInt(notifications_contact_value) + parseInt(unread_count));
@@ -2122,6 +2124,9 @@ function addNotificationCount(key, unread_count){
     console.log("[addNotificationCount] menu! value = " + parseInt($("#message-count").text()) + parseInt(1));
     $("#message-count").text(parseInt($("#message-count").text())+1);
     $("#message-count").show();
+    
+    var whichList = contacts[key].group ? "#contact-group-list ul" : "#contact-list ul";
+    $("#contact-"+key).prependTo(whichList);
 }
 
 function removeNotificationCount(key){
@@ -2134,7 +2139,7 @@ function removeNotificationCount(key){
     //NOTIFICATION IN CONTACT LIST
     var contact = contacts[key];
     
-    if(contact == null)
+    if(contact == undefined)
         return false;
         
     var notifications_contact = $("#contact-"+key).find(".message-notifications");
