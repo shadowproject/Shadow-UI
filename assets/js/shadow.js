@@ -2015,10 +2015,9 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     
     if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
     {     
-        if(message.type=="R"&& message.read==false) //not a duplicate, received message and not read => addnotification
-            addNotificationCount(key, 1);
-    
         contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read}); 
+        
+        appendContact(key, false);
         if(current_key == key) //on send of our own message reload convo to add message.
             openConversation(key, false);
          
@@ -2026,7 +2025,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
             addNotificationCount(key, 1);
      }
      
-     appendContact(key, false);
+
      
      if(current_key == "") 
         current_key = key;
