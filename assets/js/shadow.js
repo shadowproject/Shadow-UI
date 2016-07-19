@@ -1444,7 +1444,7 @@ function appendAddresses(addresses) {
         if(isSend){
             console.log("adding to addressbook isGroup=" + isGroup);
             createContact(address.label, address.address, isGroup);
-            appendContact(address.label, false, true);    
+            appendContact(address.address, false, true);    
          }
          
          /* Fill up addressbook "BOOK" in chat sidebar  */
@@ -1920,9 +1920,8 @@ function appendMessages(messages, reset) {
     
         //console.log("For loop key" + key);
 
-        
-    
-    //openConversation(contacts[0].key, false);
+    //console.log("opening first convo=" + contacts[0].address);
+    //openConversation(contacts[0].address, false);
     
     console.log("Before contact[current_key].group=" + contacts[current_key].group);
     if(!contacts[current_key].group)
@@ -1955,9 +1954,10 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 
     var them = type == "S" ? to_address   : from_address;
     var self = type == "S" ? from_address : to_address;
+    var contact_address = them;
 
     var label_msg = type == "S" ? (labelTo == "(no label)" ? self : labelTo) : (label == "(no label)" ? them : label);
-    var key = (label_value == "" ? them : label_value).replace(/\s/g, '');
+    var key = them;
 
     var group = false;
     //Setup instructions: make sure the receiving address is named 'group_ANYTHING'.
@@ -1967,11 +1967,13 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     It will put all messages under the same contact*/
 
     if(type == "R" && labelTo.lastIndexOf("group_", 0) === 0){ //Received, to group
-        key = labelTo.replace('group_', '');
+        label_msg = label_msg.replace('group_', '');
         group = true;
+        key =  self;
     } else if(label_value.lastIndexOf("group_", 0) === 0){ //sent to group,
-        key = label_value.replace('group_', '');
+        label_msg = label_msg.replace('group_', '');
         group = true;
+        key =  them;
     } else if(labelTo.lastIndexOf("group_", 0) === 0){ //sent by group, should not be possible but yeah anything can happen.
         group = true;
     }
@@ -1990,27 +1992,27 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
        var group_key = message.substring(8, 60).replace(/^[V79e][1-9A-HJ-NP-Za-km-z]{50,51}$/, ""); // regex priv keys */
        var group_label = message.substring(61, message.length).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex whitelist only a-z, A-Z, 0-9
         
-        if(group_key == null){
-            return 0;
+        if(group_key != null){
+            console.log("GROUP INVITE | key=" + group_key + " label=" + group_label);
+        
+            if(type = "R"){ //If message contains /invite privkey label, insert HTML
+                message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a id="add-new-send-address" class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
+            } else if(type = "S"){
+                message = "An invite for group " + group_label + " has been sent.";
+            }
         } else if(group_label.length == 0){
             group_label = them + "_" + String(group_key).substring(1, 5);
+        } else if(group_key == null){
+                message = "The group invitation as a malconfigured private key.";
         }
             
-        
              //+ group_key.substring(0, 5)
             
-        console.log("GROUP INVITE | key=" + group_key + " label=" + group_label);
-        
-        if(type = "R"){ //If message contains /invite privkey label, insert HTML
-            message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a id="add-new-send-address" class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
-        } else if(type = "S"){
-            message = "An invite for group " + group_label + " has been sent.";
-        }
+
     }
     
 
-   var contact_address = (group && type != "S") ? self : them;
-    createContact(key, contact_address, group);
+    createContact(label_msg, key, group);
     var contact = contacts[key];
     
     if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
@@ -2026,17 +2028,20 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
             addNotificationCount(key, 1);
      }
      
-     appendContact(key, true); 
+     appendContact(key, false);
+     
+     if(current_key == "") 
+        current_key = key;
 }
 
 
-function createContact(key, address, group){
-    var contact = contacts[key];
-    if(contacts[key] == undefined){
-        contacts[key] = {},
-        contact = contacts[key],
-        contact.key = key,
-        contact.label = key,
+function createContact(label, address, group){
+    var contact = contacts[address];
+    if(contacts[address] == undefined){
+        contacts[address] = {},
+        contact = contacts[address],
+        contact.key = address,
+        contact.label = label,
         contact.address = address,
         contact.group = group,
         contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
@@ -2197,7 +2202,7 @@ function openConversation(key, click) {
                 $("#contact-group-list").addClass("in-conversation");
             }
             
-            $("#chat-header").text(String(contact.label).toUpperCase());
+            $("#chat-header").text(contact.label);
             
             var message;
             var bSentMessage = false;
