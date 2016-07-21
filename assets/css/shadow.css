@@ -556,6 +556,18 @@ color: #000;
     white-space: nowrap;
 }
 
+.contact-list ul li .contact-info .contact-message {
+    font-size: 13px;
+    font-style: italic;
+    color: #92a0ad;
+    width:100%;
+    display:block;
+    padding-bottom:5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .contact-list ul li .contact-options {
     display: block;
     width: 80px;

@@ -68,6 +68,65 @@ function updateValue(element) {
     });
 }
 
+function updateValueChat(element, key) {
+    var curhtml = element.html();
+    console.log("element=" + element);
+    var value = element.data("value");
+    console.log("updateValueChat curvalue=" + value);
+    var contact = contacts[key];
+    
+    if(contact == undefined)
+        return false;
+        
+    element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + contact.address + '\', \'' + (contact.group ? "group_" : "") + '\' +this.value);" value="' + value + '" size=35 style="display:inline;" />'); //
+    
+    $("#chat-header .newval").focus();
+    $("#chat-header .newval").on("contextmenu", function(e) {
+        e.stopPropagation();
+    });
+    
+    $("#chat-header .newval").keypress(function (event) {
+        console.log("keypress");
+        console.log("keypress called!" + event.which);
+        if (event.which == 13){
+            event.preventDefault();
+            var localChatheader = $("#chat-header .newval");                
+            if(localChatheader == undefined)
+                return false;
+            
+            var newval = localChatheader.val().trim();
+
+            if(newval == undefined)
+                return false; 
+            
+            element.html(curhtml.replace(value, newval));
+            contacts[current_key].label = newval;
+            $("#chat-header").data("value", newval);
+            $("#contact-" + current_key + " .contact-info .contact-name").text(newval);
+            console.log("reached end of keypress");
+        }
+    });
+
+    $(document).one('click', function () {
+        var localChatheader = $("#chat-header .newval");                
+        if(localChatheader == undefined)
+            return false;
+            
+        var newval = localChatheader.val().trim();
+
+        if(newval == undefined)
+            return false; 
+            
+        element.html(curhtml.replace(value, newval));
+        contacts[current_key].label = newval;
+        $("#chat-header").data("value", newval);
+        $("#contact-" + current_key + " .contact-info .contact-name").text(newval);
+
+    });
+    
+    
+}
+
 $(function() {
     $("#qramount").on("keydown", unit.keydown).on("paste", unit.paste);
 
@@ -1833,7 +1892,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
             console.log("GROUP INVITE | key=" + group_key + " label=" + group_label);
 
             if(type = "R"){ //If message contains /invite privkey label, insert HTML
-                message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a id="add-new-send-address" class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
+                message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
             } else if(type = "S"){
                 message = "An invite for group " + group_label + " has been sent.";
             }
@@ -1855,6 +1914,11 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
     {     
         contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read}); 
+        
+        contact.messages.sort(function (a, b) {
+            return a.received - b.received;
+        });
+
         
         appendContact(key, false);
         if(current_key == key) //on send of our own message reload convo to add message.
@@ -1885,24 +1949,26 @@ function createContact(label, address, group){
 }
 
 function appendContact (key, newcontact, addressbook) {
-    var contact_el = $("#contact-"+key);
+    var elementName = addressbook ? "contact-book-" : "contact-";
+    var contact_el = $("#" + elementName +key);
     var contact = contacts[key];
-    var prefix = "";
-
-    if(addressbook){
-        contact_el = $("#contact-book-"+key);
-        prefix = "book-";
-    }
+      
     console.log("appendContact key ="+contact.key);
     console.log("appending Contact! key=" + key + " group=" + contact.group);
 
     if(contact_el.length == 0) {
+        var latestMessage = "";
+    
+        if(contact.messages != undefined && !addressbook)
+            latestMessage = contact.messages[0].message; //contact.messages.length-1
+            
+        
         //alert("[appendContact] key=" + key + " address=" + contact.messages[0].them + " self=" + contact.messages[0].self + " group=" + contact.messages[0].group + " type=" + contact.messages[0].type);
         var contact_html =
-            "<li id='contact-"+ prefix + key +"' class='contact' data-title='"+contact.label+"'>\
+            "<li id='"+ elementName + key +"' class='contact' data-title='"+contact.label+"'>\
                 <span class='contact-info'>\
                     <span class='contact-name'>"+contact.label+"</span>\
-                    <span class='contact-address'>"+ contact.address + "</span>\
+                     <span class='" + (addressbook ? "contact-address" : "contact-message") + "'>"+ (addressbook ? contact.address : latestMessage) + "</span>\
                 </span>\
                 <span class='contact-options'>\
                         <span class='message-notifications'>0</span>\ " + //"+(unread_count==0?' none':'')+"
@@ -1914,7 +1980,7 @@ function appendContact (key, newcontact, addressbook) {
                 console.log("appending to book!");
                 contact_book_list.append(contact_html);
                 console.log("appended to book!");
-                $("#contact-"+ prefix + key).find(".delete").hide();
+                $("#"+ elementName + key).find(".delete").hide();
          }else if(contact.group){ //if not group
             contact_group_list.append(contact_html);
          } else
@@ -1923,7 +1989,7 @@ function appendContact (key, newcontact, addressbook) {
 
 
          //onClick contact in sidebar list, on hover and on delete.
-        contact_el = $("#contact-"+ prefix + key).on('click',
+        contact_el = $("#"+ elementName + key).on('click',
             function(e) {
                 $(this).addClass("selected").siblings("li").removeClass("selected");
                 if(addressbook)
@@ -1937,12 +2003,17 @@ function appendContact (key, newcontact, addressbook) {
         contact_el.find(".delete").on("click", function(e) {e.stopPropagation()});
         contact_el.find(".message-notifications").hide();
         console.log("reached end of append!");
+    } else {    
+        if(contact.messages != undefined && !addressbook)
+            $("#" + elementName + key + " .contact-info .contact-message").text(contact.messages[contact.messages.length-1].message); 
+        
     }
-
 
     if(newcontact){ //|| contact_el.hasClass("selected")
         openConversation(key, false);
     }
+    
+    iscrollReload();
 }
 
 function addNotificationCount(key, unread_count){
@@ -2031,10 +2102,6 @@ function openConversation(key, click) {
 
             discussion.html("");
 
-            contact.messages.sort(function (a, b) {
-              return a.received - b.received;
-            });
-
             var is_group = contact.group;
 
             if(!is_group){
@@ -2043,7 +2110,14 @@ function openConversation(key, click) {
                 $("#contact-group-list").addClass("in-conversation");
             }
 
-            $("#chat-header").text(contact.label);
+            //Set label in discussion
+            $("#chat-header").text(contact.label).addClass("editable");
+            $("#chat-header").data("value", contact.label);
+            
+            $("#chat-header").on("dblclick", function (event) {
+                event.stopPropagation();
+                updateValueChat($(this), contact.key);
+            }).attr("data-title", "Double click to edit").tooltip();
 
             var message;
             var bSentMessage = false;
@@ -2060,10 +2134,12 @@ function openConversation(key, click) {
                     //</span>\
 
                 //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
+                //TODO: parse with regex to be sure.. do in appendMessage
+                var onclick = (message.label_msg == message.them) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-send-address').show(); $('#new-send-address').val('" + message.them + "')\" " : "";
                 discussion.append(
                     "<li id='"+message.id+"' class='"+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
                     <span class='message-content'>\
-					    <span class='user-name'>"
+					    <span class='user-name' " + onclick + ">"
                             +(message.label_msg)+"\
                         </span>\
                         <span class='timestamp'>"+(new Date(message.received*1000).toLocaleString())+"</span>\
