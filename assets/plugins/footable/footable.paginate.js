@@ -101,7 +101,6 @@
 
             var $nav = $(ft.table).find(ft.pageInfo.pageNavigation);
             //if we cannot find the navigation control within the table, then try find it outside
-            console.log('create navigation', $nav.length);
             if ($nav.length === 0) {
                 $nav = $(ft.pageInfo.pageNavigation);
                 //if the navigation control is inside another table, then get out
@@ -109,7 +108,6 @@
                 //if we found more than one navigation control, write error to console
                 if ($nav.length > 1 && ft.options.debug === true) console.error('More than one pagination control was found!');
             }
-            console.log('create navigation 1', $nav.length);
             //if we still cannot find the control, then don't do anything
             if ($nav.length === 0) return;
             //if the nav is not a UL, then find or create a UL

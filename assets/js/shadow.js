@@ -1,11 +1,7 @@
-//$("#start-conversation").leanModal({top : 110, overlay : 0.5, zindex:11001, closeButton: "#new-contact-modal .modal_close"});
-//$("#add-new-send-address").leanModal({top : 110, overlay : 0.5, zindex:11001, closeButton: "#add-address-modal .modal_close"});
-//$("#sign-addlkp-btn").leanModal({  top : 110, overlay : 1,  zindex:11001, closeButton: "#address-lookup-modal .modal_close", childPopup: true});
-//$("#verify-addlkp-btn").leanModal({ top : 110, overlay : 1, zindex:11001, closeButton: "#address-lookup-modal .modal_close", childPopup: true});
-//$("#verify-message-button").leanModal({top : 50, overlay : 0.5, zindex:11001, closeButton: "#verify-sign-modal .modal_close"});
-//$("#import-key-button").leanModal({top : 50, overlay : 0.5, zindex:11001, closeButton: "#import-key-modal .modal_close"});
-
 var breakpoint = 906;
+
+// Load page js requirements..
+$.getScript('assets/js/pages/send.js');
 
 function updateValue(element) {
     //TODO: add prefix label group_ when addresstype AT = 4. So we can remove it from the label being shown and handle it in the background..
@@ -74,7 +70,6 @@ $(function() {
         $("[href='#about']").on("click", function() {bridge.userAction(['aboutClicked'])});
 
     overviewPage.init();
-    sendPageInit();
     receivePageInit();
     transactionPageInit();
     addressBookInit();
@@ -98,11 +93,9 @@ function connectSignals() {
 
     bridge.emitCoinControlUpdate.connect(this, updateCoinControlInfo);
 
-    bridge.emitAddressBookReturn.connect(this, addressBookReturn);
-
     bridge.triggerElement.connect(this, triggerElement);
 
-    bridge.emitReceipient.connect(this, addRecipientDetail);
+    bridge.emitReceipient.connect(sendPage, "addRecipientDetail");
     bridge.networkAlert.connect(this, networkAlert);
 
     optionsModel.displayUnitChanged.connect(unit, "setType");
@@ -146,23 +139,6 @@ var base58 = {
         el.css("background", "").css("color", "");
         return true;
     }
-}
-
-var addressLookup = "",
-    addressLabel  = "";
-
-function openAddressBook(field, label, sending)
-{
-    addressLookup = field;
-    addressLabel  = label;
-
-    bridge.openAddressBook(sending);
-}
-
-function addressBookReturn(address, label)
-{
-    $(addressLookup).val(address).change();
-    $(addressLabel) .val(label)  .change();
 }
 
 var pasteTo = "";
@@ -384,117 +360,6 @@ var overviewPage = {
         this.unconfirmed = $("#unconfirmed"),
         this.immature = $("#immature"),
         this.total = $("#total");
-
-        var menu = [{
-                name: 'Backup&nbsp;Wallet...',
-                fa: 'fa-save red fa-fw font-20px',
-                fun: function () {
-                   bridge.userAction(['backupWallet']);
-                }
-                }, /*
-                {
-                    name: 'Export...',
-                    img: 'qrc:///icons/editcopy',
-                    fun: function () {
-                        copy('#addressbook .footable .selected .label');
-                    }
-                }, */
-                {
-                    name: 'Sign&nbsp;Message...',
-                    fa: 'fa-pencil-square-o red fa-fw font-20px',
-                    fun: function () {
-
-                       $('#sign-message-button').click();
-                    }
-                },
-                {
-                    name: 'Verify&nbsp;Message...',
-                    fa: 'fa-check red fa-fw font-20px',
-                    fun: function () {
-                        $('#verify-message-button').click();
-                    }
-                },
-                {
-                    name: 'Exit',
-                    fa: 'fa-times red fa-fw font-20px',
-                    fun: function () {
-                       bridge.userAction(['close']);
-                    }
-                }];
-
-        $('#file').contextMenu(menu, {onOpen:function(data,e){openContextMenu(data.menu);}, onClose:function(data,e){data.menu.isOpen = 0;}, triggerOn: 'click', displayAround: 'trigger', position: 'bottom', mouseClick: 'left', sizeStyle: 'content'});
-
-        menu = [{
-                     id: 'encryptWallet',
-                     name: 'Encrypt&nbsp;Wallet...',
-                     fa: 'fa-lock red fa-fw font-20px',
-                     fun: function () {
-                        bridge.userAction(['encryptWallet']);
-                     }
-                 },
-                 {
-                     id: 'changePassphrase',
-                     name: 'Change&nbsp;Passphrase...',
-                     fa: 'fa-user-secret red fa-fw font-20px',
-                     fun: function () {
-                        bridge.userAction(['changePassphrase']);
-                     }
-                 },
-                 {
-                     id: 'toggleLock',
-                     name: '(Un)Lock&nbsp;Wallet...',
-                     fa: 'fa-unlock red pad fa-fw font-20px',
-                     fun: function () {
-                        bridge.userAction(['toggleLock']);
-                     }
-                 },
-                 {
-                     name: 'Key Management',
-                     fa: 'fa-key red fa-fw font-20px',
-                     fun: function () {
-                        $("#navitems [href=#keymanagement]").click();
-                     }
-                 },
-                 {
-                     name: 'Options',
-                     fa: 'fa-wrench red fa-fw font-20px',
-                     fun: function () {
-                        $("#navitems [href=#options]").click();
-                     }
-                 }];
-
-        $('#settings').contextMenu(menu, {onOpen:function(data,e){openContextMenu(data.menu);}, onClose:function(data,e){data.menu.isOpen = 0;}, triggerOn: 'click', displayAround: 'trigger', position: 'bottom', mouseClick: 'left', sizeStyle: 'content'});
-
-        menu = [{
-                     name: 'Debug&nbsp;Window...',
-                     fa: 'fa-bug red fa-fw font-20px',
-                     fun: function () {
-                        bridge.userAction(['debugClicked']);
-                     }
-                 },
-                 {
-                     name: 'Developer&nbsp;Tools...',
-                     fa: 'fa-edit red fa-fw font-20px',
-                     fun: function () {
-                        bridge.userAction(['developerConsole']);
-                     }
-                 },
-                 {
-                     name: ' About&nbsp;Shadow...',
-                     img: 'qrc:///icons/shadow',
-                     fun: function () {
-                        bridge.userAction(['aboutClicked']);
-                     }
-                 },
-                 {
-                     name: 'About&nbsp;Qt...',
-                     fa: 'fa-question red fa-fw font-20px',
-                     fun: function () {
-                        bridge.userAction(['aboutQtClicked']);
-                     }
-                 }];
-
-        $('#help').contextMenu(menu, {onOpen:function(data,e){openContextMenu(data.menu);}, onClose:function(data,e){data.menu.isOpen = 0;}, triggerOn: 'click', displayAround: 'trigger', position: 'bottom', mouseClick: 'left', sizeStyle: 'content'});
     },
 
     updateBalance: function(balance, shadowBal, stake, unconfirmed, immature) {
@@ -724,325 +589,6 @@ var optionsPage = {
                 changeTxnType();
         }
     }
-}
-
-/* Send Page */
-function sendPageInit() {
-    toggleCoinControl(); // TODO: Send correct option value...
-    addRecipient();
-    changeTxnType();
-    $("#cust-add-lkp").leanModal({top : 200, overlay : 0.5, closeButton: "#address-lookup-modal .modal_close"});
-}
-
-var recipients = 0;
-var returnto = "";
-function addRecipient() {
-
-    $("#recipients").append((
-           (recipients == 0 || $("div.recipient").length == 0 ? '' : '<hr />')
-        +  '<div id="recipient[count]" class="recipient">\
-<div class="form-group">\
-<label class="col-sm-3 p-l-20 control-label">Pay to <a href="#"><i class="p-b-5 fa fa-question-circle" data-title="Shadowcash.. public.." style="color:#626262;"></i></a></label>\
-<div class="col-sm-9">\
-<div class="row">\
-<div class="col-sm-6">\
-<input class="form-control" id="pay_to[count]" data-title="The address to send the payment to" maxlength="128" oninput="base58.check(this);" onchange="$(\'#label[count]\').val(bridge.getAddressLabel(this.value));" placeholder="The address to send the payment to" type="text">\
-</div>\
-<div class="col-sm-3">\
-<input class="form-control" id="label[count]"  maxlength="128" type="text" data-title="Enter a label for this address" placeholder="Enter a label"></div>\
-<div class="btn-group col-sm-3 sm-m-t-10">\
-<a id="address_lookup[count]" data-title="Choose from address book" data-toggle="modal"  data-target="#address-lookup-modal" href="#" onclick="returnto=\'pay_to[count]\,label[count]\';prepAddressLookup(true);" class="btn btn-default"><i class="fa fa-book"></i>\
-</a>\
-<a data-title="Paste address from clipboard"  class="btn btn-default" onclick="paste(\'#pay_to[count]\')"><i class="fa fa-files-o"></i>\
-</a>\
-<a data-title="Remove this recipient" class="btn btn-default" onclick="if($(\'div.recipient\').length == 1) clearRecipients(); else {var recipient=$(\'#recipient[count]\');if(recipient.next(\'hr\').remove().length==0)recipient.prev(\'hr\').remove();$(\'#recipient[count]\').remove();}"><i class="fa fa-close"></i>\
-</a>\
-</div>\
-</div>\
-</div>\
-</div>\
-<div class="form-group">\
-<label class="col-sm-3 control-label option p-l-20" for="amount[count]" class="recipient">Amount <a href="#"><i class="p-b-5 fa fa-question-circle" data-title="Shadowcash.. public.." style="color:#626262;"></i></a></label>\
-<div class="col-sm-9">\
-<div class="row">\
-<div class="col-sm-9">\
-<input class="form-control" id="amount[count]" class="amount" placeholder="0.00000000" step="0.01" type="text" value="0.00000000" onfocus="invalid($(this), true);" onchange="unit.parse(this, $(\'#unit[count]\').val());updateCoinControl();">\
-</div>\
-<select class="select-drop-down" style="margin-left:7px" id="unit[count]" onchange="unit.format(\'#amount[count]\', $(this).val());">\
-<option value="0" title="Shadow"                    ' + (unit.type == 0 ? "selected" : "") + '>SDC</option>\
-<option value="1" title="Milli-Shadow (1 / 1000)"   ' + (unit.type == 1 ? "selected" : "") + '>mSDC</option>\
-<option value="2" title="Micro-Shadow (1 / 1000000)"' + (unit.type == 2 ? "selected" : "") + '>&micro;SDC</option>\
-<option value="3" title="Shadowshi (1 / 100000000)" ' + (unit.type == 3 ? "selected" : "") + '>Shadowshi</option>\
-</select>\
-</div>\
-</div>\
-</div>\
-<div class="form-group" id="show_nar" style="border-bottom: 1px solid #F0F1F3">\
-<label class="col-sm-3 control-label option p-l-20 recipient" for="narration[count]" title="Narration:">Narration <a href="#"><i class="p-b-5 fa fa-question-circle" data-title="Shadowcash.. public.." style="color:#626262;"></i></a></label>\
-<div class="col-sm-9">\
-<div class="row">\
-<div class="col-sm-9">\
-<input class="form-control" id="narration[count]" maxlength="24" data-title="Enter a short note to send with payment (max 24 characters)"\
-placeholder="Enter a short note to send with a payment (max 24 characters)">\
-</div>\
-<div class="col-sm-3">\
-</div>\
-</div>\
-</div>\
-</div>\
-</form>\
-</div>\
-</div>\
-').replace(/\[count\]/g, recipients++));
-        // Don't allow characters in numeric fields
-        $("#amount"+(recipients-1).toString()).on("keydown", unit.keydown).on("paste",  unit.paste);
-
-        //$("#address_lookup"+(recipients-1)).leanModal({top : 200, overlay : 0.5, closeButton: "#address-lookup-modal .modal_close"});
-		$('#address-lookup-modal'+(recipients-1)).modal('hide');
-
-        // Addressbook Modal
-        $("#addressbook"+(recipients-1).toString()).leanModal({ top : 10, left: 5, overlay : 0.5, closeButton: ".modal_close" });
-
-    bridge.userAction(['clearRecipients']);
-}
-
-
-
-
-function clearRecipients() {
-    $("#recipients").html("");
-    recipients = 0;
-    addRecipient();
-    returnto = "";
-    $('#recipients [data-title]').tooltip();
-}
-
-function addRecipientDetail(address, label, narration, amount) {
-    var recipient = recipients - 1;
-
-    $("#pay_to"+recipient).val(address).change();
-    $("#label"+recipient).val(label).change();
-    $("#amount"+recipient).val(amount).change();
-}
-
-function changeTxnType()
-{
-    var type=$("#txn_type").val();
-
-    if (type > 1)
-    {
-        $("#tx_ringsize,#suggest_ring_size")[bridge.info.options.AutoRingSize == true ? 'hide' : 'show']();
-        $("#coincontrol,#spend_sdc,#suggest_ring_size,#tx_ringsize").hide();
-        $("#spend_shadow").show();
-        toggleCoinControl(false);
-		$(".hide-coin-controle").hide();
-		$(".hide-adv-controle").show();
-    }
-    else
-    {
-        $("#tx_ringsize,#suggest_ring_size,#spend_shadow").hide();
-        $("#coincontrol,#spend_sdc").show();
-		$(".hide-coin-controle").show();
-		$(".hide-adv-controle").hide();
-    }
-}
-
-//rarw
-
-
-function toggleADVControl(enable) {
-   if( $('#txn_type').val() == "2")
-      $('#tx_ringsize,#suggest_ring_size').toggle();
-   else
-      $('#tx_ringsize,#suggest_ring_size').hide();
-}
-
-function suggestRingSize()
-{
-    chainDataPage.updateAnonOutputs();
-
-    var minsize = bridge.info.options.MinRingSize||3,
-        maxsize = bridge.info.options.MaxRingSize||50;
-
-    function mature(value, min_owned) {
-        if(min_owned == undefined || !$.isNumeric(min_owned))
-            min_owned = 1;
-
-        var anonOutput = chainDataPage.anonOutputs[value];
-
-        if(anonOutput)
-            return Math.min(anonOutput
-               && anonOutput.owned_mature  >= min_owned
-               && anonOutput.system_mature >= minsize
-               && anonOutput.system_mature, maxsize);
-        else
-            return 0;
-    }
-
-    function getOutputRingSize(output, test, maxsize)
-    {
-        switch (output)
-        {
-            case 0:
-                return maxsize;
-            case 2:
-                return mature(1*test, 2)||getOutputRingSize(++output, test, maxsize);
-            case 6:
-                return Math.min(mature(5*test, 1),
-                                mature(1*test, 1))||getOutputRingSize(++output, test, maxsize);
-            case 7:
-                return Math.min(mature(4*test, 1),
-                                mature(3*test, 1))||getOutputRingSize(++output, test, maxsize);
-            case 8:
-                return Math.min(mature(5*test, 1),
-                                mature(3*test, 1))||getOutputRingSize(++output, test, maxsize);
-            case 9:
-                return Math.min(mature(5*test, 1),
-                                mature(4*test, 1))||getOutputRingSize(++output, test, maxsize);
-            default:
-                if(output == 10)
-                    return mature(test/2, 2);
-
-                maxsize = Math.max(mature(output*test, 1),mature(1*test, output))||getOutputRingSize(output==1?3:++output, test, maxsize);
-        }
-        return maxsize;
-    }
-
-    for(var i=0;i<recipients;i++)
-    {
-        var test = 1,
-            output = 0,
-            el = $("#amount"+i),
-            amount = unit.parse(el.val(), $("#unit"+i));
-
-        $("[name=err"+el.attr('id')+"]").remove();
-
-        while (amount >= test && maxsize >= minsize)
-        {
-            output = parseInt((amount / test) % 10);
-            try {
-                maxsize = getOutputRingSize(output, test, maxsize);
-            } catch(e) {
-                console.log(e);
-            } finally {
-                if(!maxsize)
-                    maxsize = mature(output*test);
-
-                test *= 10;
-            }
-        }
-
-        if(maxsize < minsize)
-        {
-            invalid(el);
-            el.parent().before("<div name='err"+el.attr('id')+"' class='warning'>Not enough system and or owned outputs for the requested amount. Only <b>"
-                     +maxsize+"</b> anonymous outputs exist for coin value: <b>" + unit.format(output*(test/10), $("#unit"+i)) + "</b></div>");
-            el.on('change', function(){$("[name=err"+el.attr('id')+"]").remove();});
-
-            $("#tx_ringsize").show();
-            $("#suggest_ring_size").show();
-
-            return;
-        }
-    }
-    $("#ring_size").val(maxsize);
-}
-
-function toggleCoinControl(enable) {
-    if(enable==undefined && $("#coincontrol_enabled").css("display") == "block" || enable == false)
-    {
-        $("#coincontrol_enabled") .css("display", "none");
-        $("#coincontrol_disabled").css("display", "block");
-    } else
-    {
-        $("#coincontrol_enabled") .css("display", "block");
-        $("#coincontrol_disabled").css("display", "none");
-    }
-}
-
-function updateCoinControl() {
-    if($("#coincontrol_enabled").css("display") == "none")
-        return;
-    var amount = 0;
-
-    for(var i=0;i<recipients;i++)
-        amount += unit.parse($("#amount"+i).val());
-
-    bridge.updateCoinControlAmount(amount);
-}
-
-function updateCoinControlInfo(quantity, amount, fee, afterfee, bytes, priority, low, change)
-{
-    if($("#coincontrol_enabled").css("display") == "none")
-        return;
-
-    if (quantity > 0)
-    {
-        $("#coincontrol_auto").hide();
-
-        var enable_change = (change == "" ? false : true);
-
-        $("#coincontrol_quantity").text(quantity);
-        $("#coincontrol_amount")  .text(unit.format(amount));
-        $("#coincontrol_fee")     .text(unit.format(fee));
-        $("#coincontrol_afterfee").text(unit.format(afterfee));
-        $("#coincontrol_bytes")   .text("~"+bytes).css("color", (bytes > 10000 ? "red" : null));
-        $("#coincontrol_priority").text(priority).css("color", (priority.indexOf("low") == 0 ? "red" : null)); // TODO: Translations of low...
-        $("#coincontrol_low")     .text(low).toggle(enable_change).css("color", (low == "yes" ? "red" : null)); // TODO: Translations of low outputs
-        $("#coincontrol_change")  .text(unit.format(change)).toggle(enable_change);
-
-        $("label[for='coincontrol_low']")   .toggle(enable_change);
-        $("label[for='coincontrol_change']").toggle(enable_change);
-
-        $("#coincontrol_labels").show();
-
-    } else
-    {
-        $("#coincontrol_auto").show();
-        $("#coincontrol_labels").hide();
-        $("#coincontrol_quantity").text("");
-        $("#coincontrol_amount")  .text("");
-        $("#coincontrol_fee")     .text("");
-        $("#coincontrol_afterfee").text("");
-        $("#coincontrol_bytes")   .text("");
-        $("#coincontrol_priority").text("");
-        $("#coincontrol_low")     .text("");
-        $("#coincontrol_change")  .text("");
-    }
-}
-
-var invalid = function(el, valid) {
-    if(valid == true)
-        el.css("background", "").css("color", "");
-    else
-        el.css("background", "#E51C39").css("color", "white");
-
-    return (valid == true);
-}
-
-function sendCoins() {
-    bridge.userAction(['clearRecipients']);
-
-    if(bridge.info.options.AutoRingSize && $("#txn_type").val() > 1)
-        suggestRingSize();
-
-    for(var i=0;i<recipients;i++) {
-        var el = $("#pay_to"+i);
-        var valid = true;
-
-        valid = invalid(el, bridge.validateAddress(el.val()));
-
-        el = $("#amount"+i);
-
-        if(unit.parse(el.val()) == 0 && !invalid(el))
-            valid = false;
-
-        if(!valid || !bridge.addRecipient($("#pay_to"+i).val(), $("#label"+i).val(), $("#narration"+i).val(), unit.parse($("#amount"+i).val(), $("#unit"+i).val()), $("#txn_type").val(), $("#ring_size").val()))
-            return false;
-    }
-
-    if(bridge.sendCoins($("#coincontrol_enabled").css("display") != "none", $("#change_address").val()))
-        clearRecipients();
 }
 
 function receivePageInit() {
@@ -1292,7 +838,7 @@ function appendAddresses(addresses) {
 
 }
 
-function prepAddressLookup(lReceiveAddresses)
+function addressLookup(returnFields, lReceiveAddresses)
 {
     var page = (lReceiveAddresses ? "#receive" : "#addressbook");
     var table =  $(page + "-table");
@@ -1308,7 +854,7 @@ function prepAddressLookup(lReceiveAddresses)
             $(this).addClass("selected").siblings("tr").removeClass("selected");
         })
         .on('dblclick', function() {
-            var retfields = returnto.split(',');
+            var retfields = returnFields.split(',');
             $("#" + retfields[0]).val( $(this).attr("id").trim() );
             if(retfields[1] != undefined )
             {
@@ -1471,14 +1017,12 @@ function formatTransaction(transaction) {
     return "<tr id='"+transaction.id+"' data-title='"+transaction.tt+"'>\
 	                <td data-value='"+transaction.d+"'>"+transaction.d_s+"</td>\
                     <td class='trans-status' data-value='"+transaction.c+"'><center><i class='fa fa-lg "+transaction.s+"'></center></td>\
-                    <td class='trans-type'>"+transaction.t_l+"</td>\
+                    <td class='trans_type'><img height='15' width='15' src='assets/icons/tx_"+transaction.t+".png' /> "+transaction.t_l+"</td>\
                     <td style='color:"+transaction.a_c+";' data-value='"+transaction.ad+"' data-label='"+transaction.ad_l+"'><span class='editable'>"+transaction.ad_d+"</span></td>\
                     <td class='trans-nar'>"+transaction.n+"</td>\
                     <td class='amount' style='color:"+transaction.am_c+";' data-value='"+transaction.am_d+"'>"+transaction.am_d+"</td>\
                  </tr>";
 }
-
-					/* <td class='trans_type'><img height='15' width='15' src='qrc:///icons/tx_"+transaction.t+"' /> "+transaction.t_l+"</td>\  */ //todo
 
 function visibleTransactions(visible) {
     if(visible[0] != "*")
@@ -2413,7 +1957,6 @@ var blockExplorerPage =
                         .on("dblclick", function(e) {
 
 							$('#blkexp-txn-modal').appendTo('body').modal('show');
-                            //$(this).leanModal({ top : 10, overlay : 0.5, closeButton: "#blkexp-txn-modal .modal_close" });
 
                             selectedTxn = bridge.txnDetails(blkHash , $(this).attr("data-value").trim());
 
@@ -2481,8 +2024,6 @@ var blockExplorerPage =
             .on("dblclick", function(e)
             {
 				$('#block-info-modal').appendTo('body').modal('show');
-
-                //$(this).leanModal({ top : 10, overlay : 0.5, closeButton: "#block-info-modal .modal_close" });
 
                 selectedBlock = bridge.blockDetails($(this).attr("data-value").trim()) ;
 
