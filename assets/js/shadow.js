@@ -5,31 +5,6 @@
 //$("#verify-message-button").leanModal({top : 50, overlay : 0.5, zindex:11001, closeButton: "#verify-sign-modal .modal_close"});
 //$("#import-key-button").leanModal({top : 50, overlay : 0.5, zindex:11001, closeButton: "#import-key-modal .modal_close"});
 
-var qrcode = new QRCode("qrcode", {colorDark:'#E51C39', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H, width: 220, height: 220,});
-
-function showQRCode(address, label) {
-
-    if(address!=undefined)
-        $("#qraddress").val(address);
-
-    if(label!=undefined)
-        $("#qrlabel").val(label);
-
-    qrcode.clear();
-
-    var textarea = $("#qrcode-data"),
-        data = "shadowcoin:";
-
-    data += $("#qraddress").val()
-          + "?label="     + $("#qrlabel").val()
-          + "&narration=" + $("#qrnarration").val()
-          + "&amount=" + unit.parse($("#qramount").val(), $("#qrunit").val());
-
-    textarea.text(data);
-
-    qrcode.makeCode(data);
-}
-
 var breakpoint = 906;
 
 function updateValue(element) {
@@ -69,8 +44,6 @@ function updateValue(element) {
 }
 
 $(function() {
-    $("#qramount").on("keydown", unit.keydown).on("paste", unit.paste);
-
     $('.footable').footable({breakpoints:{phone:480, tablet:700}, delay: 50})
     .on({'footable_breakpoint': function() {
             //$('table').trigger('footable_expand_first_row'); uncomment if we want the first row to auto-expand
@@ -96,7 +69,6 @@ $(function() {
         if (window.innerWidth > breakpoint)
             $("#layout").removeClass('active');
     };
-
 
     if(bridge)
         $("[href='#about']").on("click", function() {bridge.userAction(['aboutClicked'])});
@@ -1853,9 +1825,9 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     var contact = contacts[key];
 
     if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
-    {     
-        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read}); 
-        
+    {
+        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read});
+
         appendContact(key, false);
         if(current_key == key) //on send of our own message reload convo to add message.
             openConversation(key, false);
