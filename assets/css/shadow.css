@@ -498,6 +498,51 @@ color: #000;
     background-color: #F0F1F3;
 }
 
+.group-invite {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    padding-left: 20px;
+    border-bottom: 1px solid #ecf0f1;
+    text-decoration:none;
+    color: #fff;
+    background-color: #131218;
+    font-weight:700;
+}
+
+.group-invite:hover{
+    color: #fff;
+}
+
+.group-invite-label {
+    display: inline-block; 
+    width: 70%; 
+    padding-left: 10px;
+}
+/*
+#group-invite:hover {
+    background-color: #F0F1F3;
+}*/
+
+.group-invite-check {
+    padding: 3%;
+    color: #fff;
+}
+
+.group-invite-check:hover {
+    padding: 3%;
+    color: green;
+}
+
+.group-invite-close {
+    padding: 3%;
+    color: #fff;
+}
+.group-invite-close:hover {
+    padding: 3%;
+    color: red;
+}
+
 .contact-list ul {
     list-style: none;
     margin: 0;

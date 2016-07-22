@@ -1892,14 +1892,17 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
             console.log("GROUP INVITE | key=" + group_key + " label=" + group_label);
 
             if(type = "R"){ //If message contains /invite privkey label, insert HTML
-                message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
+                //message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
+                if(!read)
+                    addInvite(group_key, group_label, id);
+                return false;
             } else if(type = "S"){
                 message = "An invite for group " + group_label + " has been sent.";
             }
         } else if(group_label.length == 0){
             group_label = them + "_" + String(group_key).substring(1, 5);
         } else if(group_key == null){
-                message = "The group invitation as a malconfigured private key.";
+                message = "The group invitation was a malconfigured private key.";
         }
 
              //+ group_key.substring(0, 5)
@@ -2091,6 +2094,7 @@ function removeNotificationCount(key){
 
 }
 
+
 //OpenConversation is split off to allow for opening conversation automatically without removing notification.
 function openConversation(key, click) {
             console.log("opening Conversation key=" + key);
@@ -2132,6 +2136,7 @@ function openConversation(key, click) {
 					//<span class='info'>\
                         //<img src='"+contact.avatar+"' />\
                     //</span>\
+                   
 
                 //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
                 //TODO: parse with regex to be sure.. do in appendMessage
@@ -2144,7 +2149,7 @@ function openConversation(key, click) {
                         </span>\
                         <span class='timestamp'>"+(new Date(message.received*1000).toLocaleString())+"</span>\
 						<span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-						<span class='message-text'>"+micromarkdown.parse(message.message)+    "</span>\
+						<span class='message-text'>"+micromarkdown.parse(message.message) +  "</span>\
                     </span></li>");
 
                 if(message.group && message.type == 'S' && !bSentMessage){ //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
@@ -2193,6 +2198,30 @@ function openConversation(key, click) {
             }
 
         }
+        
+function addInvite(privkey, label, id){
+    $("#group-invite-list").append(
+            "<div id=invite-" + privkey + "-" + id + ">" +
+                 "<a class='group-invite'>"+
+                  "<i class=\"fa fa-envelope\"></i>"+
+                  "<span class=\"group-invite-label\"> " + label + " </span>"+
+                  "<i class=\"fa fa-check group-invite-check\" onclick=\"acceptInvite('" + privkey + "','" + label + "', '" + id + "');\"></i>"+
+                  "<i class=\"fa fa-close group-invite-close\" onclick=\"deleteInvite('" + privkey + "','" + id + "');\"></i>"+
+                "</a>"+
+             "</div>"
+    );
+}
+
+function deleteInvite(key, id){
+    console.log("deleting invite!");
+    $("#invite-" + key + "-" + id).html("");
+    bridge.deleteMessage(id);
+}
+
+function acceptInvite(key, label, id){
+    deleteInvite(key, id);
+    bridge.joinGroupChat(key,'group_' + label);
+}
 
 function newConversation() {
 	$('#new-contact-modal').modal('hide');
