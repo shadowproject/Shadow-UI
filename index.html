@@ -319,7 +319,7 @@
                     <div id="stakingIcon" class="not-staking" data-title="Not staking because wallet is locked"></div>
                   </li>
                   <li class="inline p-l-10">
-                    <div id="connectionsIcon" class="no-connection" data-title="0 active connection(s) to ShadowCoin network"></div>
+                    <div id="connectionsIcon" class="no-connection" data-title="0 active connection(s) to ShadowCash network"></div>
                   </li>
                   <li class="inline p-l-10">
                     <div id="syncingIcon" class="syncing-spinner" data-title="Wallet is syncing"></div>
@@ -1905,17 +1905,17 @@
 
       <!-- nav tabs -->
       <ul class="nav nav-tabs">
-        <li id="quickview-private-tab">
+        <li id="quickview-private-tab" onclick="contactScroll.refresh()">
           <a href="#quickview-private" data-toggle="tab">
             <i class="fa fa-user"></i>
             PRIVATE</a>
         </li>
-        <li id="quickview-group-tab">
+        <li id="quickview-group-tab" onclick="contactGroupScroll.refresh()">
           <a href="#quickview-group" data-toggle="tab">
             <i class="fa fa-users"></i>
             GROUP</a>
         </li>
-        <li id="quickview-book-tab">
+        <li id="quickview-book-tab" onclick="">
           <a href="#quickview-book" data-toggle="tab">
             <i class="fa fa-bars"></i>
             BOOK</a>
@@ -1940,10 +1940,7 @@
             <div class="view bg-white" style="height: auto;">
 
               <div id="contact-list" class="contact-list">
-
-                <div>
                   <ul></ul>
-                </div>
               </div>
             </div>
             <!--
@@ -1976,10 +1973,7 @@
             <div class="view bg-white">
 
               <div id="contact-group-list" class="contact-list">
-
-                <div>
                   <ul></ul>
-                </div>
               </div>
 
             </div>
@@ -1992,10 +1986,7 @@
           <div class="view-port clearfix" id="alerts">
             <div class="view bg-white">
               <div id="contact-book-list" class="contact-list">
-
-                <div>
                   <ul></ul>
-                </div>
               </div>
             </div>
 
@@ -3165,6 +3156,9 @@
 <script>
 $(window).resize(function () {
   $('.contact-discussion').height($(window).height() - 276);
+  $('#contact-list').height($(window).height()-80);
+  $('#contact-group-list').height($(window).height()-80);
+  $('#contact-book-list').height($(window).height()-80);
 });
 
 $(window).trigger('resize');

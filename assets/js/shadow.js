@@ -1220,7 +1220,7 @@ function addSendAddress()
 
     var addType = 0; // not used
     result = bridge.newAddress(sendLabel, addType, sendAddress, true);
-
+    updateContact(sendLabel, current_key, sendAddress);
     if (result == "")
     {
         var errorMsg = bridge.lastAddressError();
@@ -1343,6 +1343,10 @@ function appendAddresses(addresses) {
         if(isSend){
             console.log("adding to addressbook isGroup=" + isGroup);
             createContact(address.label, address.address, isGroup);
+            /*
+            if(contacts[address.address] != undefined)
+                updateContact(address.label, address.address);*/
+                
             appendContact(address.address, false, true);
          }
 
@@ -1787,6 +1791,11 @@ function appendMessages(messages, reset) {
         $("#message-count").text(0);
         messagesScroller.scrollTo(0, 0);
         contactScroll   .scrollTo(0, 0);
+        contactGroupScroll   .scrollTo(0, 0);
+        contactBookScroll   .scrollTo(0, 0);
+         $("#contact-list").on("mouseover", function (){contactScroll.refresh();});
+         $("#contact-group-list").on("mouseover", function (){contactGroupScroll.refresh();});
+         $("#contact-book-list").on("mouseover", function (){contactBookScroll.refresh();});
     }
 
     if(messages == "[]")
@@ -1947,8 +1956,43 @@ function createContact(label, address, group){
         contact.group = group,
         contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
         contact.messages  = new Array();
-    }
+    } 
+}
 
+function updateContact(label, address, contact_address){
+        //if address is a group address, then we'll be search for contact_address in the group messages
+        var contact = contacts[address];
+        if(contact != undefined){
+            console.log("updating key=" + address + " label=" + label);
+            
+            if(contact_address == undefined || address==contact_address)
+                contact_address = "";
+            else
+                console.log("updateContact contact_address" + contact_address);
+            
+            for(var i =0;i < contact.messages.length;i++){
+            if(contact.messages[i].type == "R" && (contact.messages[i].them == address || contact.messages[i].them == contact_address)) {
+                        console.log("[updateContact]" + contact.messages[i].them + " == " + address + " OR" ); //+ (contact_address != undefined) ? contact_address : ""
+                        console.log("updating message with label " + label)
+                        contact.messages[i].label_msg = label;
+                    }
+                }
+                    
+            
+            if(contact_address == ""){ //if not groupchat
+                contacts[address].label = label;
+                $("#contact-book-" + address + " .contact-info .contact-name").text(label);
+                $("#contact-" + address + " .contact-info .contact-name").text(label);
+            } else {
+                $("#contact-book-" + contact_address + " .contact-info .contact-name").text(label);
+                $("#contact-" + contact_address + " .contact-info .contact-name").text(label);
+            }
+            openConversation(address, true);
+        }
+        //check if current key is ==address
+        //loop through messages and change label
+       
+       
 }
 
 function appendContact (key, newcontact, addressbook) {
@@ -2162,8 +2206,6 @@ function openConversation(key, click) {
 
             messagesScroller.refresh();
 
-            messagesScroller.scrollTo(0, messagesScroller.maxScrollY, 600);
-
             var scrollerBottom = function() {
 
                 var max = messagesScroller.maxScrollY;
@@ -2173,6 +2215,7 @@ function openConversation(key, click) {
                 if(max != messagesScroller.maxScrollY)
                     messagesScroller.scrollTo(0, messagesScroller.maxScrollY, 100);
             };
+            
 
             setTimeout(scrollerBottom, 700);
             setTimeout(scrollerBottom, 1000);
@@ -2182,6 +2225,7 @@ function openConversation(key, click) {
             setTimeout(scrollerBottom, 2200);
             setTimeout(scrollerBottom, 2500);
             setTimeout(scrollerBottom, 5000);
+
 
             //discussion.children("[title]").on("mouseenter", tooltip);
 
@@ -2356,7 +2400,26 @@ function verifyMessage() {
 
 var contactScroll = new IScroll('#contact-list', {
     mouseWheel: true,
-    scrollbars: true,
+    lockDirection: true,
+    interactiveScrollbars: true,
+    scrollbars: 'custom',
+    scrollY: true,
+    scrollX: false,
+    preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|P|SPAN)$/ }
+});
+
+var contactGroupScroll = new IScroll('#contact-group-list', {
+    mouseWheel: true,
+    lockDirection: true,
+    interactiveScrollbars: true,
+    scrollbars: 'custom',
+    scrollY: true,
+    scrollX: false,
+    preventDefaultException:{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|P|SPAN)$/ }
+});
+
+var contactBookScroll = new IScroll('#contact-book-list', {
+    mouseWheel: true,
     lockDirection: true,
     interactiveScrollbars: true,
     scrollbars: 'custom',
@@ -2367,7 +2430,6 @@ var contactScroll = new IScroll('#contact-list', {
 
 var messagesScroller = new IScroll('.contact-discussion', {
    mouseWheel: true,
-   scrollbars: true,
    lockDirection: true,
    interactiveScrollbars: true,
    scrollbars: 'custom',
@@ -2379,6 +2441,8 @@ var messagesScroller = new IScroll('.contact-discussion', {
 
 function iscrollReload(scroll) {
     contactScroll.refresh();
+    contactGroupScroll.refresh();
+    contactBookScroll.refresh();
     messagesScroller.refresh();
 
     if(scroll == true)

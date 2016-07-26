@@ -910,10 +910,47 @@ width:auto;
 }
 
 .no-connection {
-	background: url('../icons/connect0_16.png');
+	background: url('../icons/connect_0.png');
 	height:16px;
 	width:26px;
 }
+
+.connection-1 {
+	background: url('../icons/connect_1.png');
+	height:16px;
+	width:26px;
+}
+
+.connection-2 {
+	background: url('../icons/connect_2.png');
+	height:16px;
+	width:26px;
+}
+
+.connection-3 {
+	background: url('../icons/connect_3.png');
+	height:16px;
+	width:26px;
+}
+
+.connection-4 {
+	background: url('../icons/connect_4.png');
+	height:16px;
+	width:26px;
+}
+
+.connection-5 {
+	background: url('../icons/connect_5.png');
+	height:16px;
+	width:26px;
+}
+
+.connection-6 {
+	background: url('../icons/connect_6.png');
+	height:16px;
+	width:26px;
+}
+
 .no-syncing {
 	background: url('../icons/synced.png');
 	height:16px;
