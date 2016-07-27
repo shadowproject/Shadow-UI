@@ -103,6 +103,7 @@ function updateValueChat(element, key) {
             contacts[current_key].label = newval;
             $("#chat-header").data("value", newval);
             $("#contact-" + current_key + " .contact-info .contact-name").text(newval);
+            $("#contact-book-" + current_key + " .contact-info .contact-name").text(newval);
             console.log("reached end of keypress");
         }
     });
@@ -121,7 +122,7 @@ function updateValueChat(element, key) {
         contacts[current_key].label = newval;
         $("#chat-header").data("value", newval);
         $("#contact-" + current_key + " .contact-info .contact-name").text(newval);
-
+        $("#contact-book-" + current_key + " .contact-info .contact-name").text(newval);
     });
     
     
@@ -1196,7 +1197,9 @@ function clearRecvAddress()
 function addAddress()
 {
     alert("addAddress with type=" + $("#new-addresstype").val());
-    newAdd = bridge.newAddress($("#new-address-label").val(), $("#new-addresstype").val());
+    var addresstype = $("#new-addresstype").val();
+    var addresslabel = (addresstype == "4") ? "group_" + $("#new-address-label").val() : $("#new-address-label").val();
+    newAdd = bridge.newAddress(addresslabel, addresstype);
 
     //TODO: Highlight address
     //$("#add-address-modal .modal_close").click();
@@ -1332,9 +1335,10 @@ function appendAddresses(addresses) {
             }
         }
         /* remove group_ prefix from labels*/
-        var isGroup = (address.at == 4);
+        var isGroup = (address.at == 4 || address.label.lastIndexOf("group_", 0) === 0);
         var isSend = (address.type == "S");
         if(isGroup){
+            address.at = 4; //lastIndexOf..
             address.label = address.label.replace("group_", "");
             address.label_value = address.label_value.replace("group_", "");
             isSend = true;
@@ -1942,8 +1946,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 
      if(current_key == "")
         current_key = key;
-        
-     //scrollMessages();
+
 }
 
 
@@ -1997,7 +2000,7 @@ function updateContact(label, address, contact_address){
        
 }
 
-function appendContact (key, newcontact, addressbook) {
+function appendContact (key, openconvo, addressbook) {
     var elementName = addressbook ? "contact-book-" : "contact-";
     var contact_el = $("#" + elementName +key);
     var contact = contacts[key];
@@ -2008,7 +2011,7 @@ function appendContact (key, newcontact, addressbook) {
     if(contact_el.length == 0) {
         var latestMessage = "";
     
-        if(contact.messages != undefined && !addressbook)
+        if(contact.messages[0] != undefined && !addressbook)
             latestMessage = contact.messages[0].message; //contact.messages.length-1
             
         
@@ -2058,11 +2061,10 @@ function appendContact (key, newcontact, addressbook) {
         
     }
 
-    if(newcontact){ //|| contact_el.hasClass("selected")
+    if(openconvo){ //|| contact_el.hasClass("selected")
         openConversation(key, false);
     }
-    
-    iscrollReload();
+      
 }
 
 function addNotificationCount(key, unread_count){
@@ -2092,7 +2094,7 @@ function removeNotificationCount(key){
     }
     
     //iscrollReload();
-    //scrollMessages(); //THIS ONE WORKS
+    scrollMessages(); //THIS ONE WORKS
 
     //NOTIFICATION IN CONTACT LIST
     var contact = contacts[key];
@@ -2103,6 +2105,9 @@ function removeNotificationCount(key){
     var notifications_contact = $("#contact-"+key).find(".message-notifications");
     var notifications_contact_value = notifications_contact.html();
 
+    if(notifications_contact.text() == 0)
+        return false;
+        
     notifications_contact.text(0);
     notifications_contact.hide();
 
@@ -2146,6 +2151,11 @@ function removeNotificationCount(key){
 //OpenConversation is split off to allow for opening conversation automatically without removing notification.
 function openConversation(key, click) {
             console.log("opening Conversation key=" + key);
+            
+            if(click)
+                 $("#chat-menu-link").click();//open chat window when on other page
+            
+                
             current_key = key;
             //TODO: detect wether user is typing, if so do not reload page to other conversation..
             //$(this).addClass("selected").siblings("li").removeClass("selected");
@@ -2250,32 +2260,29 @@ function acceptInvite(key, label, id){
 }
 
 function scrollMessages(){
-            console.log("scrollMessages called!");
             messagesScroller.refresh();
 
             var scrollerBottom = function() {
 
-                var max = messagesScroller.maxScrollY;
+                var max = messagesScroller.y;
 
                 messagesScroller.refresh();
-                console.log("max=" + max + " maxScrollY=" + messagesScroller.maxScrollY);
-                //if(max != messagesScroller.maxScrollY){
+                if(max != messagesScroller.maxScrollY){
                     //console.log("not equal max=" + max + " maxScrollY=" + messagesScroller.maxScrollY);
                     messagesScroller.scrollTo(0, messagesScroller.maxScrollY, 100);
-                //}
+                }
             };
             
-
-            setTimeout(scrollerBottom, 700);
+            scrollerBottom();
+            /*setTimeout(scrollerBottom, 700);
             setTimeout(scrollerBottom, 1000);
             setTimeout(scrollerBottom, 1300);
             setTimeout(scrollerBottom, 1600);
             setTimeout(scrollerBottom, 1900);
             setTimeout(scrollerBottom, 2200);
             setTimeout(scrollerBottom, 2500);
-            setTimeout(scrollerBottom, 5000);
+            setTimeout(scrollerBottom, 5000);*/
             
-            console.log("reached end of scrollmessages");
 }
 
 function newConversation() {

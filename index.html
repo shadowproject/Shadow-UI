@@ -133,7 +133,7 @@
           </li>
 
           <li class="">
-            <a href="#messages" onclick="iscrollReload(true);">
+            <a href="#messages" id="chat-menu-link" onclick="scrollMessages();">
               <span class="title">Chat</span>
               <span class="details">
                 <span class="user-notifications">
@@ -3158,7 +3158,7 @@ $(window).resize(function () {
   $('.contact-discussion').height($(window).height() - 276);
   $('#contact-list').height($(window).height()-80);
   $('#contact-group-list').height($(window).height()-80);
-  $('#contact-book-list').height($(window).height()-80);
+  $('#contact-book-list').height($(window).height()-60);
 });
 
 $(window).trigger('resize');
