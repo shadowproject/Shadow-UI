@@ -1942,6 +1942,8 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 
      if(current_key == "")
         current_key = key;
+        
+     //scrollMessages();
 }
 
 
@@ -2067,7 +2069,7 @@ function addNotificationCount(key, unread_count){
 
     if(contacts[key] == undefined)
         return false;
-
+        
     var notifications_contact = $("#contact-"+key).find(".message-notifications");
     var notifications_contact_value = notifications_contact.html();
     notifications_contact.text(parseInt(notifications_contact_value) + parseInt(unread_count));
@@ -2088,7 +2090,9 @@ function removeNotificationCount(key){
     if(key == undefined && current_key != ""){
         key = current_key;
     }
-
+    
+    //iscrollReload();
+    //scrollMessages(); //THIS ONE WORKS
 
     //NOTIFICATION IN CONTACT LIST
     var contact = contacts[key];
@@ -2204,29 +2208,7 @@ function openConversation(key, click) {
             }
 
 
-            messagesScroller.refresh();
-
-            var scrollerBottom = function() {
-
-                var max = messagesScroller.maxScrollY;
-
-                messagesScroller.refresh();
-
-                if(max != messagesScroller.maxScrollY)
-                    messagesScroller.scrollTo(0, messagesScroller.maxScrollY, 100);
-            };
-            
-
-            setTimeout(scrollerBottom, 700);
-            setTimeout(scrollerBottom, 1000);
-            setTimeout(scrollerBottom, 1300);
-            setTimeout(scrollerBottom, 1600);
-            setTimeout(scrollerBottom, 1900);
-            setTimeout(scrollerBottom, 2200);
-            setTimeout(scrollerBottom, 2500);
-            setTimeout(scrollerBottom, 5000);
-
-
+            scrollMessages();
             //discussion.children("[title]").on("mouseenter", tooltip);
 
             if(!bSentMessage && contact.messages.length > 0){
@@ -2240,7 +2222,7 @@ function openConversation(key, click) {
                  $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li>");
                  $("#message-to-address").val(contact.address);
             }
-
+            
         }
         
 function addInvite(privkey, label, id){
@@ -2265,6 +2247,35 @@ function deleteInvite(key, id){
 function acceptInvite(key, label, id){
     deleteInvite(key, id);
     bridge.joinGroupChat(key,'group_' + label);
+}
+
+function scrollMessages(){
+            console.log("scrollMessages called!");
+            messagesScroller.refresh();
+
+            var scrollerBottom = function() {
+
+                var max = messagesScroller.maxScrollY;
+
+                messagesScroller.refresh();
+                console.log("max=" + max + " maxScrollY=" + messagesScroller.maxScrollY);
+                //if(max != messagesScroller.maxScrollY){
+                    //console.log("not equal max=" + max + " maxScrollY=" + messagesScroller.maxScrollY);
+                    messagesScroller.scrollTo(0, messagesScroller.maxScrollY, 100);
+                //}
+            };
+            
+
+            setTimeout(scrollerBottom, 700);
+            setTimeout(scrollerBottom, 1000);
+            setTimeout(scrollerBottom, 1300);
+            setTimeout(scrollerBottom, 1600);
+            setTimeout(scrollerBottom, 1900);
+            setTimeout(scrollerBottom, 2200);
+            setTimeout(scrollerBottom, 2500);
+            setTimeout(scrollerBottom, 5000);
+            
+            console.log("reached end of scrollmessages");
 }
 
 function newConversation() {
@@ -2401,6 +2412,7 @@ function verifyMessage() {
 var contactScroll = new IScroll('#contact-list', {
     mouseWheel: true,
     lockDirection: true,
+    scrollbars: true,
     interactiveScrollbars: true,
     scrollbars: 'custom',
     scrollY: true,
@@ -2411,6 +2423,7 @@ var contactScroll = new IScroll('#contact-list', {
 var contactGroupScroll = new IScroll('#contact-group-list', {
     mouseWheel: true,
     lockDirection: true,
+    scrollbars: true,
     interactiveScrollbars: true,
     scrollbars: 'custom',
     scrollY: true,
@@ -2421,6 +2434,7 @@ var contactGroupScroll = new IScroll('#contact-group-list', {
 var contactBookScroll = new IScroll('#contact-book-list', {
     mouseWheel: true,
     lockDirection: true,
+    scrollbars: true,
     interactiveScrollbars: true,
     scrollbars: 'custom',
     scrollY: true,
@@ -2431,6 +2445,7 @@ var contactBookScroll = new IScroll('#contact-book-list', {
 var messagesScroller = new IScroll('.contact-discussion', {
    mouseWheel: true,
    lockDirection: true,
+   scrollbars: true,
    interactiveScrollbars: true,
    scrollbars: 'custom',
    scrollY: true,
@@ -2440,6 +2455,7 @@ var messagesScroller = new IScroll('.contact-discussion', {
 
 
 function iscrollReload(scroll) {
+    console.log("iScrollReload called");
     contactScroll.refresh();
     contactGroupScroll.refresh();
     contactBookScroll.refresh();
