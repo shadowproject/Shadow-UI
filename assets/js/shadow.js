@@ -2019,7 +2019,7 @@ function appendContact (key, openconvo, addressbook) {
         var contact_html =
             "<li id='"+ elementName + key +"' class='contact' data-title='"+contact.label+"'>\
                 <span class='contact-info'>\
-                    <span class='contact-name'>"+contact.label+"</span>\
+                    <span class='contact-name'>"+ ((contact.group && addressbook) ? "<i class='fa fa-users' style='padding-right: 7px;'></i>" : "") + contact.label+"</span>\
                      <span class='" + (addressbook ? "contact-address" : "contact-message") + "'>"+ (addressbook ? contact.address : latestMessage) + "</span>\
                 </span>\
                 <span class='contact-options'>\
@@ -2195,7 +2195,8 @@ function openConversation(key, click) {
                         //<img src='"+contact.avatar+"' />\
                     //</span>\
                    
-
+                 var time  = new Date(message.sent*1000);//.toLocaleString()            
+                 var timeReceived  = new Date(message.received*1000);
                 //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
                 //TODO: parse with regex to be sure.. do in appendMessage
                 var onclick = (message.label_msg == message.them) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-send-address').show(); $('#new-send-address').val('" + message.them + "')\" " : "";
@@ -2205,10 +2206,12 @@ function openConversation(key, click) {
 					    <span class='user-name' " + onclick + ">"
                             +(message.label_msg)+"\
                         </span>\
-                        <span class='timestamp'>"+(new Date(message.received*1000).toLocaleString())+"</span>\
+                        <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
 						<span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-						<span class='message-text'>"+micromarkdown.parse(message.message) +  "</span>\
+						<span class='message-text'>"+micromarkdown.parse(emojione.toImage(message.message)) +  "</span>\
                     </span></li>");
+                    
+                 $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString()).tooltip();
 
                 if(message.group && message.type == 'S' && !bSentMessage){ //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
                         bSentMessage = true;
