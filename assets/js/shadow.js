@@ -2030,13 +2030,13 @@ function appendContact (key, openconvo, addressbook) {
              + "</li>";
         if(addressbook){
                 console.log("appending to book!");
-                contact_book_list.append(contact_html);
+                contact_book_list.prepend(contact_html);
                 console.log("appended to book!");
                 $("#"+ elementName + key).find(".delete").hide();
          }else if(contact.group){ //if not group
-            contact_group_list.append(contact_html);
+            contact_group_list.prepend(contact_html);
          } else
-            contact_list.append(contact_html);
+            contact_list.prepend(contact_html);
 
 
 
@@ -2256,10 +2256,28 @@ function deleteInvite(key, id){
     $("#invite-" + key + "-" + id).html("");
     bridge.deleteMessage(id);
 }
-
+//VGFBbN686jRg3sU92XRpwU4PZ3pAvAcNyG2z45XtVQdrQkfSJTCb
 function acceptInvite(key, label, id){
     deleteInvite(key, id);
-    bridge.joinGroupChat(key,'group_' + label);
+    var group_label = 'group_' + label;
+    var group_address = bridge.joinGroupChat(key,group_label);
+    console.log("joinGroupChat: " + group_address);
+    
+    if(group_address == "false"){
+        console.log("group_address=" + false);
+        if(typeof contacts[group_address] !== undefined)
+            console.log("group not undefined");
+            
+        return false;
+    } else {
+        updateContact(group_label, group_address);
+    }
+
+  /*
+    
+    createContact(group_label, group_address, true);
+    appendContact(group_address, false, true);*/
+    
 }
 
 function scrollMessages(){
