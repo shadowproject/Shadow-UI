@@ -1868,6 +1868,8 @@
 
           </div>
         </div>
+
+
       </div>
     </article>
     <!-- /addressbook page -->
@@ -1969,6 +1971,103 @@
 
     <!-- messages modal -->
 
+    <!-- invite group modal -->
+    <div class="modal fade stick-up" id="new-group-modal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content p-b-25" style="background:#fff;">
+
+          <div class="modal-header clearfix text-left ">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              <i class="pg-close fs-20"></i>
+            </button>
+            <h5 class="p-l-10" style="border-bottom: 1px solid #F0F1F3">Start Group Conversation</h5>
+
+            <div class="form-group">
+              <div class="col-sm-12 p-t-15">
+                <label for="new-group-name">Group name:
+                </label>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <input
+                      id="new-group-name"
+                      class="recipient form-control input_box"
+                      data-title="Enter a label for this group"
+                      placeholder="Enter a label for this group"
+                      onchange=""
+                      maxlength="128"/>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12 p-t-15">
+                <label for="new-group-name">Search
+                </label>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <input class="form-control input_box" id="filter-new-group" placeholder="Search by label or address...">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12 p-t-15">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="panel full-width bg-transparent">
+                      <div class="panel full-width">
+
+                        <table cellspacing="0" class="footable shadow table table-hover" data-filter="#filter-new-group" data-page-size="20" width="100%" style="border-bottom: 1px solid rgba(230, 230, 230, 0.7)">
+                          <thead>
+                            <tr>
+                              <th style="padding-left:18px;" data-sort-initial="true" data-toggle="true">
+                                Label
+                              </th>
+                              <th data-hide="phone">
+                                Address
+                              </th>
+                              <th data-hide="phone">
+                                Invite
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr id="group-SjFC9bmDkg8p7WgkugUXnSX68DAZH4pBZE" lbl="anothertest" style="display: table-row;" class="">               
+                              <td style="padding-left: 18px;" class="label2 footable-visible footable-first-column"><span class="footable-toggle"></span>anothertest</td>               
+                              <td class="address footable-visible" style="">SjFC9bmDkg8p7WgkugUXnSX68DAZH4pBZE</td>                           
+                              <td class="addresstype footable-visible footable-last-column" style="">Yes</td></tr>
+                          </tbody>
+                          <tfoot>
+                            <tr>
+                              <td colspan="3">
+                                <div class="pagination pager hide-if-no-paging"></div>
+                              </td>
+                            </tr>
+                          </tfoot>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pull-right m-r-10 m-t-25">
+              <a class="btn btn-danger btn-cons" href="javascript:newConversation();">Start Conversation
+                <i class="fa fa-check"></i>
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- invite group modal -->
+
     <!-- begin chatmenu (right) -->
     <div id="quickview" class="quickview-wrapper" data-framework="quickview" style="z-index:99999;">
 
@@ -2033,7 +2132,7 @@
         <div class="tab-pane fade no-padding" id="quickview-group">
           <div class="view-port clearfix" id="alerts">
 
-            <a href="#new-contact-group-modal" data-target="" data-toggle="" id='start-conversation'>
+            <a href="#" data-target="#new-group-modal" data-toggle="modal" id='start-conversation'>
               <i class="fa fa-plus margin-right-10"></i>
               Start group conversation</a>
             <div id="group-invite-list">
