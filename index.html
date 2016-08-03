@@ -8,7 +8,7 @@
 
     <!-- default CSS-->
     <link href="assets/plugins/pace/pace-theme-flash.css" rel="stylesheet" type="text/css"/>
-    <link href="assets/plugins/boostrapv3/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/plugins/boostrapv3/css/bootstrap.css" rel="stylesheet" type="text/css"/>
     <link href="assets/plugins/jquery-scrollbar/jquery.scrollbar.css" rel="stylesheet" type="text/css" media="screen"/>
 
     <link href="assets/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
@@ -100,18 +100,6 @@
                 <a href="#addressbook">Address Book</a>
                 <span class="icon-thumbnail">
                   <i class="fa fa-bars"></i>
-                </span>
-              </li>
-              <li class="">
-                <a href="#" data-target="#verify-sign-message-modal" data-toggle="modal" onclick="$('#sign-href').click(); $('#sign-address');">Sign Message</a>
-                <span class="icon-thumbnail">
-                  <i class="fa fa-pencil"></i>
-                </span>
-              </li>
-              <li class="">
-                <a href="#" data-target="#verify-sign-message-modal" data-toggle="modal" onclick="$('#verify-href').click(); $('#verify-address');">Verify Message</a>
-                <span class="icon-thumbnail">
-                  <i class="fa fa-check-square-o"></i>
                 </span>
               </li>
             </ul>
@@ -240,6 +228,18 @@
                   <i class="fa fa-th-large"></i>
                 </span>
               </li>
+			 <li class="">
+                <a href="#" data-target="#verify-sign-message-modal" data-toggle="modal" onclick="$('#sign-href').click(); $('#sign-address');">Sign Message</a>
+                <span class="icon-thumbnail">
+                  <i class="fa fa-pencil"></i>
+                </span>
+              </li>
+              <li class="">
+                <a href="#" data-target="#verify-sign-message-modal" data-toggle="modal" onclick="$('#verify-href').click(); $('#verify-address');">Verify Message</a>
+                <span class="icon-thumbnail">
+                  <i class="fa fa-check-square-o"></i>
+                </span>
+              </li>			 
               <li class="">
                 <a href="#" onclick="bridge.userAction(['debugClicked']);">Debug</a>
                 <span class="icon-thumbnail">
@@ -564,8 +564,8 @@
                       <tbody></tbody>
                       <tfoot>
                         <tr>
-                          <td colspan="6">
-                            <ul class="pager hide-if-no-paging"></ul>
+                          <td colspan="4">
+                            <div class="pagination pager hide-if-no-paging"></div>
                           </td>
                         </tr>
                       </tfoot>
@@ -867,7 +867,7 @@
                             data-title="Enter a ShadowCash address to sign the message with (e.g. SaKYqfD8J3vw4RTnqtgk2K9B67CBaL3mhV)"
                             placeholder="Enter a ShadowCash address to sign the message with (e.g. SaKYqfD8J3vw4RTnqtgk2K9B67CBaL3mhV)"
                             maxlength="128"/>
-                          <!--<a id="sign-addlkp-btn" class="button is-inverse has-fixed-icon small-button" data-title="Choose address from address book" href="#address-lookup-modal" onclick="returnto='sign-address';prepAddressLookup(true);"><i class="fa fa-book"></i></a>-->
+                          <!--<a id="sign-addlkp-btn" class="button is-inverse has-fixed-icon small-button" data-title="Choose address from address book" href="#address-lookup-modal" onclick="addressLookup('sign-address', true);"><i class="fa fa-book"></i></a>-->
 
                         </div>
                       </div>
@@ -941,7 +941,7 @@
                           placeholder="Enter a ShadowCash address to verify the message with (e.g. SaKYqfD8J3vw4RTnqtgk2K9B67CBaL3mhV)"
                           maxlength="128"/>
                         <!--<a id="verify-addlkp-btn" class="button is-inverse has-fixed-icon small-button" style="margin-right: 0px" data-title="Choose address from address book" href="#address-lookup-modal"
-      onclick="returnto='verify-address';prepAddressLookup(false);"><i class="fa fa-book"></i></a><a class="button is-inverse has-fixed-icon small-button" href="javascript:paste('#verify-address');" data-title="Paste address from clipboard"><i class="fa fa-copy"></i></a><br/>-->
+      onclick="addressLookup('verify-address', false);"><i class="fa fa-book"></i></a><a class="button is-inverse has-fixed-icon small-button" href="javascript:paste('#verify-address');" data-title="Paste address from clipboard"><i class="fa fa-copy"></i></a><br/>-->
 
                       </div>
                     </div>
@@ -1018,6 +1018,72 @@
     </div>
 
     <!-- end modals -->
+
+    <!-- templates -->
+    <div class="none">
+        <div id="recipient-template" class="recipient">
+            <div class="form-group">
+                <label class="col-sm-3 p-l-20 control-label">Pay to <a href="#"><i class="p-b-5 fa fa-question-circle" data-title="Send to recipient." style="color:#626262;"></i></a></label>
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <input class="form-control" id="pay_to[count]"
+                                data-title="The address to send the payment to"
+                                placeholder="The address to send the payment to"
+                                maxlength="128"
+                                oninput="base58.check(this);"
+                                onchange="$('#label[count]').val(bridge.getAddressLabel(this.value));" type="text" />
+                        </div>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="label[count]"
+                                data-title="Enter a label for this address"
+                                placeholder="Enter a label"
+                                maxlength="128" type="text" />
+                        </div>
+                        <div class="btn-group col-sm-3 sm-m-t-10">
+                            <a id="address_lookup[count]" data-title="Choose from address book" data-toggle="modal" data-target="#address-lookup-modal" href="#" onclick="addressLookup('pay_to[count],label[count]', true);" class="btn btn-default"><i class="fa fa-book"></i>
+                            </a>
+                            <a data-title="Paste address from clipboard"  class="btn btn-default" onclick="paste('#pay_to[count]')"><i class="fa fa-files-o"></i>
+                            </a>
+                            <a data-title="Remove this recipient" class="btn btn-default" onclick="sendPage.removeRecipient('#recipient[count]');"><i class="fa fa-close"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label option p-l-20" for="amount[count]" class="recipient">Amount <a href="#"><i class="p-b-5 fa fa-question-circle" data-title="Amount to send." style="color:#626262;"></i></a></label>
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <input class="form-control" id="amount[count]" class="amount" placeholder="0.00000000" step="0.01" type="text" value="0.00000000"
+                                onfocus="invalid($(this), true);" onchange="unit.parse(this, $('#unit[count]').val());sendPage.updateCoinControl();" />
+                        </div>
+                        <select id="unit[count]" class="unit select-drop-down" style="margin-left:7px" onchange="unit.format('#amount[count]', $(this).val());">
+                            <option value="0" title="Shadow"                    >SDC</option>
+                            <option value="1" title="Milli-Shadow (1 / 1000)"   >mSDC</option>
+                            <option value="2" title="Micro-Shadow (1 / 1000000)">&micro;SDC</option>
+                            <option value="3" title="Shadowshi (1 / 100000000)" >Shadowshi</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" id="show_nar" style="border-bottom: 1px solid #F0F1F3">
+                <label class="col-sm-3 control-label option p-l-20 recipient" for="narration[count]" title="Narration:">Narration <a href="#"><i class="p-b-5 fa fa-question-circle" data-title="A short reference for the recipient" style="color:#626262;"></i></a></label>
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <input class="form-control" id="narration[count]" maxlength="24"
+                                data-title="Enter a short note to send with payment (max 24 characters)"
+                                placeholder="Enter a short note to send with a payment (max 24 characters)" />
+                        </div>
+                        <div class="col-sm-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end templates -->
 
     <!-- overview page -->
     <article id="overview">
@@ -1372,7 +1438,7 @@
                                     </div>
 
                                     <div class="btn-group col-sm-3 sm-m-t-10">
-                                      <a id="cust-add-lkp" data-title="Choose from address book" href="#address-lookup-modal" onclick="returnto='change_address'; prepAddressLookup(true);" class="btn btn-default">
+                                      <a id="cust-add-lkp" data-title="Choose from address book" href="#address-lookup-modal" onclick="addressLookup('change_address', true);" class="btn btn-default">
                                         <i class="fa fa-book"></i>
                                       </a>
 
@@ -1395,7 +1461,7 @@
                         </div>
 
                         <!-- old version for ryno, with this one adv control so on.. but want same function with checkboxes -->
-                        <div class="form-group">
+                        <!--div class="form-group">
                           <label class="col-sm-3 control-label p-l-20">From account
                             <a href="#">
                               <i class="p-b-5 fa fa-question-circle" data-title="Shadowcash.. public.." style="color:#626262;"></i>
@@ -1423,11 +1489,8 @@
                               </option>
 
                             </select>
-                            <span id="tx_ringsize">
-                              <label class="form-controlring_size m-r-10" for="ring_size" style="">Ring Size:</label>
-                              <input class="form-control-options-page ring_size input_box" id="ring_size" max="200" min="3" step="1" type="number" value="16"></span>
                           </div>
-                        </div>
+                        </div-->
                         <!-- old version end -->
 
                         <div class="form-group">
@@ -1453,6 +1516,9 @@
                                   <span id="spend_shadow">
                                     <span class="shadow_balance">0.00</span>
                                     <span class="unit" style="display:none;">SDC</span>PRIVATE</span>
+                                    <span id="tx_ringsize">
+                                      <label class="form-controlring_size m-r-10" for="ring_size" style="">Ring Size:</label>
+                                      <input class="form-control-options-page ring_size input_box" id="ring_size" max="200" min="3" step="1" type="number" value="16"></span>
                                 </span>
                               </div>
 
@@ -1462,7 +1528,7 @@
 
                         <div id="recipients"></div>
 
-                      </div>
+                        </div>
                     </div>
 
                   </div>
@@ -1533,15 +1599,15 @@
                         </div>
 
                         <div class="form-group" style="border-bottom: 1px solid #F0F1F3">
-                          <label class="col-sm-3 control-label option p-l-20 recipient" for="amount[count]">Amount
+                          <label class="col-sm-3 control-label option p-l-20 recipient">Amount
                             <a href="#">
-                              <i class="p-b-5 fa fa-question-circle" data-title="Shadowcash.. public.." style="color:#626262;"></i>
+                              <i class="p-b-5 fa fa-question-circle" data-title="Amount to transfer" style="color:#626262;"></i>
                             </a>
                           </label>
                           <div class="col-sm-9">
                             <div class="row">
                               <div class="col-sm-9">
-                                <input class="form-control amount" id="amount[count]" placeholder="0.00000000" step="0.01" type="text" value="0.00000000" onfocus="invalid($(this), true);" onchange="unit.parse(this, $(\'#unit[count]\').val());updateCoinControl();">
+                                <input class="form-control amount" id="amount[count]" placeholder="0.00000000" step="0.01" type="text" value="0.00000000" onfocus="invalid($(this), true);" onchange="unit.parse(this, $('#unit[count]').val());updateCoinControl();">
                               </div>
                             </div>
                           </div>
@@ -1555,15 +1621,15 @@
               </div>
 
               <div class="pull-right m-r-15 m-t-10 m-b-25">
-                <!--<a class="btn btn-default btn-cons" data-title="Send to multiple recipients at once" onclick="addRecipient();">Add Recipient</a>-->
-                <a class="btn btn-default btn-cons" onclick="clearRecipients();">
+                <a class="btn btn-default btn-cons" data-title="Send to multiple recipients at once" onclick="sendPage.addRecipient();">Add Recipient</a>
+                <a class="btn btn-default btn-cons" onclick="sendPage.clearRecipients();">
                   <i class="fa fa-close"></i>
                   Clear All
                 </a>
-                <a class="btn btn-default btn-cons" href="javascript:suggestRingSize();" id="suggest_ring_size">
+                <a class="btn btn-default btn-cons" href="javascript:sendPage.suggestRingSize();" id="suggest_ring_size">
                   <i class="fa fa-calculator"></i>
                   Suggest Ring Size</a>
-                <a class="btn btn-primary btn-cons" onclick="sendCoins();">Send Payment
+                <a class="btn btn-primary btn-cons" onclick="sendPage.sendCoins();">Send Payment
                   <i class="fa fa-arrow-right"></i>
                 </a>
               </div>
@@ -1643,8 +1709,8 @@
               <tbody></tbody>
               <tfoot>
                 <tr>
-                  <td colspan="6">
-                    <ul class="pager hide-if-no-paging"></ul>
+                  <td colspan="4">
+                    <div class="pagination pager hide-if-no-paging"></div>
                   </td>
                 </tr>
               </tfoot>
@@ -1715,7 +1781,7 @@
               <tfoot>
                 <tr>
                   <td colspan="6">
-                    <ul class="pager hide-if-no-paging"></ul>
+                    <div class="pagination pager hide-if-no-paging"></div>
                   </td>
                 </tr>
               </tfoot>
@@ -1773,8 +1839,8 @@
                 <tbody></tbody>
                 <tfoot>
                   <tr>
-                    <td colspan="6">
-                      <div class="pager pager-centered "></div>
+                    <td colspan="3">
+                      <div class="pagination pager hide-if-no-paging"></div>
                     </td>
                   </tr>
                 </tfoot>
@@ -2130,7 +2196,7 @@
                 <tfoot>
                   <tr>
                     <td colspan="5">
-                      <div class="pager pager-centered hide-if-no-paging"></div>
+                      <div class="pagination pager hide-if-no-paging"></div>
                     </td>
                   </tr>
                 </tfoot>
@@ -2206,7 +2272,7 @@
                 <tfoot style="display:none;">
                   <tr>
                     <td colspan="2">
-                      <div class="pager pager-centered hide-if-no-paging"></div>
+                      <div class="pagination pager hide-if-no-paging"></div>
                     </td>
                   </tr>
                 </tfoot>
@@ -3143,7 +3209,6 @@
 <script src="assets/plugins/iscroll/iscroll.js" type="text/javascript"></script>
 <script src="assets/plugins/jquery-transit/jquery.transit.min.js" type="text/javascript"></script>
 <script src="assets/plugins/qrcode/qrcode.min.js" type="text/javascript"></script>
-<script src="assets/plugins/jquery-leanModal/jquery.leanModal.min.js" type="text/javascript"></script>
 <script src="assets/plugins/markdown/markdown.min.js"></script>
 
 <!-- begin layout JS -->
@@ -3151,10 +3216,11 @@
 <!-- end layout JS -->
 
 <!-- begin shadow JS -->
-<script src="assets/js/shadow.js" type="text/javascript"></script>
 <script src="assets/js/tooltip.js" type="text/javascript"></script>
 <script src="assets/js/navigation.js" type="text/javascript"></script>
 <script src="assets/plugins/emojione/emojione.js"></script>
+<script src="assets/js/qrcode.js" type="text/javascript"></script>
+<script src="assets/js/shadow.js" type="text/javascript"></script>
 
 <script>
 $(window).resize(function () {

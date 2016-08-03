@@ -1252,5 +1252,5 @@ padding: 18px;
 }
 
 .none {
-    display: none;
+    display: none!important;
 }

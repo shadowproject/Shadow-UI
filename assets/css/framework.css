@@ -3068,6 +3068,7 @@ fieldset[disabled] .btn-danger.active {
   padding-left: 14px;
   padding-right: 14px;
 }
+/* TODO: Is this used!? */
 .pager .disabled > button,
 .pager .disabled > button:hover,
 .pager .disabled > button:focus,
