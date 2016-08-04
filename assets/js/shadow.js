@@ -1462,10 +1462,10 @@ function appendContact (key, newcontact, addressbook) {
              + "</span>"
              + "</li>";
         if(addressbook) {
-            console.log("appending to book!");
-            contact_book_list.append(contact_html);
-            console.log("appended to book!");
-            $("#contact-"+ prefix + key).find(".delete").hide();
+                console.log("appending to book!");
+                contact_book_list.append(contact_html);
+                console.log("appended to book!");
+                $("#contact-"+ prefix + key).find(".delete").hide();
          } else if(contact.group){ //if not group
             contact_group_list.append(contact_html);
          } else
