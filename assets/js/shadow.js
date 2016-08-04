@@ -1351,7 +1351,7 @@ function appendMessages(messages, reset) {
         return;
 
 
-    console.log("message data=" + messages);
+    //console.log("message data=" + messages);
     messages = JSON.parse(messages.replace(/,\]$/, "]"));
 
     console.log("for loop through messages = " + messages.length);
@@ -1737,7 +1737,7 @@ function openConversation(key, click) {
                         </span>\
                         <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
                            <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-                           <span class='message-text'>"+micromarkdown.parse(emojione.toImage(message.message)) +  "</span>\
+                           <span class='message-text'>"+micromarkdown.parse(/*emojione.toImage(*/message.message)/*)*/ +  "</span>\
                     </span></li>");
                  $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString()).tooltip();
 
