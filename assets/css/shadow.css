@@ -1148,3 +1148,11 @@ padding: 18px;
 }
 
 }
+
+.none {
+    display: none!important;
+}
+
+.radio label.form-controlring_size:before {
+    display: none;
+}

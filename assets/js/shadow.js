@@ -1,45 +1,11 @@
-//$("#start-conversation").leanModal({top : 110, overlay : 0.5, zindex:11001, closeButton: "#new-contact-modal .modal_close"});
-//$("#add-new-send-address").leanModal({top : 110, overlay : 0.5, zindex:11001, closeButton: "#add-address-modal .modal_close"});
-//$("#sign-addlkp-btn").leanModal({  top : 110, overlay : 1,  zindex:11001, closeButton: "#address-lookup-modal .modal_close", childPopup: true});
-//$("#verify-addlkp-btn").leanModal({ top : 110, overlay : 1, zindex:11001, closeButton: "#address-lookup-modal .modal_close", childPopup: true});
-//$("#verify-message-button").leanModal({top : 50, overlay : 0.5, zindex:11001, closeButton: "#verify-sign-modal .modal_close"});
-//$("#import-key-button").leanModal({top : 50, overlay : 0.5, zindex:11001, closeButton: "#import-key-modal .modal_close"});
+function invalid(el, valid) {
+    if(valid == true)
+        el.css("background", "").css("color", "");
+    else
+        el.css("background", "#E51C39").css("color", "white");
 
-var qrcode = new QRCode("qrcode", {colorDark:'#E51C39', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H, width: 220, height: 220,});
-
-function showQRCode(address, label) {
-
-    if(address!=undefined)
-        $("#qraddress").val(address);
-
-    if(label!=undefined)
-        $("#qrlabel").val(label);
-
-    qrcode.clear();
-
-    var textarea = $("#qrcode-data"),
-        data = "shadowcoin:";
-
-    data += $("#qraddress").val()
-          + "?label="     + $("#qrlabel").val()
-          + "&narration=" + $("#qrnarration").val()
-          + "&amount=" + unit.parse($("#qramount").val(), $("#qrunit").val());
-
-    textarea.text(data);
-
-    qrcode.makeCode(data);
+    return (valid == true);
 }
-
-var breakpoint = 906, // 56.625em
-    footer = $("#footer");
-
-function resizeFooter() {
-    $(".ui-buttons").each(function() {
-        $(this).css("margin-top", Math.max($("body").height() - ($(this).offset().top + $(this).height()) -65 + parseInt($(this).css("margin-top")), 10) + "px");
-    });
-
-    footer.height(Math.max($("body").height() - footer.offset().bottom, 0) + "px");
-};
 
 function updateValue(element) {
     //TODO: add prefix label group_ when addresstype AT = 4. So we can remove it from the label being shown and handle it in the background..
@@ -47,46 +13,46 @@ function updateValue(element) {
         value   = (element.parent("td").data("label") != undefined ? element.parent("td").data("label") :
                   (element.parent("td").data("value") != undefined ? element.parent("td").data("value") :
                   (element             .data("label") != undefined ? element             .data("label") :
-                  (element             .data("value") != undefined ? element             .data("value") : element.text()))));
+                  (element             .data("value") != undefined ? element             .data("value") : element.text())))),
 
-    var address = element.parents(".selected").find(".address");
-    var addresstype = element.parents(".selected").find(".addresstype");
+        address = element.parents(".selected").find(".address"),
+        addresstype = element.parents(".selected").find(".addresstype");
 
     address = address.data("value") ? address.data("value") : address.text();
-    addresstype = addresstype.data("value") ? addresstype.data("value") : addresstype.text();
 
+    if (addresstype.length === 1)
+        addresstype = addresstype.data("value") ? addresstype.data("value") : addresstype.text();
 
+    var prefix = (addresstype == "Group" ? "group_" : "");
 
-    var prefix = (addresstype == "Group" ? "group_" : "" );
     if(addresstype == "Group")
         value.replace("group_", "");
 
-   element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + address + '\', \'' + prefix + '\' +this.value);" value="' + value + '" size=60 />'); //
+    element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + address + '\', \'' + prefix + '\' +this.value);" value="' + value + '" size=60 />'); //
 
-    $(".newval").focus();
-    $(".newval").on("contextmenu", function(e) {
-        e.stopPropagation();
-    });
-    $(".newval").keyup(function (event) {
-        if (event.keyCode == 13)
-            element.html(curhtml.replace(value, $(".newval").val().trim()))
-    });
+    function leave(e) {
+        var newval = $(".newval");
 
-    $(document).one('click', function () {
-        element.html(curhtml.replace(value, $(".newval").val().trim()));
-    });
+        if (newval.length === 0)
+            return;
+
+        element.html(curhtml.replace(value, newval.val().trim()));
+    }
+
+    $(".newval").focus()
+        .on("contextmenu", function(e) {
+            e.stopPropagation();
+        })
+        .keyup(function (event) {
+            if (event.keyCode == 13)
+                leave(event);
+        });
+
+    $(document).one('click', leave);
 }
 
 $(function() {
-    // Menu icon onclick
-    $("#navlink").on("click", function() {
-        $("#layout").toggleClass('active');
-    });
-
-    $("#qramount").on("keydown", unit.keydown).on("paste", unit.paste);
-
-
-    $('.footable').footable({breakpoints:{phone:480, tablet:700}, delay: 50})
+    $('.footable,.footable-lookup').footable({breakpoints:{phone:480, tablet:700}, delay: 50})
     .on({'footable_breakpoint': function() {
             //$('table').trigger('footable_expand_first_row'); uncomment if we want the first row to auto-expand
         },
@@ -141,125 +107,24 @@ $(function() {
     // Tooltip
     $('[data-title]').on('mouseenter', tooltip);
 
-    $(".footable tr").on('click', function() {
-        $(this).addClass("selected").siblings("tr").removeClass("selected");
-    });
+    // Initialise row selection
+    $(".footable > tbody tr").selection();
 });
 
-var prevPage = null;
+// Row select function
+$.fn.selection = function(sibling) {
+    if (!sibling)
+        sibling = "tr";
 
-function changePage(event) {
-    var toPage = $($(this).attr('href'));
-
-    prevPage = $("#navitems li.selected a");
-
-    $("#navitems li").removeClass("selected");
-    $(this).parent("li").addClass("selected");
-
-    if(toPage.length == 1 && toPage[0].tagName.toLowerCase() == "article") {
-        event.preventDefault();
-        $(window).scrollTop(0);
-        $("article").hide();
-        toPage.show();
-        $(document).resize();
-    }
-}
-
-function tooltip (event) {
-    var target  = false,
-        tooltip = false,
-        tip     = false;
-
-    if($("input, textarea").is(':focus') || $('.iw-contextMenu').css('display') == 'inline-block')
-        return;
-
-    event.stopPropagation();
-
-    $("#tooltip").click();
-
-    target  = $(this);
-    tip     = target.attr('data-title');
-    tooltip = $('<div id="tooltip"></div>');
-
-    if(!tip || tip == '')
-        return false;
-
-    tip = tip.replace(/&#013;|\n|\x0A/g, '<br />')
-
-    .replace(/%column%/g, function() {
-        return $(target.parents("table").find("thead tr th")[target[0].cellIndex]).text();
-    }).replace(/%([.\w\-]+),([.\w\-]+)%/g, function($0, $1, $2){
-        return target.children($1).attr($2);
-    }).replace(/%([.\w\-]+)%/g, function($0, $1){
-        return target.children($1).text();
+    return this.on('click', function() {
+        $(this)
+            .addClass("selected")
+        .siblings(sibling)
+            .removeClass("selected");
     });
-
-    tooltip.css('opacity', 0)
-           .html(tip)
-           .appendTo('body');
-
-    if(target.css('cursor') != "pointer" && target.prop("tagName") != "A")
-        target.css('cursor', 'help');
-
-    var init_tooltip = function() {
-        if($(window).width() < tooltip.outerWidth() * 1.5)
-            tooltip.css('max-width', $(window).width() / 2);
-        else
-            tooltip.css('max-width', 340);
-
-        var pos_left = target.offset().left + (target.outerWidth() / 3) - (tooltip.outerWidth() / 2),
-            pos_top  = target.offset().top - tooltip.outerHeight() - 20;
-
-        if(pos_left < 0)
-        {
-            pos_left = target.offset().left + target.outerWidth() / 2 - 20;
-            tooltip.addClass('left');
-        }
-        else
-            tooltip.removeClass('left');
-
-        if(pos_left + tooltip.outerWidth() > $(document).width())
-        {
-            pos_left = target.offset().left - tooltip.outerWidth() + target.outerWidth() / 2 + 13;
-            tooltip.addClass('right');
-        }
-        else
-            tooltip.removeClass('right');
-
-        if(pos_left + target.outerWidth() > $(document).width())
-        {
-            pos_left = event.pageX;
-            tooltip.removeClass('left right');
-        }
-
-        if(pos_top < 0)
-        {
-            var pos_top = target.offset().top + target.outerHeight();
-            tooltip.addClass('top');
-        }
-        else
-            tooltip.removeClass('top');
-
-        tooltip.css({left: pos_left, top: pos_top})
-               .animate({top: '+=10', opacity: 1}, 100);
-    };
-
-    init_tooltip();
-    $(window).resize(init_tooltip);
-
-    var remove_tooltip = function()
-    {
-        tooltip.animate({top: '-=10', opacity: 0}, 100, function() {
-            $(this).remove();
-        });
-    };
-
-    target.on('mouseleave', remove_tooltip);
-    target.on('contextmenu', remove_tooltip);
-    tooltip.on('click', remove_tooltip);
 }
 
-
+// Connect to bridge signals
 function connectSignals() {
     bridge.emitPaste.connect(this, pasteValue);
 
@@ -268,7 +133,7 @@ function connectSignals() {
     bridge.emitMessages.connect(this, appendMessages);
     bridge.emitMessage.connect(this,  appendMessage);
 
-    bridge.emitCoinControlUpdate.connect(this, updateCoinControlInfo);
+    bridge.emitCoinControlUpdate.connect(sendPage, "updateCoinControlInfo");
 
     bridge.emitAddressBookReturn.connect(this, addressBookReturn);
 
@@ -296,8 +161,13 @@ function triggerElement(el, trigger) {
 
 function updateRowsPerPage(rows) {
     $(".footable").each(function() {
-        $(this).data().pageSize = rows;
-        $(this).trigger('footable_initialize');
+        var table = $(this);
+
+        if (table.hasClass('footable-lookup'))
+            return;
+
+        table.data().pageSize = rows;
+        table.trigger('footable_initialize');
     });
 }
 
@@ -1415,7 +1285,8 @@ function appendAddresses(addresses) {
         var addrRow = $("#"+address.address);
         var page = (address.type == "S" ? "#addressbook" : (address.label.lastIndexOf("group_", 0) !== 0 ? "#receive" : "#addressbook"));
 
-        if(address.type == "R" && address.address.length < 75 && address.label.lastIndexOf("group_", 0) !== 0) {
+        /* add address to chat dropdown box to choose sender from*/
+        if(address.type == "R" && sendPage.initSendBalance(address) && address.address.length < 75 && address.label.lastIndexOf("group_", 0) !== 0) {
             if(addrRow.length==0)
                 $("#message-from-address").append("<option title='"+address.address+"' value='"+address.address+"'>"+address.label+"</option>");
             else
@@ -1463,50 +1334,54 @@ function appendAddresses(addresses) {
 
 }
 
-function prepAddressLookup(lReceiveAddresses)
+function addressLookup(returnFields, receive, filterType)
 {
-    var page = (lReceiveAddresses ? "#receive" : "#addressbook");
-    var table =  $(page + "-table");
-    var lookupTable = $("#address-lookup-table");
+    var lookupData = $((receive ? '#receive' : '#addressbook') + ' table.footable > tbody').html(),
+        lookupTable = $("#address-lookup-table");
 
-    lookupTable.data().pageSize = 5;
+    lookupTable.children('tbody').html(lookupData);
     lookupTable.trigger('footable_initialize');
-    lookupTable.html( table.html() );
     lookupTable.data('footable-filter').clearFilter();
 
     $("#address-lookup-table > tbody tr")
-        .on('click', function() {
-            $(this).addClass("selected").siblings("tr").removeClass("selected");
-        })
+        .selection()
         .on('dblclick', function() {
             var retfields = returnto.split(',');
             $("#" + retfields[0]).val( $(this).attr("id").trim() );
             if(retfields[1] != undefined )
             {
-                $("#" + retfields[1]).val( $(this).attr("lbl").trim() );
+                $("#" + retfields[1])
+                    .val($(this).attr("lbl").trim())
+                    .text($(this).attr("lbl").trim());
             }
 			$('#address-lookup-modal').modal('hide');
-        })
+        });
+
+    function doFilter() {
+        $('#address-lookup-filter').val($('#address-lookup-address-filter').val() + " " + $('#address-lookup-address-type').val() ) ;
+        lookupTable.trigger('footable_filter', {filter: $('#address-lookup-filter').val()});
+    }
 
     // Deal with the lookup table filtering
     // On any input update the filter
-    $('#lookup-addressfilter').on('input', function () {
-        if($('#lookup-addressfilter').val() == "")
-        {
+    $('#address-lookup-address-filter').on('input', function () {
+        if($('#lookup-address-filter').val() == "")
             lookupTable.data('footable-filter').clearFilter();
-        }
-        $('#lookup-filter').val($('#lookup-addressfilter').val() + " " + $('#lookup-addresstype').val() ) ;
-        lookupTable.trigger('footable_filter', {filter: $('#lookup-filter').val()});
+
+        doFilter();
     });
 
-    $('#lookup-addresstype').change(function () {
-        if($('#filter-addresstype').val() == "")
-        {
+    $('#address-lookup-address-type').change(function () {
+        if($('#address-lookup-address-type').val() == "")
             lookupTable.data('footable-filter').clearFilter();
-        }
-        $('#lookup-filter').val($('#lookup-addressfilter').val() + " " + $('#lookup-addresstype').val() ) ;
-        lookupTable.trigger('footable_filter', {filter: $('#lookup-filter').val()});
+
+        doFilter();
     });
+
+    if (filterType) {
+        $('#address-lookup-address-type').val(filterType);
+        doFilter();
+    }
 }
 
 function transactionPageInit() {
@@ -1643,8 +1518,8 @@ function formatTransaction(transaction) {
     return "<tr id='"+transaction.id+"' data-title='"+transaction.tt+"'>\
 	                <td data-value='"+transaction.d+"'>"+transaction.d_s+"</td>\
                     <td class='trans-status' data-value='"+transaction.c+"'><center><i class='fa fa-lg "+transaction.s+"'></center></td>\
-                    <td class='trans-type'>"+transaction.t_l+"</td>\
-                    <td style='color:"+transaction.a_c+";' data-value='"+transaction.ad+"' data-label='"+transaction.ad_l+"'><span class='editable'>"+transaction.ad_d+"</span></td>\
+                    <td class='trans_type'><img height='15' width='15' src='assets/icons/tx_"+transaction.t+".png' /> "+transaction.t_l+"</td>\
+                    <td class='address' style='color:"+transaction.a_c+";' data-value='"+transaction.ad+"' data-label='"+transaction.ad_l+"'><span class='editable'>"+transaction.ad_d+"</span></td>\
                     <td class='trans-nar'>"+transaction.n+"</td>\
                     <td class='amount' style='color:"+transaction.am_c+";' data-value='"+transaction.am_d+"'>"+transaction.am_d+"</td>\
                  </tr>";
@@ -1836,12 +1711,12 @@ function shadowChatInit() {
     });
     
     //ONCLICK REMOVE NOTIFICATION
-    $("#messages").on('click',
+    $("#messages")
+        .selection()
+        .on('click',
         function(e) {
-                $(this).addClass("selected").siblings("li").removeClass("selected");
-                
-                if(current_key != "")
-                    removeNotificationCount(current_key);
+            if(current_key != "")
+                removeNotificationCount(current_key);
         });
     
 }
@@ -2022,6 +1897,16 @@ function appendContact (key, newcontact) {
                         " //<span class='favorite favorited'></span>\ //TODO: Favourites
              + "</span>"
              + "</li>";
+        if(addressbook) {
+                console.log("appending to book!");
+                contact_book_list.append(contact_html);
+                console.log("appended to book!");
+                $("#contact-"+ prefix + key).find(".delete").hide();
+         } else if(contact.group){ //if not group
+            contact_group_list.append(contact_html);
+         } else
+            contact_list.append(contact_html);
+
 
          if(!new_group)
             contact_list.append(contact_html);
@@ -2030,7 +1915,9 @@ function appendContact (key, newcontact) {
 
         contact_el = $("#contact-"+key).on('click',
             function(e) {
-                $(this).addClass("selected").siblings("li").removeClass("selected");
+                $(this).selected('li');
+                if(addressbook)
+                    appendContact(key, false);
                 openConversation(key, true);
 
 
@@ -2499,9 +2386,9 @@ var blockExplorerPage =
     prepareBlockTable: function()
     {
         $("#latest-blocks-table  > tbody tr")
+            .selection()
             .on('click', function()
                 {
-                    $(this).addClass("selected").siblings("tr").removeClass("selected");
                     var blkHash = $(this).attr("data-value").trim();
                     blockExplorerPage.blkTxns = bridge.listTransactionsForBlock(blkHash);
                     var txnTable = $('#block-txs-table  > tbody');
@@ -2518,9 +2405,7 @@ var blockExplorerPage =
 
                     $("#block-txs-table").removeClass("none");
                     $("#block-txs-table > tbody tr")
-                        .on('click', function() {
-                            $(this).addClass("selected").siblings("tr").removeClass("selected");
-                        })
+                        .selection()
 
                         .on("dblclick", function(e) {
 
@@ -2555,16 +2440,13 @@ var blockExplorerPage =
 
                             var txnInputs = $('#txn-detail-inputs > tbody');
                             txnInputs.html('');
-                            for (value in selectedTxn.transaction_inputs)
-                            {
-
-
+                            for (value in selectedTxn.transaction_inputs) {
 
                               var txnInput = selectedTxn.transaction_inputs[value];
 
                               txnInputs.append('<tr data-value='+ txnInput.input_source_address+'>\
-                                                           <td>' + txnInput.input_source_address  + '</td>\
-                                                           <td>' + txnInput.input_value + '</td>\
+                                                   <td>' + txnInput.input_source_address  + '</td>\
+                                                   <td>' + txnInput.input_value + '</td>\
                                                 </tr>');
                             }
 
@@ -2581,13 +2463,7 @@ var blockExplorerPage =
                                             </tr>');
                             }
 
-
-
-                            $(this).click();
-                            $(this).off('click');
-                            $(this).on('click', function() {
-                                    $(this).addClass("selected").siblings("tr").removeClass("selected");
-                            })
+                            $(this).click().off('click').selection();
                         }).find(".editable")
                 })
             .on("dblclick", function(e)
@@ -2617,12 +2493,9 @@ var blockExplorerPage =
                 }
 
                 // $("#block-info").html();
-                $(this).click();
-
-                $(this).off('click');
-                $(this).on('click', function() {
-                $(this).addClass("selected").siblings("tr").removeClass("selected");
-                })
+                $(this).click()
+                  .off('click')
+                  .selection();
             }).find(".editable")
     }
 }
@@ -2669,10 +2542,11 @@ var keyManagementPage = {
     },
     prepareAccountTable: function()
     {
+        //asd
         $("#extkey-account-table  > tbody tr")
+            .selection()
             .on('click', function()
             {
-                $(this).addClass("selected").siblings("tr").removeClass("selected");
                 var otherTableRows = $('#extkey-table > tbody > tr');
                 otherTableRows.removeClass("selected");
             })
@@ -2698,10 +2572,11 @@ var keyManagementPage = {
     },
     prepareKeyTable: function()
     {
+        //asd
         $("#extkey-table  > tbody tr")
+            .selection()
             .on('click', function()
             {
-                $(this).addClass("selected").siblings("tr").removeClass("selected");
                 var otherTableRows = $('#extkey-account-table > tbody > tr');
                 otherTableRows.removeClass("selected");
             })
