@@ -1474,14 +1474,12 @@ function appendContact (key, newcontact, addressbook) {
 
 
          //onClick contact in sidebar list, on hover and on delete.
-        contact_el = $("#contact-"+ prefix + key).on('click',
-            function(e) {
-                $(this).selected('li');
+        contact_el = $("#contact-"+ prefix + key)
+            .selection('li')
+            .on('click', function click(e) {
                 if(addressbook)
                     appendContact(key, false);
                 openConversation(key, true);
-
-
             }).tooltip();
 
 

@@ -251,8 +251,6 @@ var sendPage = (function($) {
         var main = $("#send-main").is(":visible"),
             from_type = $("[name=transaction_type_from]:checked").val();
 
-        console.log(event);
-
         if (event && event.target !== $("input#to_account_public")[0] && event.target !== $("input#to_account_private")[0])
             $("input[name=transaction_type_to][value=" + (main ? from_type : (from_type === "public" ? "private" : "public")) + "]").prop('checked', true);
 
