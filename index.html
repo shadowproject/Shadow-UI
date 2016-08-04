@@ -2034,7 +2034,7 @@
                               </th>
                             </tr>
                           </thead>
-                          <tbody>
+                          <tbody id="invite-modal-tbody">
                             <tr id="group-SjFC9bmDkg8p7WgkugUXnSX68DAZH4pBZE" lbl="anothertest" style="display: table-row;" class="">               
                               <td style="padding-left: 18px;" class="label2 footable-visible footable-first-column"><span class="footable-toggle"></span>anothertest</td>               
                               <td class="address footable-visible" style="">SjFC9bmDkg8p7WgkugUXnSX68DAZH4pBZE</td>                           
@@ -2056,7 +2056,7 @@
             </div>
 
             <div class="pull-right m-r-10 m-t-25">
-              <a class="btn btn-danger btn-cons" href="javascript:newConversation();">Start Conversation
+              <a class="btn btn-danger btn-cons" onclick="openInviteModal();">Start Conversation
                 <i class="fa fa-check"></i>
               </a>
             </div>
@@ -2133,7 +2133,7 @@
           <div class="view-port clearfix" id="alerts">
 
             <a href="#" data-target="#new-group-modal" data-toggle="modal" id='start-conversation'>
-              <i class="fa fa-plus margin-right-10"></i>
+              <i class="fa fa-plus margin-right-10" onClick="openInviteModal()"></i>
               Start group conversation</a>
             <div id="group-invite-list">
             </div>
