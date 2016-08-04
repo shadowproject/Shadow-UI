@@ -1,7 +1,13 @@
 var breakpoint = 906;
 
-// Load page js requirements..
-$.getScript('assets/js/pages/send.js');
+function invalid(el, valid) {
+    if(valid == true)
+        el.css("background", "").css("color", "");
+    else
+        el.css("background", "#E51C39").css("color", "white");
+
+    return (valid == true);
+}
 
 function updateValue(element) {
     //TODO: add prefix label group_ when addresstype AT = 4. So we can remove it from the label being shown and handle it in the background..
@@ -11,33 +17,42 @@ function updateValue(element) {
                   (element             .data("label") != undefined ? element             .data("label") :
                   (element             .data("value") != undefined ? element             .data("value") : element.text()))));
 
-    var address = element.parents(".selected").find(".address");
-    var addresstype = element.parents(".selected").find(".addresstype");
+        address = element.parents(".selected").find(".address");
+        addresstype = element.parents(".selected").find(".addresstype");
 
     address = address.data("value") ? address.data("value") : address.text();
-    addresstype = addresstype.data("value") ? addresstype.data("value") : addresstype.text();
 
+    if (addresstype.length === 1)
+        addresstype = addresstype.data("value") ? addresstype.data("value") : addresstype.text();
 
+    var prefix = (addresstype == "Group" ? "group_" : "");
 
-    var prefix = (addresstype == "Group" ? "group_" : "" );
     if(addresstype == "Group")
         value.replace("group_", "");
 
-   element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + address + '\', \'' + prefix + '\' +this.value);" value="' + value + '" size=60 />'); //
+    element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + address + '\', \'' + prefix + '\' +this.value);" value="' + value + '" size=60 />'); //
 
-    $(".newval").focus();
-    $(".newval").on("contextmenu", function(e) {
-        e.stopPropagation();
-    });
-    $(".newval").keyup(function (event) {
-        if (event.keyCode == 13)
-            element.html(curhtml.replace(value, $(".newval").val().trim()))
-    });
+    function leave(e) {
+        var newval = $(".newval");
 
-    $(document).one('click', function () {
-        element.html(curhtml.replace(value, $(".newval").val().trim()));
-    });
+        if (newval.length === 0)
+            return;
+
+        element.html(curhtml.replace(value, newval.val().trim()));
+    }
+
+    $(".newval").focus()
+        .on("contextmenu", function(e) {
+            e.stopPropagation();
+        })
+        .keyup(function (event) {
+            if (event.keyCode == 13)
+                leave(event);
+        });
+
+    $(document).one('click', leave);
 }
+
 
 function updateValueChat(element, key) {
     var curhtml = element.html();
@@ -100,7 +115,7 @@ function updateValueChat(element, key) {
 }
 
 $(function() {
-    $('.footable').footable({breakpoints:{phone:480, tablet:700}, delay: 50})
+    $('.footable,.footable-lookup').footable({breakpoints:{phone:480, tablet:700}, delay: 50})
     .on({'footable_breakpoint': function() {
             //$('table').trigger('footable_expand_first_row'); uncomment if we want the first row to auto-expand
         },
@@ -137,12 +152,24 @@ $(function() {
     chainDataPage.init();
     keyManagementPage.init();
 
-    $(".footable tr").on('click', function() {
-        $(this).addClass("selected").siblings("tr").removeClass("selected");
-    });
+    // Initialise row selection
+    $(".footable > tbody tr").selection();
 });
 
+// Row select function
+$.fn.selection = function(sibling) {
+    if (!sibling)
+        sibling = "tr";
 
+    return this.on('click', function() {
+        $(this)
+            .addClass("selected")
+        .siblings(sibling)
+            .removeClass("selected");
+    });
+}
+
+// Connect to bridge signals
 function connectSignals() {
     bridge.emitPaste.connect(this, pasteValue);
 
@@ -151,7 +178,7 @@ function connectSignals() {
     bridge.emitMessages.connect(this, appendMessages);
     bridge.emitMessage.connect(this,  appendMessage);
 
-    bridge.emitCoinControlUpdate.connect(this, updateCoinControlInfo);
+    bridge.emitCoinControlUpdate.connect(sendPage, "updateCoinControlInfo");
 
     bridge.triggerElement.connect(this, triggerElement);
 
@@ -177,8 +204,13 @@ function triggerElement(el, trigger) {
 
 function updateRowsPerPage(rows) {
     $(".footable").each(function() {
-        $(this).data().pageSize = rows;
-        $(this).trigger('footable_initialize');
+        var table = $(this);
+
+        if (table.hasClass('footable-lookup'))
+            return;
+
+        table.data().pageSize = rows;
+        table.trigger('footable_initialize');
     });
 }
 
@@ -839,7 +871,7 @@ function appendAddresses(addresses) {
         var page = (address.type == "S" ? "#addressbook" : (address.label.lastIndexOf("group_", 0) !== 0 ? "#receive" : "#addressbook"));
 
         /* add address to chat dropdown box to choose sender from*/
-        if(address.type == "R" && address.address.length < 75 && address.label.lastIndexOf("group_", 0) !== 0) {
+        if(address.type == "R" && sendPage.initSendBalance(address) && address.address.length < 75 && address.label.lastIndexOf("group_", 0) !== 0) {
             if(addrRow.length==0)
                 $("#message-from-address").append("<option title='"+address.address+"' value='"+address.address+"'>"+address.label+"</option>");
             else
@@ -905,50 +937,54 @@ function appendAddresses(addresses) {
 
 }
 
-function addressLookup(returnFields, lReceiveAddresses)
+function addressLookup(returnFields, receive, filterType)
 {
-    var page = (lReceiveAddresses ? "#receive" : "#addressbook");
-    var table =  $(page + "-table");
-    var lookupTable = $("#address-lookup-table");
+    var lookupData = $((receive ? '#receive' : '#addressbook') + ' table.footable > tbody').html(),
+        lookupTable = $("#address-lookup-table");
 
-    lookupTable.data().pageSize = 5;
+    lookupTable.children('tbody').html(lookupData);
     lookupTable.trigger('footable_initialize');
-    lookupTable.html( table.html() );
     lookupTable.data('footable-filter').clearFilter();
 
     $("#address-lookup-table > tbody tr")
-        .on('click', function() {
-            $(this).addClass("selected").siblings("tr").removeClass("selected");
-        })
+        .selection()
         .on('dblclick', function() {
             var retfields = returnFields.split(',');
             $("#" + retfields[0]).val( $(this).attr("id").trim() );
             if(retfields[1] != undefined )
             {
-                $("#" + retfields[1]).val( $(this).attr("lbl").trim() );
+                $("#" + retfields[1])
+                    .val($(this).attr("lbl").trim())
+                    .text($(this).attr("lbl").trim());
             }
 			$('#address-lookup-modal').modal('hide');
-        })
+        });
+
+    function doFilter() {
+        $('#address-lookup-filter').val($('#address-lookup-address-filter').val() + " " + $('#address-lookup-address-type').val() ) ;
+        lookupTable.trigger('footable_filter', {filter: $('#address-lookup-filter').val()});
+    }
 
     // Deal with the lookup table filtering
     // On any input update the filter
-    $('#lookup-addressfilter').on('input', function () {
-        if($('#lookup-addressfilter').val() == "")
-        {
+    $('#address-lookup-address-filter').on('input', function () {
+        if($('#lookup-address-filter').val() == "")
             lookupTable.data('footable-filter').clearFilter();
-        }
-        $('#lookup-filter').val($('#lookup-addressfilter').val() + " " + $('#lookup-addresstype').val() ) ;
-        lookupTable.trigger('footable_filter', {filter: $('#lookup-filter').val()});
+
+        doFilter();
     });
 
-    $('#lookup-addresstype').change(function () {
-        if($('#filter-addresstype').val() == "")
-        {
+    $('#address-lookup-address-type').change(function () {
+        if($('#address-lookup-address-type').val() == "")
             lookupTable.data('footable-filter').clearFilter();
-        }
-        $('#lookup-filter').val($('#lookup-addressfilter').val() + " " + $('#lookup-addresstype').val() ) ;
-        lookupTable.trigger('footable_filter', {filter: $('#lookup-filter').val()});
+
+        doFilter();
     });
+
+    if (filterType) {
+        $('#address-lookup-address-type').val(filterType);
+        doFilter();
+    }
 }
 
 function transactionPageInit() {
@@ -1085,7 +1121,7 @@ function formatTransaction(transaction) {
 	                <td data-value='"+transaction.d+"'>"+transaction.d_s+"</td>\
                     <td class='trans-status' data-value='"+transaction.c+"'><center><i class='fa fa-lg "+transaction.s+"'></center></td>\
                     <td class='trans_type'><img height='15' width='15' src='assets/icons/tx_"+transaction.t+".png' /> "+transaction.t_l+"</td>\
-                    <td style='color:"+transaction.a_c+";' data-value='"+transaction.ad+"' data-label='"+transaction.ad_l+"'><span class='editable'>"+transaction.ad_d+"</span></td>\
+                    <td class='address' style='color:"+transaction.a_c+";' data-value='"+transaction.ad+"' data-label='"+transaction.ad_l+"'><span class='editable'>"+transaction.ad_d+"</span></td>\
                     <td class='trans-nar'>"+transaction.n+"</td>\
                     <td class='amount' style='color:"+transaction.am_c+";' data-value='"+transaction.am_d+"'>"+transaction.am_d+"</td>\
                  </tr>";
@@ -1276,12 +1312,12 @@ function shadowChatInit() {
     });
 
     //ONCLICK REMOVE NOTIFICATION
-    $("#messages").on('click',
+    $("#messages")
+        .selection()
+        .on('click',
         function(e) {
-                $(this).addClass("selected").siblings("li").removeClass("selected");
-
-                if(current_key != "")
-                    removeNotificationCount(current_key);
+            if(current_key != "")
+                removeNotificationCount(current_key);
         });
 
 }
@@ -1443,8 +1479,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     createContact(label_msg, key, group);
     var contact = contacts[key];
 
-    if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
-    {     
+    if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0) {     
         contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read}); 
         
         contact.messages.sort(function (a, b) {
@@ -1476,7 +1511,7 @@ function createContact(label, address, group){
         contact.group = group,
         contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
         contact.messages  = new Array();
-    } 
+    }
 }
 
 function updateContact(label, address, contact_address){
@@ -1535,7 +1570,7 @@ function appendContact (key, openconvo, addressbook) {
             "<li id='"+ elementName + key +"' class='contact' data-title='"+contact.label+"'>\
                 <span class='contact-info'>\
                     <span class='contact-name'>"+ ((contact.group && addressbook) ? "<i class='fa fa-users' style='padding-right: 7px;'></i>" : "") + contact.label+"</span>\
-                     <span class='" + (addressbook ? "contact-address" : "contact-message") + "'>"+ (addressbook ? contact.address : latestMessage) + "</span>\
+                    <span class='" + (addressbook ? "contact-address" : "contact-message") + "'>"+ (addressbook ? contact.address : latestMessage) + "</span>\
                 </span>\
                 <span class='contact-options'>\
                         <span class='message-notifications'>0</span>\ " + //"+(unread_count==0?' none':'')+"
@@ -1548,7 +1583,7 @@ function appendContact (key, openconvo, addressbook) {
                 contact_book_list.prepend(contact_html);
                 console.log("appended to book!");
                 $("#"+ elementName + key).find(".delete").hide();
-         }else if(contact.group){ //if not group
+         }else if(contact.group) { //if not group
             contact_group_list.prepend(contact_html);
          } else
             contact_list.prepend(contact_html);
@@ -1556,14 +1591,12 @@ function appendContact (key, openconvo, addressbook) {
 
 
          //onClick contact in sidebar list, on hover and on delete.
-        contact_el = $("#"+ elementName + key).on('click',
-            function(e) {
-                $(this).addClass("selected").siblings("li").removeClass("selected");
+        contact_el = $("#contact-"+ prefix + key)
+            .selection('li')
+            .on('click', function click(e) {
                 if(addressbook)
                     appendContact(key, false);
                 openConversation(key, true);
-
-
             }).tooltip();
 
 
@@ -1622,7 +1655,7 @@ function removeNotificationCount(key){
 
     if(notifications_contact.text() == 0)
         return false;
-        
+
     notifications_contact.text(0);
     notifications_contact.hide();
 
@@ -1666,11 +1699,10 @@ function removeNotificationCount(key){
 //OpenConversation is split off to allow for opening conversation automatically without removing notification.
 function openConversation(key, click) {
             console.log("opening Conversation key=" + key);
-            
+
             if(click)
                  $("#chat-menu-link").click();//open chat window when on other page
-            
-                
+
             current_key = key;
             //TODO: detect wether user is typing, if so do not reload page to other conversation..
             //$(this).addClass("selected").siblings("li").removeClass("selected");
@@ -1718,12 +1750,12 @@ function openConversation(key, click) {
                 discussion.append(
                     "<li id='"+message.id+"' class='"+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
                     <span class='message-content'>\
-					    <span class='user-name' " + onclick + ">"
+                        <span class='user-name' " + onclick + ">"
                             +(message.label_msg)+"\
                         </span>\
                         <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
-						<span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-						<span class='message-text'>"+micromarkdown.parse(emojione.toImage(message.message)) +  "</span>\
+                            <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
+                            <span class='message-text'>"+micromarkdown.parse(emojione.toImage(message.message)) +  "</span>\
                     </span></li>");
                     
                  $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString()).tooltip();
@@ -2143,9 +2175,9 @@ var blockExplorerPage =
     prepareBlockTable: function()
     {
         $("#latest-blocks-table  > tbody tr")
+            .selection()
             .on('click', function()
                 {
-                    $(this).addClass("selected").siblings("tr").removeClass("selected");
                     var blkHash = $(this).attr("data-value").trim();
                     blockExplorerPage.blkTxns = bridge.listTransactionsForBlock(blkHash);
                     var txnTable = $('#block-txs-table  > tbody');
@@ -2162,9 +2194,7 @@ var blockExplorerPage =
 
                     $("#block-txs-table").removeClass("none");
                     $("#block-txs-table > tbody tr")
-                        .on('click', function() {
-                            $(this).addClass("selected").siblings("tr").removeClass("selected");
-                        })
+                        .selection()
 
                         .on("dblclick", function(e) {
 
@@ -2198,16 +2228,13 @@ var blockExplorerPage =
 
                             var txnInputs = $('#txn-detail-inputs > tbody');
                             txnInputs.html('');
-                            for (value in selectedTxn.transaction_inputs)
-                            {
-
-
+                            for (value in selectedTxn.transaction_inputs) {
 
                               var txnInput = selectedTxn.transaction_inputs[value];
 
                               txnInputs.append('<tr data-value='+ txnInput.input_source_address+'>\
-                                                           <td>' + txnInput.input_source_address  + '</td>\
-                                                           <td>' + txnInput.input_value + '</td>\
+                                                   <td>' + txnInput.input_source_address  + '</td>\
+                                                   <td>' + txnInput.input_value + '</td>\
                                                 </tr>');
                             }
 
@@ -2224,13 +2251,7 @@ var blockExplorerPage =
                                             </tr>');
                             }
 
-
-
-                            $(this).click();
-                            $(this).off('click');
-                            $(this).on('click', function() {
-                                    $(this).addClass("selected").siblings("tr").removeClass("selected");
-                            })
+                            $(this).click().off('click').selection();
                         }).find(".editable")
                 })
             .on("dblclick", function(e)
@@ -2258,12 +2279,9 @@ var blockExplorerPage =
                 }
 
                 // $("#block-info").html();
-                $(this).click();
-
-                $(this).off('click');
-                $(this).on('click', function() {
-                $(this).addClass("selected").siblings("tr").removeClass("selected");
-                })
+                $(this).click()
+                  .off('click')
+                  .selection();
             }).find(".editable")
     }
 }
@@ -2311,9 +2329,9 @@ var keyManagementPage = {
     prepareAccountTable: function()
     {
         $("#extkey-account-table  > tbody tr")
+            .selection()
             .on('click', function()
             {
-                $(this).addClass("selected").siblings("tr").removeClass("selected");
                 var otherTableRows = $('#extkey-table > tbody > tr');
                 otherTableRows.removeClass("selected");
             })
@@ -2340,9 +2358,9 @@ var keyManagementPage = {
     prepareKeyTable: function()
     {
         $("#extkey-table  > tbody tr")
+            .selection()
             .on('click', function()
             {
-                $(this).addClass("selected").siblings("tr").removeClass("selected");
                 var otherTableRows = $('#extkey-account-table > tbody > tr');
                 otherTableRows.removeClass("selected");
             })
