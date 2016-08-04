@@ -1,3 +1,5 @@
+var breakpoint = 906;
+
 function invalid(el, valid) {
     if(valid == true)
         el.css("background", "").css("color", "");
@@ -56,18 +58,13 @@ $(function() {
     .on({'footable_breakpoint': function() {
             //$('table').trigger('footable_expand_first_row'); uncomment if we want the first row to auto-expand
         },
-        'footable_redrawn':  resizeFooter,
-        'footable_resized':  resizeFooter,
-        'footable_filtered': resizeFooter,
-        'footable_paging':   resizeFooter,
         'footable_row_expanded': function(event) {
         var editable = $(this).find(".editable");
 
-        editable.off("dblclick");
-        editable.on("dblclick", function (event) {
+        editable.off("dblclick").on("dblclick", function (event) {
            event.stopPropagation();
            updateValue($(this));
-        }).attr("data-title", "Double click to edit").on('mouseenter', tooltip);
+        }).attr("data-title", "Double click to edit").tooltip();
     }});
 
     $(".editable").on("dblclick", function (event) {
@@ -75,37 +72,24 @@ $(function() {
        updateValue($(this));
     }).attr("data-title", "Double click to edit %column%");
 
-    $(document).ready(function() {
-        resizeFooter();
-        $("#navitems a[href='#overview']").trigger('click');
-    });
-
     //$('img,i').click(function(e){e.stopPropagation()});
 
     // On resize, close menu when it gets to the breakpoint
     window.onresize = function (event) {
         if (window.innerWidth > breakpoint)
             $("#layout").removeClass('active');
-
-        resizeFooter();
     };
-
-    // Change page handler
-    $("#navitems a, #test343343 a").on("click", changePage);
 
     if(bridge)
         $("[href='#about']").on("click", function() {bridge.userAction(['aboutClicked'])});
 
     overviewPage.init();
-    sendPageInit();
     receivePageInit();
     transactionPageInit();
     addressBookInit();
     shadowChatInit();
     chainDataPage.init();
     keyManagementPage.init();
-    // Tooltip
-    $('[data-title]').on('mouseenter', tooltip);
 
     // Initialise row selection
     $(".footable > tbody tr").selection();
@@ -135,11 +119,9 @@ function connectSignals() {
 
     bridge.emitCoinControlUpdate.connect(sendPage, "updateCoinControlInfo");
 
-    bridge.emitAddressBookReturn.connect(this, addressBookReturn);
-
     bridge.triggerElement.connect(this, triggerElement);
 
-    bridge.emitReceipient.connect(this, addRecipientDetail);
+    bridge.emitReceipient.connect(sendPage, "addRecipientDetail");
     bridge.networkAlert.connect(this, networkAlert);
 
     optionsModel.displayUnitChanged.connect(unit, "setType");
@@ -188,23 +170,6 @@ var base58 = {
         el.css("background", "").css("color", "");
         return true;
     }
-}
-
-var addressLookup = "",
-    addressLabel  = "";
-
-function openAddressBook(field, label, sending)
-{
-    addressLookup = field;
-    addressLabel  = label;
-
-    bridge.openAddressBook(sending);
-}
-
-function addressBookReturn(address, label)
-{
-    $(addressLookup).val(address).change();
-    $(addressLabel) .val(label)  .change();
 }
 
 var pasteTo = "";
@@ -426,117 +391,6 @@ var overviewPage = {
         this.unconfirmed = $("#unconfirmed"),
         this.immature = $("#immature"),
         this.total = $("#total");
-
-        var menu = [{
-                name: 'Backup&nbsp;Wallet...',
-                fa: 'fa-save red fa-fw font-20px',
-                fun: function () {
-                   bridge.userAction(['backupWallet']);
-                }
-                }, /*
-                {
-                    name: 'Export...',
-                    img: 'qrc:///icons/editcopy',
-                    fun: function () {
-                        copy('#addressbook .footable .selected .label');
-                    }
-                }, */
-                {
-                    name: 'Sign&nbsp;Message...',
-                    fa: 'fa-pencil-square-o red fa-fw font-20px',
-                    fun: function () {
-
-                       $('#sign-message-button').click();
-                    }
-                },
-                {
-                    name: 'Verify&nbsp;Message...',
-                    fa: 'fa-check red fa-fw font-20px',
-                    fun: function () {
-                        $('#verify-message-button').click();
-                    }
-                },
-                {
-                    name: 'Exit',
-                    fa: 'fa-times red fa-fw font-20px',
-                    fun: function () {
-                       bridge.userAction(['close']);
-                    }
-                }];
-
-        $('#file').contextMenu(menu, {onOpen:function(data,e){openContextMenu(data.menu);}, onClose:function(data,e){data.menu.isOpen = 0;}, triggerOn: 'click', displayAround: 'trigger', position: 'bottom', mouseClick: 'left', sizeStyle: 'content'});
-
-        menu = [{
-                     id: 'encryptWallet',
-                     name: 'Encrypt&nbsp;Wallet...',
-                     fa: 'fa-lock red fa-fw font-20px',
-                     fun: function () {
-                        bridge.userAction(['encryptWallet']);
-                     }
-                 },
-                 {
-                     id: 'changePassphrase',
-                     name: 'Change&nbsp;Passphrase...',
-                     fa: 'fa-user-secret red fa-fw font-20px',
-                     fun: function () {
-                        bridge.userAction(['changePassphrase']);
-                     }
-                 },
-                 {
-                     id: 'toggleLock',
-                     name: '(Un)Lock&nbsp;Wallet...',
-                     fa: 'fa-unlock red pad fa-fw font-20px',
-                     fun: function () {
-                        bridge.userAction(['toggleLock']);
-                     }
-                 },
-                 {
-                     name: 'Key Management',
-                     fa: 'fa-key red fa-fw font-20px',
-                     fun: function () {
-                        $("#navitems [href=#keymanagement]").click();
-                     }
-                 },
-                 {
-                     name: 'Options',
-                     fa: 'fa-wrench red fa-fw font-20px',
-                     fun: function () {
-                        $("#navitems [href=#options]").click();
-                     }
-                 }];
-
-        $('#settings').contextMenu(menu, {onOpen:function(data,e){openContextMenu(data.menu);}, onClose:function(data,e){data.menu.isOpen = 0;}, triggerOn: 'click', displayAround: 'trigger', position: 'bottom', mouseClick: 'left', sizeStyle: 'content'});
-
-        menu = [{
-                     name: 'Debug&nbsp;Window...',
-                     fa: 'fa-bug red fa-fw font-20px',
-                     fun: function () {
-                        bridge.userAction(['debugClicked']);
-                     }
-                 },
-                 {
-                     name: 'Developer&nbsp;Tools...',
-                     fa: 'fa-edit red fa-fw font-20px',
-                     fun: function () {
-                        bridge.userAction(['developerConsole']);
-                     }
-                 },
-                 {
-                     name: ' About&nbsp;Shadow...',
-                     img: 'qrc:///icons/shadow',
-                     fun: function () {
-                        bridge.userAction(['aboutClicked']);
-                     }
-                 },
-                 {
-                     name: 'About&nbsp;Qt...',
-                     fa: 'fa-question red fa-fw font-20px',
-                     fun: function () {
-                        bridge.userAction(['aboutQtClicked']);
-                     }
-                 }];
-
-        $('#help').contextMenu(menu, {onOpen:function(data,e){openContextMenu(data.menu);}, onClose:function(data,e){data.menu.isOpen = 0;}, triggerOn: 'click', displayAround: 'trigger', position: 'bottom', mouseClick: 'left', sizeStyle: 'content'});
     },
 
     updateBalance: function(balance, shadowBal, stake, unconfirmed, immature) {
@@ -559,7 +413,6 @@ var overviewPage = {
         this.formatValue("unconfirmed", unconfirmed);
         this.formatValue("immature",    immature);
         this.formatValue("total", balance + stake + unconfirmed + immature);
-        resizeFooter();
     },
 
     updateReserved: function(reserved) {
@@ -603,11 +456,11 @@ var overviewPage = {
         for(var i = 0;i < transactions.length;i++)
             overviewPage.updateTransaction(transactions[i]);
 
-        $("#recenttxns [data-title]").off("mouseenter").on("mouseenter", tooltip)
+        $("#recenttxns [data-title]").tooltip();
     },
     updateTransaction: function(txn) {
         var format = function(tx) {
-            return "<tr><td class='text-left' style='border-top: 1px solid rgba(230, 230, 230, 0.7);border-bottom: none;'><center><label style='margin-top:6px;' class='label label-important inline fs-12'>"+(tx.t == 'input' ? 'Send' : (tx.t == 'output' ? 'Received' : (tx.t == 'inout' ? 'In-Out' : 'Stake')))+"</label></center></td><td class='text-left' style='border-top: 1px solid rgba(230, 230, 230, 0.7);border-bottom: none;'><center><a id='"+tx.id.substring(0,17)+"' data-title='"+tx.tt+"' href='#' onclick='$(\"#navitems [href=#transactions]\").click();$(\"#"+tx.id+"\").click();'> "
+            return "<tr><td class='text-left' style='border-top: 1px solid rgba(230, 230, 230, 0.7);border-bottom: none;'><center><label style='margin-top:6px;' class='label label-important inline fs-12'>"+(tx.t == 'input' ? 'Received' : (tx.t == 'output' ? 'Sent' : (tx.t == 'inout' ? 'In-Out' : 'Stake')))+"</label></center></td><td class='text-left' style='border-top: 1px solid rgba(230, 230, 230, 0.7);border-bottom: none;'><center><a id='"+tx.id.substring(0,17)+"' data-title='"+tx.tt+"' href='#' onclick='$(\"#navitems [href=#transactions]\").click();$(\"#"+tx.id+"\").click();'> "
               +unit.format(tx.am)+" "+unit.display+" </a></center></td><td style='border-top: 1px solid rgba(230, 230, 230, 0.7);border-bottom: none;'><span class='overview_date' data-value='"+tx.d+"'><center>"+tx.d_s+"</center></span></td></tr>";
         }
 
@@ -647,7 +500,7 @@ var overviewPage = {
     },
     clientInfo: function() {
         $('#version').text(bridge.info.build.replace(/\-[\w\d]*$/, ''));
-        $('#clientinfo').attr('data-title', 'Build Desc: ' + bridge.info.build + '\nBuild Date: ' + bridge.info.date).on('mouseenter', tooltip);
+        $('#clientinfo').attr('data-title', 'Build Desc: ' + bridge.info.build + '\nBuild Date: ' + bridge.info.date).tooltip();
     },
     encryptionStatusChanged: function(status) {
         switch(status)
@@ -767,338 +620,6 @@ var optionsPage = {
                 changeTxnType();
         }
     }
-}
-
-/* Send Page */
-function sendPageInit() {
-    toggleCoinControl(); // TODO: Send correct option value...
-    addRecipient();
-    changeTxnType();
-    $("#cust-add-lkp").leanModal({top : 200, overlay : 0.5, closeButton: "#address-lookup-modal .modal_close"});
-}
-
-var recipients = 0;
-var returnto = "";
-function addRecipient() {
-
-    $("#recipients").append((
-           (recipients == 0 || $("div.recipient").length == 0 ? '' : '<hr />')
-        +  '<div id="recipient[count]" class="recipient">\
-<div class="form-group">\
-<label class="col-sm-3 p-l-20 control-label">Pay to <a href="#"><i class="p-b-5 fa fa-question-circle" data-title="Shadowcash.. public.." style="color:#626262;"></i></a></label>\
-<div class="col-sm-9">\
-<div class="row">\
-<div class="col-sm-6">\
-<input class="form-control" id="pay_to[count]" data-title="The address to send the payment to" maxlength="128" oninput="base58.check(this);" onchange="$(\'#label[count]\').val(bridge.getAddressLabel(this.value));" placeholder="The address to send the payment to" type="text">\
-</div>\
-<div class="col-sm-3">\
-<input class="form-control" id="label[count]"  maxlength="128" type="text" data-title="Enter a label for this address" placeholder="Enter a label"></div>\
-<div class="btn-group col-sm-3 sm-m-t-10">\
-<a id="address_lookup[count]" data-title="Choose from address book" data-toggle="modal"  data-target="#address-lookup-modal" href="#" onclick="returnto=\'pay_to[count]\,label[count]\';prepAddressLookup(true);" class="btn btn-default"><i class="fa fa-book"></i>\
-</a>\
-<a data-title="Paste address from clipboard"  class="btn btn-default" onclick="paste(\'#pay_to[count]\')"><i class="fa fa-files-o"></i>\
-</a>\
-<a data-title="Remove this recipient" class="btn btn-default" onclick="if($(\'div.recipient\').length == 1) clearRecipients(); else {var recipient=$(\'#recipient[count]\');if(recipient.next(\'hr\').remove().length==0)recipient.prev(\'hr\').remove();$(\'#recipient[count]\').remove();}"><i class="fa fa-close"></i>\
-</a>\
-</div>\
-</div>\
-</div>\
-</div>\
-<div class="form-group">\
-<label class="col-sm-3 control-label option p-l-20" for="amount[count]" class="recipient">Amount <a href="#"><i class="p-b-5 fa fa-question-circle" data-title="Shadowcash.. public.." style="color:#626262;"></i></a></label>\
-<div class="col-sm-9">\
-<div class="row">\
-<div class="col-sm-9">\
-<input class="form-control" id="amount[count]" class="amount" placeholder="0.00000000" step="0.01" type="text" value="0.00000000" onfocus="invalid($(this), true);" onchange="unit.parse(this, $(\'#unit[count]\').val());updateCoinControl();">\
-</div>\
-<select class="select-drop-down" style="margin-left:7px" id="unit[count]" onchange="unit.format(\'#amount[count]\', $(this).val());">\
-<option value="0" title="Shadow"                    ' + (unit.type == 0 ? "selected" : "") + '>SDC</option>\
-<option value="1" title="Milli-Shadow (1 / 1000)"   ' + (unit.type == 1 ? "selected" : "") + '>mSDC</option>\
-<option value="2" title="Micro-Shadow (1 / 1000000)"' + (unit.type == 2 ? "selected" : "") + '>&micro;SDC</option>\
-<option value="3" title="Shadowshi (1 / 100000000)" ' + (unit.type == 3 ? "selected" : "") + '>Shadowshi</option>\
-</select>\
-</div>\
-</div>\
-</div>\
-<div class="form-group" id="show_nar" style="border-bottom: 1px solid #F0F1F3">\
-<label class="col-sm-3 control-label option p-l-20 recipient" for="narration[count]" title="Narration:">Narration <a href="#"><i class="p-b-5 fa fa-question-circle" data-title="Shadowcash.. public.." style="color:#626262;"></i></a></label>\
-<div class="col-sm-9">\
-<div class="row">\
-<div class="col-sm-9">\
-<input class="form-control" id="narration[count]" maxlength="24" data-title="Enter a short note to send with payment (max 24 characters)"\
-placeholder="Enter a short note to send with a payment (max 24 characters)">\
-</div>\
-<div class="col-sm-3">\
-</div>\
-</div>\
-</div>\
-</div>\
-</form>\
-</div>\
-</div>\
-').replace(/\[count\]/g, recipients++));
-        resizeFooter();
-
-        // Don't allow characters in numeric fields
-        $("#amount"+(recipients-1).toString()).on("keydown", unit.keydown).on("paste",  unit.paste);
-
-        //$("#address_lookup"+(recipients-1)).leanModal({top : 200, overlay : 0.5, closeButton: "#address-lookup-modal .modal_close"});
-		$('#address-lookup-modal'+(recipients-1)).modal('hide');
-				
-        // Addressbook Modal
-        $("#addressbook"+(recipients-1).toString()).leanModal({ top : 10, left: 5, overlay : 0.5, closeButton: ".modal_close" });
-		
-    bridge.userAction(['clearRecipients']);
-}
-
-
-
-
-function clearRecipients() {
-    $("#recipients").html("");
-    recipients = 0;
-    addRecipient();
-    resizeFooter();
-    returnto = "";
-	 $('[data-title]').on('mouseenter', tooltip);
-}
-
-function addRecipientDetail(address, label, narration, amount) {
-    var recipient = recipients - 1;
-
-    $("#pay_to"+recipient).val(address).change();
-    $("#label"+recipient).val(label).change();
-    $("#amount"+recipient).val(amount).change();
-}
-
-function changeTxnType()
-{
-    var type=$("#txn_type").val();
-
-    if (type > 1)
-    {
-        $("#tx_ringsize,#suggest_ring_size")[bridge.info.options.AutoRingSize == true ? 'hide' : 'show']();
-        $("#coincontrol,#spend_sdc,#suggest_ring_size,#tx_ringsize").hide();
-        $("#spend_shadow").show();
-        toggleCoinControl(false);
-		$(".hide-coin-controle").hide();
-		$(".hide-adv-controle").show();
-    }
-    else
-    {
-        $("#tx_ringsize,#suggest_ring_size,#spend_shadow").hide();
-        $("#coincontrol,#spend_sdc").show();
-		$(".hide-coin-controle").show();
-		$(".hide-adv-controle").hide();
-    }
-
-    resizeFooter();
-}
-
-//rarw
-
-
-function toggleADVControl(enable) {
-$('#txn_type').val();
-   if( $('#txn_type').val() == "2")
-    {
-         $('#tx_ringsize,#suggest_ring_size').toggle();
-   }else
-   {
-      $('#tx_ringsize,#suggest_ring_size').hide();
-  }
-     resizeFooter();
-  }
-
-
-
-function suggestRingSize()
-{
-    chainDataPage.updateAnonOutputs();
-
-    var minsize = bridge.info.options.MinRingSize||3,
-        maxsize = bridge.info.options.MaxRingSize||50;
-
-    function mature(value, min_owned) {
-        if(min_owned == undefined || !$.isNumeric(min_owned))
-            min_owned = 1;
-
-        var anonOutput = chainDataPage.anonOutputs[value];
-
-        if(anonOutput)
-            return Math.min(anonOutput
-               && anonOutput.owned_mature  >= min_owned
-               && anonOutput.system_mature >= minsize
-               && anonOutput.system_mature, maxsize);
-        else
-            return 0;
-    }
-
-    function getOutputRingSize(output, test, maxsize)
-    {
-        switch (output)
-        {
-            case 0:
-                return maxsize;
-            case 2:
-                return mature(1*test, 2)||getOutputRingSize(++output, test, maxsize);
-            case 6:
-                return Math.min(mature(5*test, 1),
-                                mature(1*test, 1))||getOutputRingSize(++output, test, maxsize);
-            case 7:
-                return Math.min(mature(4*test, 1),
-                                mature(3*test, 1))||getOutputRingSize(++output, test, maxsize);
-            case 8:
-                return Math.min(mature(5*test, 1),
-                                mature(3*test, 1))||getOutputRingSize(++output, test, maxsize);
-            case 9:
-                return Math.min(mature(5*test, 1),
-                                mature(4*test, 1))||getOutputRingSize(++output, test, maxsize);
-            default:
-                if(output == 10)
-                    return mature(test/2, 2);
-
-                maxsize = Math.max(mature(output*test, 1),mature(1*test, output))||getOutputRingSize(output==1?3:++output, test, maxsize);
-        }
-        return maxsize;
-    }
-
-    for(var i=0;i<recipients;i++)
-    {
-        var test = 1,
-            output = 0,
-            el = $("#amount"+i),
-            amount = unit.parse(el.val(), $("#unit"+i));
-
-        $("[name=err"+el.attr('id')+"]").remove();
-
-        while (amount >= test && maxsize >= minsize)
-        {
-            output = parseInt((amount / test) % 10);
-            try {
-                maxsize = getOutputRingSize(output, test, maxsize);
-            } catch(e) {
-                console.log(e);
-            } finally {
-                if(!maxsize)
-                    maxsize = mature(output*test);
-
-                test *= 10;
-            }
-        }
-
-        if(maxsize < minsize)
-        {
-            invalid(el);
-            el.parent().before("<div name='err"+el.attr('id')+"' class='warning'>Not enough system and or owned outputs for the requested amount. Only <b>"
-                     +maxsize+"</b> anonymous outputs exist for coin value: <b>" + unit.format(output*(test/10), $("#unit"+i)) + "</b></div>");
-            el.on('change', function(){$("[name=err"+el.attr('id')+"]").remove();});
-
-            $("#tx_ringsize").show();
-            $("#suggest_ring_size").show();
-
-            return;
-        }
-    }
-    $("#ring_size").val(maxsize);
-}
-
-function toggleCoinControl(enable) {
-    if(enable==undefined && $("#coincontrol_enabled")  .css("display") == "block" || enable == false)
-    {
-        $("#coincontrol_enabled") .css("display", "none");
-        $("#coincontrol_disabled").css("display", "block");
-    } else
-    {
-        $("#coincontrol_enabled") .css("display", "block");
-        $("#coincontrol_disabled").css("display", "none");
-    }
-    resizeFooter();
-}
-
-function updateCoinControl() {
-    if($("#coincontrol_enabled").css("display") == "none")
-        return;
-    var amount = 0;
-
-    for(var i=0;i<recipients;i++)
-        amount += unit.parse($("#amount"+i).val());
-
-    bridge.updateCoinControlAmount(amount);
-}
-
-function updateCoinControlInfo(quantity, amount, fee, afterfee, bytes, priority, low, change)
-{
-    if($("#coincontrol_enabled").css("display") == "none")
-        return;
-
-    if (quantity > 0)
-    {
-        $("#coincontrol_auto").hide();
-
-        var enable_change = (change == "" ? false : true);
-
-        $("#coincontrol_quantity").text(quantity);
-        $("#coincontrol_amount")  .text(unit.format(amount));
-        $("#coincontrol_fee")     .text(unit.format(fee));
-        $("#coincontrol_afterfee").text(unit.format(afterfee));
-        $("#coincontrol_bytes")   .text("~"+bytes).css("color", (bytes > 10000 ? "red" : null));
-        $("#coincontrol_priority").text(priority).css("color", (priority.indexOf("low") == 0 ? "red" : null)); // TODO: Translations of low...
-        $("#coincontrol_low")     .text(low).toggle(enable_change).css("color", (low == "yes" ? "red" : null)); // TODO: Translations of low outputs
-        $("#coincontrol_change")  .text(unit.format(change)).toggle(enable_change);
-
-        $("label[for='coincontrol_low']")   .toggle(enable_change);
-        $("label[for='coincontrol_change']").toggle(enable_change);
-
-        $("#coincontrol_labels").show();
-
-    } else
-    {
-        $("#coincontrol_auto").show();
-        $("#coincontrol_labels").hide();
-        $("#coincontrol_quantity").text("");
-        $("#coincontrol_amount")  .text("");
-        $("#coincontrol_fee")     .text("");
-        $("#coincontrol_afterfee").text("");
-        $("#coincontrol_bytes")   .text("");
-        $("#coincontrol_priority").text("");
-        $("#coincontrol_low")     .text("");
-        $("#coincontrol_change")  .text("");
-    }
-}
-
-var invalid = function(el, valid) {
-    if(valid == true)
-        el.css("background", "").css("color", "");
-    else
-        el.css("background", "#E51C39").css("color", "white");
-
-    return (valid == true);
-}
-
-function sendCoins() {
-    bridge.userAction(['clearRecipients']);
-
-    if(bridge.info.options.AutoRingSize && $("#txn_type").val() > 1)
-        suggestRingSize();
-
-    for(var i=0;i<recipients;i++) {
-        var el = $("#pay_to"+i);
-        var valid = true;
-
-        valid = invalid(el, bridge.validateAddress(el.val()));
-
-        el = $("#amount"+i);
-
-        if(unit.parse(el.val()) == 0 && !invalid(el))
-            valid = false;
-
-        if(!valid || !bridge.addRecipient($("#pay_to"+i).val(), $("#label"+i).val(), $("#narration"+i).val(), unit.parse($("#amount"+i).val(), $("#unit"+i).val()), $("#txn_type").val(), $("#ring_size").val()))
-            return false;
-    }
-
-    if(bridge.sendCoins($("#coincontrol_enabled").css("display") != "none", $("#change_address").val()))
-        clearRecipients();
 }
 
 function receivePageInit() {
@@ -1232,8 +753,6 @@ function addressBookInit() {
                 var addr=$('#addressbook .footable .selected .address');
                 if(bridge.deleteAddress(addr.text()))
                     addr.closest('tr').remove();
-
-                resizeFooter();
             }
         }];
 
@@ -1279,6 +798,9 @@ function appendAddresses(addresses) {
         addresses = JSON.parse(addresses.replace(/,\]$/, "]"));
     }
 
+     /* Initialize part of chat */
+     contact_book_list = $("#contact-book-list ul");
+
     for(var i=0; i< addresses.length;i++)
     {
         var address = addresses[i];
@@ -1299,11 +821,23 @@ function appendAddresses(addresses) {
                 initialAddress = false;
             }
         }
+        /* remove group_ prefix from labels*/
+        var isGroup = (address.at == 4);
+        var isSend = (address.type == "S");
+        if(isGroup){
+            address.label = address.label.replace("group_", "");
+            address.label_value = address.label_value.replace("group_", "");
+            isSend = true;
+         }
 
-            if(address.at == 4){
-                address.label = address.label.replace("group_", "");
-                address.label_value = address.label_value.replace("group_", "");
-            }
+        if(isSend){
+            console.log("adding to addressbook isGroup=" + isGroup);
+            createContact(address.label, address.address, isGroup);
+            appendContact(address.address, false, true);
+         }
+
+         /* Fill up addressbook "BOOK" in chat sidebar  */
+
 
         if (addrRow.length==0)
         {
@@ -1314,13 +848,14 @@ function appendAddresses(addresses) {
                <td class='pubkey'>"+address.pubkey+"</td>\
                <td class='addresstype'>"+(address.at == 4 ? "Group" : address.at == 3 ? "BIP32" : address.at == 2 ? "Stealth" : "Normal")+"</td></tr>");
 
+            //console.log('appendAddress');
             $("#"+address.address)
             .on('click', function() {
                 $(this).addClass("selected").siblings("tr").removeClass("selected");
             }).find(".editable").on("dblclick", function (event) {
                 event.stopPropagation();
                 updateValue($(this));
-            }).attr("data-title", "Double click to edit").on('mouseenter', tooltip);
+            }).attr("data-title", "Double click to edit").tooltip();
         }
         else
         {
@@ -1346,7 +881,7 @@ function addressLookup(returnFields, receive, filterType)
     $("#address-lookup-table > tbody tr")
         .selection()
         .on('dblclick', function() {
-            var retfields = returnto.split(',');
+            var retfields = returnFields.split(',');
             $("#" + retfields[0]).val( $(this).attr("id").trim() );
             if(retfields[1] != undefined )
             {
@@ -1431,12 +966,11 @@ function transactionPageInit() {
             $tbody.append(val.html);
 
             return $("#"+val.id)[0];
-			
+
         });
         e.result = true;
 
         bindTransactionTableEvents();
-        resizeFooter();
 
     }).on("footable_create_pages", function(e) {
         var $txtable = $("#transactions .footable");
@@ -1525,8 +1059,6 @@ function formatTransaction(transaction) {
                  </tr>";
 }
 
-					/* <td class='trans_type'><img height='15' width='15' src='qrc:///icons/tx_"+transaction.t+"' /> "+transaction.t_l+"</td>\  */ //todo
-
 function visibleTransactions(visible) {
     if(visible[0] != "*")
         Transactions = Transactions.filter(function(val) {
@@ -1537,7 +1069,7 @@ function visibleTransactions(visible) {
 function bindTransactionTableEvents() {
 
     $("#transactions .footable tbody tr")
-    .on('mouseenter', tooltip)
+    .tooltip()
 
     .on('click', function() {
         $(this).addClass("selected").siblings("tr").removeClass("selected");
@@ -1546,9 +1078,8 @@ function bindTransactionTableEvents() {
     .on("dblclick", function(e) {
         $(this).attr("href", "#transaction-info-modal");
 
-
 		$('#transaction-info-modal').appendTo("body").modal('show');
-		
+
         $("#transaction-info").html(bridge.transactionDetails($(this).attr("id")));
         $(this).click();
 
@@ -1562,7 +1093,7 @@ function bindTransactionTableEvents() {
       event.stopPropagation();
       event.preventDefault();
       updateValue($(this));
-   }).attr("data-title", "Double click to edit").on('mouseenter', tooltip);
+   }).attr("data-title", "Double click to edit").tooltip();
 }
 
 function appendTransactions(transactions) {
@@ -1592,9 +1123,9 @@ function appendTransactions(transactions) {
     .concat(transactions);
 
     overviewPage.recent(transactions.slice(0,7));
-	
+
 	$("#transactions .footable").trigger("footable_redraw");
-	
+
 }
 
 function shadowChatInit() {
@@ -1697,19 +1228,21 @@ function shadowChatInit() {
         }];
 
     $('#message-text').contextMenu(menu, {triggerOn:'contextmenu', sizeStyle: 'content'});
-    
+
     //ON ENTER SUBMIT MESSAGE
     $("#message-text").keypress(function (e) {
         if (e.which == 13) {
             e.preventDefault();
-                    
+
             if($("#message-text").val() == "")
                 return 0;
-                
+
+            removeNotificationCount();
             sendMessage();
+
         }
     });
-    
+
     //ONCLICK REMOVE NOTIFICATION
     $("#messages")
         .selection()
@@ -1718,23 +1251,25 @@ function shadowChatInit() {
             if(current_key != "")
                 removeNotificationCount(current_key);
         });
-    
+
 }
 
 
 var contacts = {};
 var contact_list;
 var contact_group_list;
+var contact_book_list;
 var current_key = "";
 
 function appendMessages(messages, reset) {
     contact_list = $("#contact-list ul");
     contact_group_list = $("#contact-group-list ul");
 
+
     if(reset)
     {
-        contacts = null;
-        contacts = {};
+        //contacts = null;
+        //contacts = {};
         contact_list.html("");
         contact_group_list.html("");
         $("#contact-list").removeClass("in-conversation");
@@ -1748,14 +1283,14 @@ function appendMessages(messages, reset) {
 
     if(messages == "[]")
         return;
-        
+
 
     console.log("message data=" + messages);
     messages = JSON.parse(messages.replace(/,\]$/, "]"));
 
     console.log("for loop through messages = " + messages.length);
 
-    // Massage data
+    // Message data
     for(var i=0; i<messages.length; i++)
     {
         var message = messages[i];
@@ -1773,14 +1308,23 @@ function appendMessages(messages, reset) {
                       true);
     }
 
+        //console.log("For loop key" + key);
 
-    openConversation(contacts[0].key, false);
-    
-    if(!contact[0].messages[0].group)
+    //console.log("opening first convo=" + contacts[0].address);
+    //openConversation(contacts[0].address, false);
+
+    console.log("Before contact[current_key].group=" + contacts[current_key].group);
+
+    if(!contacts[current_key].group)
+    {
+        console.log("setting priv in conversation!");
         $("#contact-list").addClass("in-conversation");
-    else
+    }else{
+        console.log("setting group in conversation!");
         $("#contact-group-list").addClass("in-conversation");
 
+    }
+        console.log("After contact[0].group");
     //contact_list.find("li:first-child").click();
 
 }
@@ -1794,13 +1338,14 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
         $("#message-count").text(parseInt($("#message-count").text())+1);
         $("#message-count").show();
     }*/ //should be removed but can't test for the moment
-    
+
 
     var them = type == "S" ? to_address   : from_address;
     var self = type == "S" ? from_address : to_address;
+    var contact_address = them;
 
     var label_msg = type == "S" ? (labelTo == "(no label)" ? self : labelTo) : (label == "(no label)" ? them : label);
-    var key = (label_value == "" ? them : label_value).replace(/\s/g, '');
+    var key = them;
 
     var group = false;
     //Setup instructions: make sure the receiving address is named 'group_ANYTHING'.
@@ -1810,11 +1355,13 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     It will put all messages under the same contact*/
 
     if(type == "R" && labelTo.lastIndexOf("group_", 0) === 0){ //Received, to group
-        key = labelTo.replace('group_', '');
+        label_msg = label_msg.replace('group_', '');
         group = true;
+        key =  self;
     } else if(label_value.lastIndexOf("group_", 0) === 0){ //sent to group,
-        key = label_value.replace('group_', '');
+        label_msg = label_msg.replace('group_', '');
         group = true;
+        key =  them;
     } else if(labelTo.lastIndexOf("group_", 0) === 0){ //sent by group, should not be possible but yeah anything can happen.
         group = true;
     }
@@ -1825,71 +1372,88 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     */
    console.log("appendMessage: for invite");
     //INVITE TO GROUP CODE
-    
-    if(message.lastIndexOf("/invite", 0) === 0 && message.length >= 61){
-       var group_key = message.substring(8, 60).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex priv keys ///^[V79e][1-9A-HJ-NP-Za-km-z]{50,51}$/g
-       var group_label = message.substring(61, message.length).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex whitelist only a-z, A-Z, 0-9
 
-        if(group_label.length == 0)
-            group_label = them + "_" + group_key.substring(0, 5);
+    if(message.lastIndexOf("/invite", 0) === 0 && message.length >= 60){
+        console.log("length of message=" + message.length);
+        var group_key = message.match(/[V79e][1-9A-HJ-NP-Za-km-z]{50,51}/g);
+                       /*
+        var group_key = message.substring(8, 60).replace(/^[V79e][1-9A-HJ-NP-Za-km-z]{50,51}$/, ""); // regex priv keys */
+        var group_label = message.substring(61, message.length).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex whitelist only a-z, A-Z, 0-9
 
-        if(type = "R"){ //If message contains /invite privkey label, insert HTML
-            message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a id="add-new-send-address" class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
-        } else if(type = "S"){
-            message = "An invite for group " + group_label + " has been sent.";
+        if(group_key != null){
+            console.log("GROUP INVITE | key=" + group_key + " label=" + group_label);
+
+            if(type = "R"){ //If message contains /invite privkey label, insert HTML
+                message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a id="add-new-send-address" class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
+            } else if(type = "S"){
+                message = "An invite for group " + group_label + " has been sent.";
+            }
+        } else if(group_label.length == 0){
+            group_label = them + "_" + String(group_key).substring(1, 5);
+        } else if(group_key == null){
+                message = "The group invitation as a malconfigured private key.";
         }
+
+             //+ group_key.substring(0, 5)
+
+
     }
-    
 
 
+    createContact(label_msg, key, group);
     var contact = contacts[key];
-    var isNewContact = false;
-    if(contacts[key] == undefined){
-        contacts[key] = {},
-        contact = contacts[key],
-        contact.key = key,
-        contact.label = key,
-        contact.group = group,
-        contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
-        contact.messages  = new Array();
-        isNewContact = true;
-    }
 
     if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
-    {     
-        if(message.type=="R"&& message.read==false) //not a duplicate, received message and not read => addnotification
-            addNotificationCount(key, 1);
-    
-        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read}); 
+    {
+        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read});
+
+        appendContact(key, false);
         if(current_key == key) //on send of our own message reload convo to add message.
             openConversation(key, false);
-         
-        if(isNewContact)
-            appendContact(key, true); 
-         
+
          if(type == "R" && read == 0)
             addNotificationCount(key, 1);
      }
+
+     if(current_key == "")
+        current_key = key;
 }
 
 
+function createContact(label, address, group){
+    var contact = contacts[address];
+    if(contacts[address] == undefined){
+        contacts[address] = {},
+        contact = contacts[address],
+        contact.key = address,
+        contact.label = label,
+        contact.address = address,
+        contact.group = group,
+        contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
+        contact.messages  = new Array();
+    }
 
-function appendContact (key, newcontact) {
+}
+
+function appendContact (key, newcontact, addressbook) {
     var contact_el = $("#contact-"+key);
     var contact = contacts[key];
-    var unread_count = $.grep(contact.messages, function(a){return a.type=="R"&&a.read==false}).length;
-    var new_group = contact.messages[0].group;
+    var prefix = "";
 
+    if(addressbook){
+        contact_el = $("#contact-book-"+key);
+        prefix = "book-";
+    }
+    console.log("appendContact key ="+contact.key);
+    console.log("appending Contact! key=" + key + " group=" + contact.group);
 
-
-    var contact_address = (new_group && contact.messages[0].type != "S") ? contact.messages[0].self : contact.messages[0].them;
     if(contact_el.length == 0) {
         //alert("[appendContact] key=" + key + " address=" + contact.messages[0].them + " self=" + contact.messages[0].self + " group=" + contact.messages[0].group + " type=" + contact.messages[0].type);
         var contact_html =
-            "<li id='contact-"+ key +"' class='contact' data-title='"+contact.label+"'>\
+            "<li id='contact-"+ prefix + key +"' class='contact' data-title='"+contact.label+"'>\
                 <span class='contact-info'>\
                     <span class='contact-name'>"+contact.label+"</span>\
-                    <span class='contact-address'>"+ contact_address + "</span>\
+                    <span class='contact-address'>"+ contact.address + "</span>\
                 </span>\
                 <span class='contact-options'>\
                         <span class='message-notifications'>0</span>\ " + //"+(unread_count==0?' none':'')+"
@@ -1898,22 +1462,19 @@ function appendContact (key, newcontact) {
              + "</span>"
              + "</li>";
         if(addressbook) {
-                console.log("appending to book!");
-                contact_book_list.append(contact_html);
-                console.log("appended to book!");
-                $("#contact-"+ prefix + key).find(".delete").hide();
+            console.log("appending to book!");
+            contact_book_list.append(contact_html);
+            console.log("appended to book!");
+            $("#contact-"+ prefix + key).find(".delete").hide();
          } else if(contact.group){ //if not group
             contact_group_list.append(contact_html);
          } else
             contact_list.append(contact_html);
 
 
-         if(!new_group)
-            contact_list.append(contact_html);
-         else
-            contact_group_list.append(contact_html);
 
-        contact_el = $("#contact-"+key).on('click',
+         //onClick contact in sidebar list, on hover and on delete.
+        contact_el = $("#contact-"+ prefix + key).on('click',
             function(e) {
                 $(this).selected('li');
                 if(addressbook)
@@ -1921,37 +1482,53 @@ function appendContact (key, newcontact) {
                 openConversation(key, true);
 
 
-            }).on("mouseenter", tooltip);
+            }).tooltip();
+
 
         contact_el.find(".delete").on("click", function(e) {e.stopPropagation()});
-
+        contact_el.find(".message-notifications").hide();
+        console.log("reached end of append!");
     }
 
-    var received_message = contact.messages[contact.messages.length-1];
 
-
-    if(newcontact ){ //|| contact_el.hasClass("selected")
+    if(newcontact){ //|| contact_el.hasClass("selected")
         openConversation(key, false);
     }
 }
 
 function addNotificationCount(key, unread_count){
+
+    if(contacts[key] == undefined)
+        return false;
+
     var notifications_contact = $("#contact-"+key).find(".message-notifications");
     var notifications_contact_value = notifications_contact.html();
     notifications_contact.text(parseInt(notifications_contact_value) + parseInt(unread_count));
     console.log("[addNotificationCount] contact! value=" + notifications_contact_value + " unread_count=" + unread_count);
     notifications_contact.show();
-    
+
     $(".user-notifications").show();
     console.log("[addNotificationCount] menu! value = " + parseInt($("#message-count").text()) + parseInt(1));
     $("#message-count").text(parseInt($("#message-count").text())+1);
     $("#message-count").show();
+
+    var whichList = contacts[key].group ? "#contact-group-list ul" : "#contact-list ul";
+    $("#contact-"+key).prependTo(whichList);
 }
 
 function removeNotificationCount(key){
 
+    if(key == undefined && current_key != ""){
+        key = current_key;
+    }
+
+
     //NOTIFICATION IN CONTACT LIST
     var contact = contacts[key];
+
+    if(contact == undefined)
+        return false;
+
     var notifications_contact = $("#contact-"+key).find(".message-notifications");
     var notifications_contact_value = notifications_contact.html();
 
@@ -1974,21 +1551,21 @@ function removeNotificationCount(key){
         console.log("No messages.");
         return 0;
     }
-        
+
     console.log("removeNotificationCount triggered..")
     for(var i=contact.messages.length-1; i >= 0; i--){
-       console.log("#amount of messages=" + i);
-        
-       if(!contact.messages[i].read){
+       console.log("[" + key + "]" + " MID=" + i + " read="+contact.messages[i].read);
+
+       if(!contact.messages[i].read ){
             console.log("[" + i + "] message");
             bridge.markMessageAsRead(contact.messages[i].id);
             contact.messages[i].read = true;
         } else {
-            //not group message, = received normal message and was read.. 
+            //not group message, = received normal message and was read..
             console.log("All messages are now marked as read. key=" + key);
-            break;
+            //break;
         }
-        
+
     }
 
 
@@ -1996,6 +1573,7 @@ function removeNotificationCount(key){
 
 //OpenConversation is split off to allow for opening conversation automatically without removing notification.
 function openConversation(key, click) {
+            console.log("opening Conversation key=" + key);
             current_key = key;
             //TODO: detect wether user is typing, if so do not reload page to other conversation..
             //$(this).addClass("selected").siblings("li").removeClass("selected");
@@ -2008,12 +1586,15 @@ function openConversation(key, click) {
               return a.received - b.received;
             });
 
-            var is_group = contact.messages[0].group;
-            if(!is_group)
-                $("#contact-list").addClass("in-conversation");
-            else
-                $("#contact-group-list").addClass("in-conversation");
+            var is_group = contact.group;
 
+            if(!is_group){
+                $("#contact-list").addClass("in-conversation");
+            } else {
+                $("#contact-group-list").addClass("in-conversation");
+            }
+
+            $("#chat-header").text(contact.label);
 
             var message;
             var bSentMessage = false;
@@ -2024,21 +1605,21 @@ function openConversation(key, click) {
             for(var i=0;i<contact.messages.length;i++)
             {
                 message = contact.messages[i];
-               
+
 					//<span class='info'>\
                         //<img src='"+contact.avatar+"' />\
                     //</span>\
-					
+
                 //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
                 discussion.append(
-                    "<li id='"+message.id+"' class='"+(message.type=='S'?'user-message':'other-message')+"' contact-key='"+contact.key+"'>\
+                    "<li id='"+message.id+"' class='"+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
                     <span class='message-content'>\
 					    <span class='user-name'>"
                             +(message.label_msg)+"\
                         </span>\
                         <span class='timestamp'>"+(new Date(message.received*1000).toLocaleString())+"</span>\
 						<span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-						<span class='message-text'>"+micromarkdown.parse(message.message)+"</span>\
+						<span class='message-text'>"+micromarkdown.parse(message.message)+    "</span>\
                     </span></li>");
 
                 if(message.group && message.type == 'S' && !bSentMessage){ //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
@@ -2046,8 +1627,6 @@ function openConversation(key, click) {
                         $("#message-from-address").val(message.self);
                         $("#message-to-address").val(message.them);
                 }
-
-
             }
 
 
@@ -2076,13 +1655,16 @@ function openConversation(key, click) {
 
             //discussion.children("[title]").on("mouseenter", tooltip);
 
-            if(!bSentMessage){
-                if(!message.group){ //normal procedure
+            if(!bSentMessage && contact.messages.length > 0){
+                if(!contact.group){ //normal procedure
                     $("#message-from-address").val(message.self);
                     $("#message-to-address").val(message.them); //them
                 } else if(message.type == "R") { //if it's a group, and no messages were sent from it yet, then we have not sent a message to it.
                     $("#message-to-address").val(message.self);
                 }
+            } else if(contact.messages.length == 0){
+                 $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li>");
+                 $("#message-to-address").val(contact.address);
             }
 
         }
@@ -2096,6 +1678,7 @@ function newConversation() {
     $("#new-contact-address").val("");
     $("#new-contact-name").val("");
     $("#new-contact-pubkey").val("");
+
     $("#contact-list ul li").removeClass("selected");
     $("#contact-list").addClass("in-conversation");
 
@@ -2118,19 +1701,19 @@ function deleteMessages(key, messageid) {
 
     var message_count = $("#message-count"),
         message_count_val = parseInt(message_count.text());
-        
+
     removeNotificationCount(key);
-    
+
     if(messageid == undefined)
         current_key = "";
-        
+
     for(var i=0;i<contact.messages.length;i++) {
 
         if(messageid == undefined) { //delete all messages of key
             console.log("Deleting all messages..");
             if(bridge.deleteMessage(contact.messages[i].id))
             {
-                $("#"+contact.messages[i].id).remove(); 
+                $("#"+contact.messages[i].id).remove();
                 contact.messages.splice(i, 1);
                 i--;
             } else{
@@ -2143,7 +1726,7 @@ function deleteMessages(key, messageid) {
                 console.log("removing message id=" + messageid);
                 contact.messages.splice(i, 1);
                 i--;
-                break; 
+                break;
             } else {
                 console.log("returning false");
                 return false;
@@ -2161,8 +1744,6 @@ function deleteMessages(key, messageid) {
         iscrollReload();
         openConversation(key, false);
     }
-    
-    
 }
 
 function signMessage() {
@@ -2259,7 +1840,6 @@ function editorCommand(text, endText) {
 
         scrollTop = editor.scrollTop;
         editor.focus();
-
 
         if (typeof editor.selectionStart !== 'undefined')
         {
@@ -2410,7 +1990,6 @@ var blockExplorerPage =
                         .on("dblclick", function(e) {
 
 							$('#blkexp-txn-modal').appendTo('body').modal('show');
-                            //$(this).leanModal({ top : 10, overlay : 0.5, closeButton: "#blkexp-txn-modal .modal_close" });
 
                             selectedTxn = bridge.txnDetails(blkHash , $(this).attr("data-value").trim());
 
@@ -2469,8 +2048,6 @@ var blockExplorerPage =
             .on("dblclick", function(e)
             {
 				$('#block-info-modal').appendTo('body').modal('show');
-
-                //$(this).leanModal({ top : 10, overlay : 0.5, closeButton: "#block-info-modal .modal_close" });
 
                 selectedBlock = bridge.blockDetails($(this).attr("data-value").trim()) ;
 
