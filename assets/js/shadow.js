@@ -53,6 +53,59 @@ function updateValue(element) {
     $(document).one('click', leave);
 }
 
+
+function updateValueChat(element, key) {
+    var curhtml = element.html();
+    console.log("element=" + element);
+    var value = element.data("value");
+    console.log("updateValueChat curvalue=" + value);
+    var contact = contacts[key];
+    
+    if(contact == undefined)
+        return false;
+        
+    element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + contact.address + '\', \'' + (contact.group ? "group_" : "") + '\' +this.value);" value="' + value + '" size=35 style="display:inline;" />'); //
+    
+    $("#chat-header .newval").focus();
+    $("#chat-header .newval").on("contextmenu", function(e) {
+        e.stopPropagation();
+    });
+    
+    $("#chat-header .newval").keypress(function (event) {
+        console.log("keypress");
+        console.log("keypress called!" + event.which);
+        if (event.which == 13){
+            event.preventDefault();
+            var localChatheader = $("#chat-header .newval");                
+            if(localChatheader == undefined)
+                return false;
+            
+            var newval = localChatheader.val().trim();
+
+            if(newval == undefined)
+                return false; 
+            
+            element.html(curhtml.replace(value, newval));
+            contacts[current_key].label = newval;
+            $("#chat-header").data("value", newval);
+            $("#contact-" + current_key + " .contact-info .contact-name").text(newval);
+            $("#contact-book-" + current_key + " .contact-info .contact-name").text(newval);
+            console.log("reached end of keypress");
+        }
+    });
+
+    $(".newval").focus()
+        .on("contextmenu", function(e) {
+            e.stopPropagation();
+        })
+        .keyup(function (event) {
+            if (event.keyCode == 13)
+                leave(event);
+        });
+
+    $(document).one('click', leave);
+}
+
 $(function() {
     $('.footable,.footable-lookup').footable({breakpoints:{phone:480, tablet:700}, delay: 50})
     .on({'footable_breakpoint': function() {
@@ -1403,9 +1456,12 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     createContact(label_msg, key, group);
     var contact = contacts[key];
 
-    if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0)
-    {
-        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read});
+    if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0) {     
+        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read}); 
+        
+        contact.messages.sort(function (a, b) {
+            return a.received - b.received;
+        });
 
         appendContact(key, false);
         if(current_key == key) //on send of our own message reload convo to add message.
@@ -1422,7 +1478,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 
 function createContact(label, address, group){
     var contact = contacts[address];
-    if(contacts[address] == undefined){
+    if(contacts[address] == undefined) {
         contacts[address] = {},
         contact = contacts[address],
         contact.key = address,
@@ -1432,7 +1488,6 @@ function createContact(label, address, group){
         contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
         contact.messages  = new Array();
     }
-
 }
 
 function appendContact (key, newcontact, addressbook) {
@@ -1440,38 +1495,36 @@ function appendContact (key, newcontact, addressbook) {
     var contact = contacts[key];
     var prefix = "";
 
-    if(addressbook){
+    if (addressbook) {
         contact_el = $("#contact-book-"+key);
         prefix = "book-";
     }
     console.log("appendContact key ="+contact.key);
     console.log("appending Contact! key=" + key + " group=" + contact.group);
 
-    if(contact_el.length == 0) {
+    if (contact_el.length == 0) {
         //alert("[appendContact] key=" + key + " address=" + contact.messages[0].them + " self=" + contact.messages[0].self + " group=" + contact.messages[0].group + " type=" + contact.messages[0].type);
         var contact_html =
             "<li id='contact-"+ prefix + key +"' class='contact' data-title='"+contact.label+"'>\
                 <span class='contact-info'>\
-                    <span class='contact-name'>"+contact.label+"</span>\
-                    <span class='contact-address'>"+ contact.address + "</span>\
+                    <span class='contact-name'>"+ ((contact.group && addressbook) ? "<i class='fa fa-users' style='padding-right: 7px;'></i>" : "") + contact.label+"</span>\
+                    <span class='" + (addressbook ? "contact-address" : "contact-message") + "'>"+ (addressbook ? contact.address : latestMessage) + "</span>\
                 </span>\
                 <span class='contact-options'>\
-                        <span class='message-notifications'>0</span>\ " + //"+(unread_count==0?' none':'')+"
-                        "<span class='delete' onclick='deleteMessages(\""+key+"\")'><i class='fa fa-minus-circle'></i></span>\
-                        " //<span class='favorite favorited'></span>\ //TODO: Favourites
-             + "</span>"
-             + "</li>";
-        if(addressbook) {
-                console.log("appending to book!");
-                contact_book_list.append(contact_html);
-                console.log("appended to book!");
-                $("#contact-"+ prefix + key).find(".delete").hide();
-         } else if(contact.group){ //if not group
-            contact_group_list.append(contact_html);
-         } else
+                    <span class='message-notifications'>0</span>"  // + //"+(unread_count==0?' none':'')
+                  +"<span class='delete' onclick='deleteMessages("+key+")'><i class='fa fa-minus-circle'></i></span>"
+                        //<span class='favorite favorited'></span>\ //TODO: Favourites
+             + "</span>\
+             </li>";
+        if (addressbook) {
+            console.log("appending to book!");
+            contact_book_list.append(contact_html);
+            console.log("appended to book!");
+            $("#"+ elementName + key).find(".delete").hide();
+        } else if(contact.group) { //if not group
+            contact_group_list.prepend(contact_html);
+        } else
             contact_list.append(contact_html);
-
-
 
          //onClick contact in sidebar list, on hover and on delete.
         contact_el = $("#contact-"+ prefix + key)
@@ -1489,7 +1542,7 @@ function appendContact (key, newcontact, addressbook) {
     }
 
 
-    if(newcontact){ //|| contact_el.hasClass("selected")
+    if(newcontact) { //|| contact_el.hasClass("selected")
         openConversation(key, false);
     }
 }
@@ -1529,6 +1582,9 @@ function removeNotificationCount(key){
 
     var notifications_contact = $("#contact-"+key).find(".message-notifications");
     var notifications_contact_value = notifications_contact.html();
+
+    if(notifications_contact.text() == 0)
+        return false;
 
     notifications_contact.text(0);
     notifications_contact.hide();
@@ -1572,6 +1628,10 @@ function removeNotificationCount(key){
 //OpenConversation is split off to allow for opening conversation automatically without removing notification.
 function openConversation(key, click) {
             console.log("opening Conversation key=" + key);
+
+            if(click)
+                 $("#chat-menu-link").click();//open chat window when on other page
+
             current_key = key;
             //TODO: detect wether user is typing, if so do not reload page to other conversation..
             //$(this).addClass("selected").siblings("li").removeClass("selected");
@@ -1612,24 +1672,22 @@ function openConversation(key, click) {
                 discussion.append(
                     "<li id='"+message.id+"' class='"+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
                     <span class='message-content'>\
-					    <span class='user-name'>"
+                        <span class='user-name' " + onclick + ">"
                             +(message.label_msg)+"\
                         </span>\
-                        <span class='timestamp'>"+(new Date(message.received*1000).toLocaleString())+"</span>\
-						<span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-						<span class='message-text'>"+micromarkdown.parse(message.message)+    "</span>\
+                        <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
+                           <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
+                           <span class='message-text'>"+micromarkdown.parse(emojione.toImage(message.message)) +  "</span>\
                     </span></li>");
 
                 if(message.group && message.type == 'S' && !bSentMessage){ //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
-                        bSentMessage = true;
-                        $("#message-from-address").val(message.self);
-                        $("#message-to-address").val(message.them);
+                    bSentMessage = true;
+                    $("#message-from-address").val(message.self);
+                    $("#message-to-address").val(message.them);
                 }
             }
 
-
             messagesScroller.refresh();
-
             messagesScroller.scrollTo(0, messagesScroller.maxScrollY, 600);
 
             var scrollerBottom = function() {
