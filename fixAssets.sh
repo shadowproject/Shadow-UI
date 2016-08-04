@@ -15,7 +15,7 @@ do
     then
         for asset in $assets
         do
-            echo '        <file alias="'$asset'">build/'$asset'</file>' >> build/shadow.qrc
+            echo '        <file alias="'$asset'">../Shadow-UI/build/'$asset'</file>' >> build/shadow.qrc
         done
     fi
 done < shadow.qrc
