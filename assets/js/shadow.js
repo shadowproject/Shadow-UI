@@ -60,31 +60,31 @@ function updateValueChat(element, key) {
     var value = element.data("value");
     console.log("updateValueChat curvalue=" + value);
     var contact = contacts[key];
-    
+
     if(contact == undefined)
         return false;
-        
+
     element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + contact.address + '\', \'' + (contact.group ? "group_" : "") + '\' +this.value);" value="' + value + '" size=35 style="display:inline;" />'); //
-    
+
     $("#chat-header .newval").focus();
     $("#chat-header .newval").on("contextmenu", function(e) {
         e.stopPropagation();
     });
-    
+
     $("#chat-header .newval").keypress(function (event) {
         console.log("keypress");
         console.log("keypress called!" + event.which);
         if (event.which == 13){
             event.preventDefault();
-            var localChatheader = $("#chat-header .newval");                
+            var localChatheader = $("#chat-header .newval");
             if(localChatheader == undefined)
                 return false;
-            
+
             var newval = localChatheader.val().trim();
 
             if(newval == undefined)
-                return false; 
-            
+                return false;
+
             element.html(curhtml.replace(value, newval));
             contacts[current_key].label = newval;
             $("#chat-header").data("value", newval);
@@ -1456,9 +1456,9 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     createContact(label_msg, key, group);
     var contact = contacts[key];
 
-    if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0) {     
-        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read}); 
-        
+    if($.grep(contact.messages, function(a){ return a.id == id; }).length == 0) {
+        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read});
+
         contact.messages.sort(function (a, b) {
             return a.received - b.received;
         });
