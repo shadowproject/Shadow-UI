@@ -941,12 +941,13 @@ function addressLookup(returnFields, receive, filterType)
         .selection()
         .on('dblclick', function() {
             var retfields = returnFields.split(',');
-            $("#" + retfields[0]).val( $(this).attr("id").trim() );
+            $("#" + retfields[0]).val($(this).attr("id").trim()).change();
             if(retfields[1] != undefined )
             {
                 $("#" + retfields[1])
                     .val($(this).attr("lbl").trim())
-                    .text($(this).attr("lbl").trim());
+                    .text($(this).attr("lbl").trim())
+                    .change();
             }
 			$('#address-lookup-modal').modal('hide');
         });
@@ -1833,6 +1834,11 @@ function scrollMessages(){
 }
 
 function newConversation() {
+    var pubkey = $("#new-contact-pubkey");
+
+    if (!invalid(pubkey, pubkey.val() !== ""))
+        return;
+
 	$('#new-contact-modal').modal('hide');
     $("#message-to-address").val($("#new-contact-address").val());
     $("#message-text").focus();

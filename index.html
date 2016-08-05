@@ -516,7 +516,7 @@
             <!-- add address modal -->
 
             <!-- add lookup modal -->
-            <div class="modal fade stick-up" id="address-lookup-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal fade stick-up" id="address-lookup-modal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index:1060;">
               <div class="modal-dialog">
                 <div class="modal-content p-b-25" style="background:#fff;">
                   <div class="modal-header clearfix text-left ">
@@ -1366,7 +1366,7 @@
                           </div>
 
                           <div class="btn-group col-sm-3 sm-m-t-10">
-                            <a id="cust-add-lkp" data-title="Choose from address book" href="#address-lookup-modal" onclick="addressLookup('change_address', true);" class="btn btn-default">
+                            <a id="cust-add-lkp" data-title="Choose from address book" data-toggle="modal" data-target="#address-lookup-modal" href="#" onclick="addressLookup('change_address', true);" class="btn btn-default">
                               <i class="fa fa-book"></i>
                             </a>
 
@@ -1866,16 +1866,16 @@
                       class="recipient form-control input_box"
                       data-title="The address to send the payment to  (e.g. SXywGBZBowrppUwwNUo1GCRDTibzJi7g2M)"
                       placeholder="Enter a Shadow address (e.g. SXywGBZBowrppUwwNUo1GCRDTibzJi7g2M)"
-                      onchange="if(base58.check(this)) $('#new-contact-pubkey').val(bridge.getPubKey(this.value, $('#new-contact-name').val()));"
+                      onchange="if(base58.check(this)) { $('#new-contact-name').val(bridge.getAddressLabel(this.value));$('#new-contact-pubkey').val(bridge.getPubKey(this.value, $('#new-contact-name').val())).change()};"
                       maxlength="128"
-                      oninput="base58.check(this);"/>
+                      oninput="base58.check(this);"/><!-- TODO: Move onchange to javascript function... -->
 
                   </div>
                   <div class="col-sm-4">
 
                     <div class="btn-group">
 
-                      <a class="btn btn-default" data-title="Choose address from address book" onclick="openAddressBook('#new-contact-address', '#new-contact-name', true)">
+                      <a class="btn btn-default" data-title="Choose address from address book" data-toggle="modal" data-target="#address-lookup-modal" href="#" onclick="addressLookup('new-contact-address,new-contact-name', false, 'Normal')">
                         <i class="fa fa-book"></i>
                       </a>
                       <a class="btn btn-default" data-title="Paste address from clipboard" onclick="paste('#new-contact-address')">
@@ -1903,7 +1903,7 @@
                       class="recipient form-control input_box"
                       data-title="Enter a label for this address to add it to your address book"
                       placeholder="Enter a label for this address to add it to your address book"
-                      onchange="$('#new-contact-pubkey').val(bridge.getPubKey($('#new-contact-address').val(), this.value));"
+                      onchange="bridge.getPubKey($('#new-contact-address').val(), this.value);"
                       maxlength="128"/>
 
                   </div>
@@ -1922,14 +1922,15 @@
                       class="recipient form-control input_box"
                       data-title="Enter a public key for the address above"
                       placeholder="Enter a public key for the address above"
-                      onchange="bridge.setPubKey($('#new-contact-address').val(), this.value)"/>
+                      oninput="base58.check(this);"
+                      onchange="invalid($(this), bridge.setPubKey($('#new-contact-address').val(), this.value))"/>
                   </div>
                 </div>
               </div>
             </div>
 
             <div class="pull-right m-r-10 m-t-25">
-              <a class="btn btn-danger btn-cons" href="javascript:newConversation();">Start Conversation
+              <a class="btn btn-danger btn-cons" href="#" onclick="newConversation();">Start Conversation
                 <i class="fa fa-check"></i>
               </a>
             </div>
@@ -2026,7 +2027,7 @@
             </div>
 
             <div class="pull-right m-r-10 m-t-25">
-              <a class="btn btn-danger btn-cons" href="javascript:newConversation();">Start Conversation
+              <a class="btn btn-danger btn-cons" href="#" onclick="newConversation();">Start Conversation
                 <i class="fa fa-check"></i>
               </a>
             </div>
