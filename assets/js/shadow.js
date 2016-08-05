@@ -849,6 +849,7 @@ var Name = 'You';
 var initialAddress = true;
 
 function appendAddresses(addresses) {
+    var addressTypes = ['', 'Normal', 'Stealth', 'BIP32', 'Group'];
     if(typeof addresses == "string")
     {
         if(addresses == "[]")
@@ -880,7 +881,7 @@ function appendAddresses(addresses) {
         }
         /* remove group_ prefix from labels*/
         var isGroup = (address.at == 4 || address.label.lastIndexOf("group_", 0) === 0);
-        var isSend = (address.type == "S");
+        var isSend = (address.type == "S" && address.at == 1 && address.pubkey != "n/a");
         if (isGroup) {
             address.at = 4; //lastIndexOf..
             address.label = address.label.replace("group_", "");
@@ -906,7 +907,7 @@ function appendAddresses(addresses) {
                  <td style='padding-left:18px;' class='label2 editable' data-value='"+address.label_value+"'>"+address.label+"</td>\
                  <td class='address'>"+address.address+"</td>\
                  <td class='pubkey'>"+address.pubkey+"</td>\
-                 <td class='addresstype'>"+(address.at == 4 ? "Group" : address.at == 3 ? "BIP32" : address.at == 2 ? "Stealth" : "Normal")+"</td></tr>");
+                 <td class='addresstype'>"+addressTypes[address.at]+"</td></tr>");
 
             //console.log('appendAddress');
             $("#"+address.address)
@@ -1327,8 +1328,8 @@ function appendMessages(messages, reset) {
 
     if(reset)
     {
-        //contacts = null;
-        //contacts = {};
+        delete contacts; // we need to remove all contacts and messages, for if the user locks the wallet.
+        contacts = {};
         contact_list.html("");
         contact_group_list.html("");
         $("#contact-list").removeClass("in-conversation");
@@ -1336,10 +1337,10 @@ function appendMessages(messages, reset) {
         $(".contact-discussion ul").html("");
         $(".user-notifications").hide();
         $("#message-count").text(0);
-        messagesScroller.scrollTo(0, 0);
-        contactScroll   .scrollTo(0, 0);
-        contactGroupScroll   .scrollTo(0, 0);
-        contactBookScroll   .scrollTo(0, 0);
+        messagesScroller  .scrollTo(0, 0);
+        contactScroll     .scrollTo(0, 0);
+        contactGroupScroll.scrollTo(0, 0);
+        contactBookScroll .scrollTo(0, 0);
         $("#contact-list").on("mouseover", function (){contactScroll.refresh();});
         $("#contact-group-list").on("mouseover", function (){contactGroupScroll.refresh();});
         $("#contact-book-list").on("mouseover", function (){contactBookScroll.refresh();});
