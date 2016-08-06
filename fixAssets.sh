@@ -43,7 +43,7 @@ do
     then
         DIR=`dirname $alias`
         PREVDIR=`dirname $DIR`
-        REPLACE=$(fgrep "url(" $file | grep -o 'url(['\''"]\?\([^'\''")]\+\)["'\'']\?)' | sed 's/url(\|["'\'']\|)//g')
+        REPLACE=$(fgrep "url(" $file | grep -o 'url(['\''"]\?\([^'\''")]\+\)["'\'']\?)' | sed 's/url(\|["'\'']\|)//g'|sed 's/&/\\&/g')
         for filename in $REPLACE
         do
             [[ $filename == "qrc:"* ]] && continue
