@@ -96,7 +96,7 @@ function updateValueChat(element, key) {
 
     $(document).one('click', function () {
         var localChatheader = $("#chat-header .newval");
-        if(localChatheader == undefined)
+        if(typeof localChatheader === undefined || typeof localChatheader.val() === undefined)
             return false;
         var newval = localChatheader.val().trim();
 
