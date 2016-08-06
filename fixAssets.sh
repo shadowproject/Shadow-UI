@@ -4,7 +4,7 @@ shopt -s extglob
 rm -rf build
 mkdir -p build
 cp -rp !(build) build/
-sed -i 's^assets^qrc:///assets^g' build/index.html # fix index.html
+sed -i 's^"assets^"qrc:///assets^g' build/index.html # fix index.html
 assets=`find assets/ -type f`
 > build/shadow.qrc
 IFS=$'\n'
@@ -43,7 +43,7 @@ do
     then
         DIR=`dirname $alias`
         PREVDIR=`dirname $DIR`
-        REPLACE=$(fgrep "url(" $file | grep -o 'url(['\''"]\?\([^'\''")]\+\)["'\'']\?)' | sed 's/url(\|["'\'']\|)//g')
+        REPLACE=$(fgrep "url(" $file | grep -o 'url(['\''"]\?\([^'\''")]\+\)["'\'']\?)' | sed 's/url(\|["'\'']\|)//g'|sed 's/&/\\&/g')
         for filename in $REPLACE
         do
             [[ $filename == "qrc:"* ]] && continue
@@ -63,7 +63,9 @@ do
 
     if [[ $file == *".js" ]] && [ $(fgrep "assets" $file -l) ]
     then
-        sed -i 's^\(assets/\(js\|icons\|images\)\)^qrc:///\1^g' $file
+        sed -i 's^\(assets/\(js\|icons\|images\|plugins\)\)^qrc:///\1^g' $file
+        sed -i 's^\./qrc:///^qrc:///^g' $file
+
         echo $file
     fi
 done

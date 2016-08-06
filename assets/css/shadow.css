@@ -49,10 +49,13 @@
     color: rgb(73, 151, 73);
 }
 .fa.red {
-    color: rgb(187, 53, 53);
+    color: #E3223C;
 }
 .fa.blue {
     color: rgb(86, 86, 165);
+}
+.fa.orange {
+    color: #f39347;
 }
 
 /*------------------------------------------------------------------
@@ -882,9 +885,14 @@ width:auto;
 	width:26px;
 }
 .no-encryption {
-	background: url('../icons/lock_off.png');
-	height:16px;
-	width:26px;
+        background: url('../icons/lock_off.png');
+        height:16px;
+        width:26px;
+}
+.encryption-stake {
+        background: url('../icons/lock_stake.png');
+        height:16px;
+        width:26px;
 }
 
 .i2p {
@@ -909,43 +917,43 @@ width:auto;
 	width:26px;
 }
 
-.no-connection {
+.connect-0 {
 	background: url('../icons/connect_0.png');
 	height:16px;
 	width:26px;
 }
 
-.connection-1 {
+.connect-1 {
 	background: url('../icons/connect_1.png');
 	height:16px;
 	width:26px;
 }
 
-.connection-2 {
+.connect-2 {
 	background: url('../icons/connect_2.png');
 	height:16px;
 	width:26px;
 }
 
-.connection-3 {
+.connect-3 {
 	background: url('../icons/connect_3.png');
 	height:16px;
 	width:26px;
 }
 
-.connection-4 {
+.connect-4 {
 	background: url('../icons/connect_4.png');
 	height:16px;
 	width:26px;
 }
 
-.connection-5 {
+.connect-5 {
 	background: url('../icons/connect_5.png');
 	height:16px;
 	width:26px;
 }
 
-.connection-6 {
+.connect-6 {
 	background: url('../icons/connect_6.png');
 	height:16px;
 	width:26px;
