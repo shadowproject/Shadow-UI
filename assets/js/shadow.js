@@ -862,7 +862,6 @@ function appendAddresses(addresses) {
 
     addresses.forEach(function(address) {
         var addrRow = $("#"+address.address);
-        var addrRowInviteModal = $("#invite-modal-"+address.address);
         var page = (address.type == "S" ? "#addressbook" : (address.label.lastIndexOf("group_", 0) !== 0 ? "#receive" : "#addressbook"));
 
         /* add address to chat dropdown box to choose sender from */
@@ -899,19 +898,7 @@ function appendAddresses(addresses) {
          }
 
          /* Fill up addressbook "BOOK" in chat sidebar  */
-         if(!isGroup && isSend){
-            if (addrRowInviteModal.length==0){
-                $( "#invite-modal-tbody").append(
-                    "<tr id='#invite-modal-"+address.address+"' lbl='"+address.label+"'>\
-                   <td style='padding-left:18px;' class='label2' data-value='"+address.label_value+"'>"+address.label+"</td>\
-                   <td class='address'>"+address.address+"</td>\
-                   <td class='invite footable-visible footable-last-column'><input type='checkbox' class='checkbox'></input></td>\
-                   </tr>");
-            }
-            else {
-                $("#invite-modal-"+address.address+" .label2").text(address.label);
-            }
-         }
+
 
         if (addrRow.length==0) {
             $(page + " .footable tbody").append(
@@ -1843,17 +1830,6 @@ function scrollMessages(){
     setTimeout(scrollerBottom, 2500);
     setTimeout(scrollerBottom, 5000);*/
 
-}
-
-function openInviteModal(){
-    var contactsToInvite = {};
-    $("#invite-modal-tbody tr" ).each(function() {
-        var address = $(this).find(".address").text();
-        var checked = $(this).find(".invite .checkbox").is(':checked');
-
-        if(checked)
-            console.log("openInviteModal: " + address);
-    });
 }
 
 function newConversation() {
