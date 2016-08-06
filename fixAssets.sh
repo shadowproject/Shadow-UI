@@ -63,7 +63,9 @@ do
 
     if [[ $file == *".js" ]] && [ $(fgrep "assets" $file -l) ]
     then
-        sed -i 's^\(assets/\(js\|icons\|images\)\)^qrc:///\1^g' $file
+        sed -i 's^\(assets/\(js\|icons\|images\|plugins\)\)^qrc:///\1^g' $file
+        sed -i 's^\./qrc:///^qrc:///^g' $file
+
         echo $file
     fi
 done
