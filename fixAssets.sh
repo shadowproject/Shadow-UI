@@ -4,7 +4,7 @@ shopt -s extglob
 rm -rf build
 mkdir -p build
 cp -rp !(build) build/
-sed -i 's^assets^qrc:///assets^g' build/index.html # fix index.html
+sed -i 's^"assets^"qrc:///assets^g' build/index.html # fix index.html
 assets=`find assets/ -type f`
 > build/shadow.qrc
 IFS=$'\n'
