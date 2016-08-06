@@ -49,10 +49,13 @@
     color: rgb(73, 151, 73);
 }
 .fa.red {
-    color: rgb(187, 53, 53);
+    color: #E3223C;
 }
 .fa.blue {
     color: rgb(86, 86, 165);
+}
+.fa.orange {
+    color: #f39347;
 }
 
 /*------------------------------------------------------------------
@@ -882,9 +885,14 @@ width:auto;
 	width:26px;
 }
 .no-encryption {
-	background: url('../icons/lock_off.png');
-	height:16px;
-	width:26px;
+        background: url('../icons/lock_off.png');
+        height:16px;
+        width:26px;
+}
+.encryption-stake {
+        background: url('../icons/lock_stake.png');
+        height:16px;
+        width:26px;
 }
 
 .i2p {
