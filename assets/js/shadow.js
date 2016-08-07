@@ -897,7 +897,20 @@ function appendAddresses(addresses) {
             appendContact(address.address, false, true);
          }
 
-         /* Fill up addressbook "BOOK" in chat sidebar  */
+        /* Fill up addressbook "BOOK" in invite modal  */
+         if(!isGroup && isSend){
+            if (addrRowInviteModal.length==0){
+                $( "#invite-modal-tbody").append(
+                    "<tr id='#invite-modal-"+address.address+"' lbl='"+address.label+"'>\
+                   <td style='padding-left:18px;' class='label2' data-value='"+address.label_value+"'>"+address.label+"</td>\
+                   <td class='address'>"+address.address+"</td>\
+                   <td class='invite footable-visible footable-last-column'><input type='checkbox' class='checkbox'></input></td>\
+                   </tr>");
+            }
+            else {
+                $("#invite-modal-"+address.address+" .label2").text(address.label);
+            }
+         }
 
 
         if (addrRow.length==0) {
@@ -1804,6 +1817,17 @@ function acceptInvite(key, label, id){
     createContact(group_label, group_address, true);
     appendContact(group_address, false, true);*/
 
+}
+
+function openInviteModal(){
+    var contactsToInvite = {};
+    $("#invite-modal-tbody tr" ).each(function() {
+        var address = $(this).find(".address").text();
+        var checked = $(this).find(".invite .checkbox").is(':checked');
+
+        if(checked)
+            console.log("openInviteModal: " + address);
+    });
 }
 
 function scrollMessages(){
