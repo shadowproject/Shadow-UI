@@ -863,7 +863,8 @@ function appendAddresses(addresses) {
     addresses.forEach(function(address) {
         var addrRow = $("#"+address.address);
         var page = (address.type == "S" ? "#addressbook" : (address.label.lastIndexOf("group_", 0) !== 0 ? "#receive" : "#addressbook"));
-
+        var addrRowInviteModal = $("#invite-modal-"+address.address);
+        
         /* add address to chat dropdown box to choose sender from */
         if(address.type == "R" && sendPage.initSendBalance(address) && address.address.length < 75 && address.label.lastIndexOf("group_", 0) !== 0) {
             if (addrRow.length==0)
@@ -938,6 +939,7 @@ function appendAddresses(addresses) {
     });
 
     var table = $('#addressbook .footable,#receive .footable').trigger("footable_setup_paging");
+    console.log("--- end of appendAddresses --- ");
 
 }
 
@@ -1551,7 +1553,7 @@ function appendContact (key, openconvo, addressbook) {
     var contact_el = $("#" + elementName +key);
     var contact = contacts[key];
 
-    console.log("appendContact : appending Contact! key=" + key + " group=" + contact.group);
+    console.log("appendContact : appending Contact! label= " + contact.label + "key=" + key + " group=" + contact.group);
 
     if (contact_el.length == 0) {
         var latestMessage = "";
@@ -1825,8 +1827,10 @@ function openInviteModal(){
         var address = $(this).find(".address").text();
         var checked = $(this).find(".invite .checkbox").is(':checked');
 
-        if(checked)
+        if(checked){
+            //bridge.sendMessage(address, "/invite shit", "from")
             console.log("openInviteModal: " + address);
+        }
     });
 }
 
