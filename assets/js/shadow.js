@@ -1822,7 +1822,14 @@ function acceptInvite(key, label, id){
 }
 
 function openInviteModal(){
-    var contactsToInvite = {};
+    var contactsToInvite = [];
+    var label = $("#new-group-name").val();
+
+    if(label == ""){
+        alert("Please enter a label.");
+        return false;
+    }
+
     $("#invite-modal-tbody tr" ).each(function() {
         var address = $(this).find(".address").text();
         var checked = $(this).find(".invite .checkbox").is(':checked');
@@ -1830,8 +1837,14 @@ function openInviteModal(){
         if(checked){
             //bridge.sendMessage(address, "/invite shit", "from")
             console.log("openInviteModal: " + address);
+            contactsToInvite.push(address);
+            
         }
+
     });
+
+    var groupAddress = bridge.createGroupChat("group_" + label);
+    var invitedAddresses = bridge.inviteGroupChat(groupAddress, contactsToInvite, label, $("#message-from-address").val()); //SdigvLiftUCM4hsHBhrQC8CtTddQv4y5fx
 }
 
 function scrollMessages(){
