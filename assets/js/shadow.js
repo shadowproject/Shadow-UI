@@ -889,7 +889,9 @@ function appendAddresses(addresses) {
             isSend = true;
          }
 
-        if (isSend) {
+         var bHasPubKey = (address.pubkey != "n/a" ? true : false);
+
+        if (isSend && bHasPubKey) {
             console.log("adding to addressbook isGroup=" + isGroup);
             createContact(address.label, address.address, isGroup);
             /*
@@ -899,7 +901,7 @@ function appendAddresses(addresses) {
          }
 
         /* Fill up addressbook "BOOK" in invite modal  */
-         if(!isGroup && isSend){
+         if(!isGroup && isSend && bHasPubKey){
             if (addrRowInviteModal.length==0){
                 $( "#invite-modal-tbody").append(
                     "<tr id='#invite-modal-"+address.address+"' lbl='"+address.label+"'>\
@@ -1826,9 +1828,11 @@ function openInviteModal(){
     var label = $("#new-group-name").val();
 
     if(label == ""){
-        alert("Please enter a label.");
+        alert("Please enter a label..");
         return false;
     }
+
+    $("#filter-new-group").text("");
 
     $("#invite-modal-tbody tr" ).each(function() {
         var address = $(this).find(".address").text();
@@ -1842,6 +1846,8 @@ function openInviteModal(){
         }
 
     });
+
+    $("#new-group-modal").modal('hide');
 
     var groupAddress = bridge.createGroupChat("group_" + label);
     var invitedAddresses = bridge.inviteGroupChat(groupAddress, contactsToInvite, $("#message-from-address").val()); //SdigvLiftUCM4hsHBhrQC8CtTddQv4y5fx
