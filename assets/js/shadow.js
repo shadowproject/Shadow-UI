@@ -1844,7 +1844,7 @@ function openInviteModal(){
     });
 
     var groupAddress = bridge.createGroupChat("group_" + label);
-    var invitedAddresses = bridge.inviteGroupChat(groupAddress, contactsToInvite, label, $("#message-from-address").val()); //SdigvLiftUCM4hsHBhrQC8CtTddQv4y5fx
+    var invitedAddresses = bridge.inviteGroupChat(groupAddress, contactsToInvite, $("#message-from-address").val()); //SdigvLiftUCM4hsHBhrQC8CtTddQv4y5fx
 }
 
 function scrollMessages(){
