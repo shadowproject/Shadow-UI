@@ -889,7 +889,9 @@ function appendAddresses(addresses) {
             isSend = true;
          }
 
-        if (isSend) {
+         var bHasPubKey = (address.pubkey != "n/a" ? true : false);
+
+        if (isSend && bHasPubKey) {
             console.log("adding to addressbook isGroup=" + isGroup);
             createContact(address.label, address.address, isGroup);
             /*
@@ -899,7 +901,7 @@ function appendAddresses(addresses) {
          }
 
         /* Fill up addressbook "BOOK" in invite modal  */
-         if(!isGroup && isSend){
+         if(!isGroup && isSend && bHasPubKey){
             if (addrRowInviteModal.length==0){
                 $( "#invite-modal-tbody").append(
                     "<tr id='#invite-modal-"+address.address+"' lbl='"+address.label+"'>\
@@ -1798,9 +1800,8 @@ function deleteInvite(key, id){
     bridge.deleteMessage(id);
 }
 //VGFBbN686jRg3sU92XRpwU4PZ3pAvAcNyG2z45XtVQdrQkfSJTCb
-function acceptInvite(key, label, id){
+function acceptInvite(key, group_label, id){
     deleteInvite(key, id);
-    var group_label = 'group_' + label;
     var group_address = bridge.joinGroupChat(key,group_label);
     console.log("joinGroupChat: " + group_address);
 
@@ -1814,21 +1815,22 @@ function acceptInvite(key, label, id){
         updateContact(group_label, group_address);
     }
 
-  /*
-
+  
     createContact(group_label, group_address, true);
-    appendContact(group_address, false, true);*/
+    appendContact(group_address, true, false);
 
 }
 
 function openInviteModal(){
-    var contactsToInvite = [];
-    var label = $("#new-group-name").val();
+    var contacts_to_invite = [];
+    var group_label = $("#new-group-name").val();
 
-    if(label == ""){
-        alert("Please enter a label.");
+    if(group_label == ""){
+        alert("Please enter a label..");
         return false;
     }
+
+    $("#filter-new-group").text("");
 
     $("#invite-modal-tbody tr" ).each(function() {
         var address = $(this).find(".address").text();
@@ -1837,14 +1839,19 @@ function openInviteModal(){
         if(checked){
             //bridge.sendMessage(address, "/invite shit", "from")
             console.log("openInviteModal: " + address);
-            contactsToInvite.push(address);
+            contacts_to_invite.push(address);
             
         }
 
     });
 
-    var groupAddress = bridge.createGroupChat("group_" + label);
-    var invitedAddresses = bridge.inviteGroupChat(groupAddress, contactsToInvite, $("#message-from-address").val()); //SdigvLiftUCM4hsHBhrQC8CtTddQv4y5fx
+    $("#new-group-modal").modal('hide');
+
+    var group_address = bridge.createGroupChat(group_label);
+    var invited_addresses = bridge.inviteGroupChat(group_address, contacts_to_invite, $("#message-from-address").val()); //SdigvLiftUCM4hsHBhrQC8CtTddQv4y5fx
+    
+    createContact(group_label, group_address, true);
+    appendContact(group_address, true, false);
 }
 
 function scrollMessages(){
