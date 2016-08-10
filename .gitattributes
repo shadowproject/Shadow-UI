@@ -1,0 +1,6 @@
+## fix line endings
+*.sh     text
+*.css    text
+*.html   text
+*.js     text
+*.json   text
