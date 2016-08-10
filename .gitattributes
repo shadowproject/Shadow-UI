@@ -1,6 +1,14 @@
-## fix line endings
+* text=auto
+## SOURCE - fix line endings
 *.sh     text
 *.css    text
 *.html   text
 *.js     text
 *.json   text
+
+## FONTS - leave untouched
+*.ttf   binary
+*.eot   binary
+*.otf   binary
+*.woff  binary
+*.woff2 binary
