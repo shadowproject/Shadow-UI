@@ -866,11 +866,14 @@
                      'transform': _this.menuOpenCSS
                  });
                  _this.$body.addClass('sidebar-visible');
+                 $('#sidebar-header-collapsed').removeClass('sidebar-header-collapsed-visible');
+
              } else {
                  _this.$element.stop().animate({
                      left: '0px'
                  }, 400, $.bez(_this.bezierEasing), function() {
                      _this.$body.addClass('sidebar-visible');
+                     $('#sidebar-header-collapsed').removeClass('sidebar-header-collapsed-visible');
                  });
              }
          }
@@ -899,6 +902,7 @@
                      'transform': _this.menuClosedCSS
                  });
                  _this.$body.removeClass('sidebar-visible');
+                 $('#sidebar-header-collapsed').addClass('sidebar-header-collapsed-visible');
              } else {
 
                  _this.$element.stop().animate({
@@ -906,6 +910,7 @@
                  }, 400, $.bez(_this.bezierEasing), function() {
 
                      _this.$body.removeClass('sidebar-visible')
+                     $('#sidebar-header-collapsed').addClass('sidebar-header-collapsed-visible');
                      setTimeout(function() {
                          $('.close-sidebar').data({
                              clicked: false
