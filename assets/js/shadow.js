@@ -1343,8 +1343,8 @@ function appendMessages(messages, reset) {
 
     if(reset)
     {
-        //contacts = null;
-        //contacts = {};
+        delete contacts; // We have to delete contacts, in order to clear messages when the wallet is locked...
+        contacts = {};
         contact_list.html("");
         contact_group_list.html("");
         $("#contact-list").removeClass("in-conversation");
