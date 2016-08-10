@@ -1967,9 +1967,9 @@
 
     <!-- messages modal -->
 
-    <!-- invite group modal -->
+    <!-- invite group modal style="max-height: 500px;" -->
     <div class="modal fade stick-up" id="new-group-modal" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog">
+      <div class="modal-dialog" >
         <div class="modal-content p-b-25" style="background:#fff;">
 
           <div class="modal-header clearfix text-left ">
@@ -1979,11 +1979,9 @@
             <h5 class="p-l-10" style="border-bottom: 1px solid #F0F1F3">Start Group Conversation</h5>
 
             <div class="form-group">
-              <div class="col-sm-12 p-t-15">
+              <div class="col-sm-8 p-t-15">
                 <label for="new-group-name">Group name:
                 </label>
-                <div class="row">
-                  <div class="col-sm-12">
                     <input
                       id="new-group-name"
                       class="recipient form-control input_box"
@@ -1991,21 +1989,21 @@
                       placeholder="Enter a label for this group"
                       onchange=""
                       maxlength="128"/>
-
-                  </div>
+              </div>
+              <div class="col-sm-4 p-t-15">
+                <div class="pull-right m-t-25">
+                  <a class="btn btn-danger" onclick="openInviteModal();">Create Group
+                    <i class="fa fa-check"></i>
+                  </a>
                 </div>
               </div>
             </div>
 
             <div class="form-group">
               <div class="col-sm-12 p-t-15">
-                <label for="new-group-name">Search
-                </label>
-                <div class="row">
-                  <div class="col-sm-12">
+                <label for="filter-new-group">Search
+                </label>                  
                     <input class="form-control input_box" id="filter-new-group" placeholder="Search by label or address...">
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -2048,11 +2046,6 @@
               </div>
             </div>
 
-            <div class="pull-right m-r-10 m-t-25">
-              <a class="btn btn-danger btn-cons" onclick="openInviteModal();">Start Conversation
-                <i class="fa fa-check"></i>
-              </a>
-            </div>
 
           </div>
         </div>
