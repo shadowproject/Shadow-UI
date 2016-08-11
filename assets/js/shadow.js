@@ -1343,8 +1343,8 @@ function appendMessages(messages, reset) {
 
     if(reset)
     {
-        delete contacts; // We have to delete contacts, in order to clear messages when the wallet is locked...
-        contacts = {};
+        //delete contacts; // We have to delete contacts, in order to clear messages when the wallet is locked...
+        //contacts = {};
         contact_list.html("");
         contact_group_list.html("");
         $("#contact-list").removeClass("in-conversation");
@@ -1359,6 +1359,8 @@ function appendMessages(messages, reset) {
         $("#contact-list").on("mouseover", function (){contactScroll.refresh();});
         $("#contact-group-list").on("mouseover", function (){contactGroupScroll.refresh();});
         $("#contact-book-list").on("mouseover", function (){contactBookScroll.refresh();});
+
+        console.log("RESET CALLED!");
     }
 
     if(messages == "[]")
@@ -1425,6 +1427,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     var contact_address = them;
 
     var label_msg = type == "S" ? (labelTo == "(no label)" ? self : labelTo) : (label == "(no label)" ? them : label);
+    var label_chat;
     var key = them;
 
     var group = false;
@@ -1435,22 +1438,24 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     It will put all messages under the same contact*/
 
     if(type == "R" && labelTo.lastIndexOf("group_", 0) === 0){ //Received, to group
-        label_msg = label_msg.replace('group_', '');
+        label_chat = labelTo.replace('group_', '');
         group = true;
         key =  self;
     } else if(label_value.lastIndexOf("group_", 0) === 0){ //sent to group,
-        label_msg = label_msg.replace('group_', '');
+        label_chat = label_value.replace('group_', '');
         group = true;
         key =  them;
-    } else if(labelTo.lastIndexOf("group_", 0) === 0){ //sent by group, should not be possible but yeah anything can happen.
+    } else if(label_value.lastIndexOf("group_", 0) === 0 || labelTo.lastIndexOf("group_", 0) === 0){ //sent by group, should not be possible but yeah anything can happen.
         group = true;
+    } else {
+        label_chat = label_msg;
     }
-    //alert("Debug label=" + label_value + " label_msg=" + label_msg + " labelTo=" + labelTo + " group=" + group + " key=" + key + " them=" + them + " self=" + self );
+    console.log("Debug label=" + label_value + " label_msg=" + label_msg + " labelTo=" + labelTo + " group=" + group + " key=" + key + " them=" + them + " self=" + self + " message=" + message + " type=" + type +"\n" );
     /*
     Basically I seperated the sender of the message (label_msg) from the contact[key].
     So we can still group by the key, but the messages in the chat have the right sender label.
     */
-   console.log("appendMessage: for invite");
+
     //INVITE TO GROUP CODE
 
     if(message.lastIndexOf("/invite", 0) === 0 && message.length >= 60){
@@ -1480,7 +1485,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
              //+ group_key.substring(0, 5)
     }
 
-    createContact(label_msg, key, group);
+    createContact(label_chat, key, group);
     var contact = contacts[key];
 
     if($.grep(contact.messages, function(a) { return a.id == id; }).length == 0) {
@@ -1596,7 +1601,7 @@ function appendContact (key, openconvo, addressbook) {
 
         if(addressbook)
             contact_el.on('click', function click(e) {
-                appendContact(key, false);
+                //appendContact(key, false);
             });
 
         contact_el.find(".delete").on("click", function(e) {e.stopPropagation()});
