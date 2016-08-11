@@ -1873,9 +1873,9 @@ function scrollMessages(){
         }
     };
 
-    scrollerBottom();
-    /*setTimeout(scrollerBottom, 700);
-    setTimeout(scrollerBottom, 1000);
+    //scrollerBottom();
+    setTimeout(scrollerBottom, 100);
+    /*setTimeout(scrollerBottom, 1000);
     setTimeout(scrollerBottom, 1300);
     setTimeout(scrollerBottom, 1600);
     setTimeout(scrollerBottom, 1900);
