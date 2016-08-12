@@ -7,10 +7,10 @@
     width: 33px;
     line-height: 33px;
     vertical-align: top;
-	border: solid 1px #ededed;
-	text-align: center;
-	margin-bottom:5px;
-	-webkit-border-radius: 5px;
+    border: solid 1px #ededed;
+    text-align: center;
+    margin-bottom:5px;
+    border-radius: 5px;
 }
 
 td .button-icon {

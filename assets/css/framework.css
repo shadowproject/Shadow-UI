@@ -12,18 +12,14 @@ body {
   margin: 0;
   padding: 0;
   background-color: #fafafa;
-      -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-	-webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 body.fixed-header .header {
   position: fixed;
   left: 0;
   top: 0;
-
 }
 body.mobile .sidebar-menu {
   overflow: scroll;
@@ -1192,7 +1188,6 @@ body.dashboard .page-container {
 [Panels]
 */
 .panel {
-  -webkit-box-shadow: none;
   box-shadow: none;
   border-radius: 1px;
   -webkit-border-radius: 1px;
@@ -1201,12 +1196,12 @@ body.dashboard .page-container {
   transition: all 0.2s ease;
   position: relative;
 }
-
+/* TODO: Remove me?
 .panel-shadow {
-/*-webkit-box-shadow: 0px 5px 5px 0px rgba(50, 50, 50, 0.24);
+-webkit-box-shadow: 0px 5px 5px 0px rgba(50, 50, 50, 0.24);
 -moz-box-shadow:    0px 5px 5px 0px rgba(50, 50, 50, 0.24);
-box-shadow:         0px 5px 5px 0px rgba(50, 50, 50, 0.24);*/
-}
+box-shadow:         0px 5px 5px 0px rgba(50, 50, 50, 0.24);
+}*/
 
 .panel .panel-heading {
   background: #fff;
@@ -1294,7 +1289,6 @@ box-shadow:         0px 5px 5px 0px rgba(50, 50, 50, 0.24);*/
 }
 .panel.panel-transparent {
   background: transparent;
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 .panel.panel-transparent .panel-body {
@@ -1309,7 +1303,6 @@ box-shadow:         0px 5px 5px 0px rgba(50, 50, 50, 0.24);*/
   height: 100%;
 }
 .panel.panel-featured {
-  -webkit-box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.14);
   box-shadow: -1px 1px 3px 0px rgba(121, 129, 135, 0.14);
   width: calc(100% - 50px);
   float: right;
@@ -1348,7 +1341,6 @@ box-shadow:         0px 5px 5px 0px rgba(50, 50, 50, 0.24);*/
   height: 38px;
   margin-left: -39px;
   float: left;
-  -webkit-box-shadow: inset -3px 0px 3px 0px rgba(0, 0, 0, 0.14);
   box-shadow: inset -3px 0px 3px 0px rgba(0, 0, 0, 0.14);
 }
 .panel.panel-featured .ribbon.green {
@@ -2149,8 +2141,6 @@ hr.dotted {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  -webkit-box-shadow: none !important;
-  -moz-box-shadow: none !important;
   box-shadow: none !important;
   border: none;
   background-image: none;
@@ -2903,7 +2893,6 @@ fieldset[disabled] .btn-danger.active {
   float: left;
   list-style: none;
   text-shadow: none;
-  -webkit-box-shadow: 0px 0px 5px rgba(98, 98, 98, 0.2);
   box-shadow: 0px 0px 5px rgba(98, 98, 98, 0.2);
   border: none;
   border-radius: 3px;
@@ -5218,7 +5207,6 @@ input[type="file"]:focus,
 input[type="radio"]:focus,
 input[type="checkbox"]:focus {
   outline: none;
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 form legend {
@@ -5241,7 +5229,6 @@ form legend {
   min-height: 35px;
   -webkit-transition: all 0.12s ease;
   transition: all 0.12s ease;
-  -webkit-box-shadow: none;
   box-shadow: none;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -5253,7 +5240,6 @@ form legend {
   border-color: rgba(0, 0, 0, 0.1);
   background-color: #f0f0f0;
   outline: 0 !important;
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 .form-control:focus::-moz-placeholder {
@@ -5861,12 +5847,10 @@ fieldset[disabled] .form-control {
 }
 .has-success .form-control {
   border-color: #b81c31;
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 .has-success .form-control:focus {
   border-color: #8c1525;
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 .has-success .input-group-addon {
@@ -5887,12 +5871,10 @@ fieldset[disabled] .form-control {
 }
 .has-warning .form-control {
   border-color: #c9a843;
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 .has-warning .form-control:focus {
   border-color: #a98b31;
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 .has-warning .input-group-addon {
@@ -5913,12 +5895,10 @@ fieldset[disabled] .form-control {
 }
 .has-error .form-control {
   border-color: #f55753;
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 .has-error .form-control:focus {
   border-color: #f22823;
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 .has-error .input-group-addon {
@@ -6382,7 +6362,6 @@ https://github.com/timschlechter/bootstrap-tagsinput
   border: 1px solid rgba(0, 0, 0, 0.07);
   border-radius: 4px;
   padding-bottom: 5px;
-  -webkit-box-shadow: none;
   box-shadow: none;
   width: 100%;
   -webkit-transition: background 0.2s linear 0s;
@@ -6474,7 +6453,6 @@ https://github.com/Waxolunist/bootstrap3-wysihtml5-bower
 .wysiwyg5-wrapper .wysiwyg:focus {
   background-color: #fafafa;
   outline: 0 !important;
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 .wysiwyg5-wrapper .expand-wysiwyg {
@@ -6609,15 +6587,15 @@ input:focus {
   -webkit-transition: none !important;
 }
 input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+  box-shadow: 0 0 0 1000px #fff inset !important;
 }
 input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px #f0f0f0 inset !important;
+  box-shadow: 0 0 0 1000px #f0f0f0 inset !important;
 }
 input.error:-webkit-autofill,
 input.error:-webkit-autofill:focus,
 .has-error input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 1000px #F9E9E9 inset !important;
+  box-shadow: 0 0 0 1000px #F9E9E9 inset !important;
 }
 /* SelectFx */
 /* Default custom select styles */
