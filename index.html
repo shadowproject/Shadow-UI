@@ -6,6 +6,19 @@
     <title>Shadow GUIv2 alpha</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
+    <!-- JS - custom - inline js either before or after resources  -->
+    <script type="text/javascript">
+
+      // Disable drop/dragging
+      function preventDefault(e) {
+        e = e || event;
+        e.preventDefault();
+      }
+
+      window.addEventListener("dragover", preventDefault, false);
+      window.addEventListener("drop", preventDefault, false);
+    </script>
+
     <!-- default CSS-->
     <link href="assets/plugins/pace/pace-theme-flash.css" rel="stylesheet" type="text/css"/>
     <link href="assets/plugins/boostrapv3/css/bootstrap.css" rel="stylesheet" type="text/css"/>
@@ -25,19 +38,6 @@
 
     <!-- smiley CSS-->
     <link rel="stylesheet" href="assets/plugins/emojione/assets/css/emojione.min.css" type="text/css" media="all" />
-
-    <!-- JS - custom  -->
-    <script type="text/javascript">
-
-      // Disable drop/dragging
-      function preventDefault(e) {
-        e = e || event;
-        e.preventDefault();
-      }
-
-      window.addEventListener("dragover", preventDefault, false);
-      window.addEventListener("drop", preventDefault, false);
-    </script>
 
   </head>
 
