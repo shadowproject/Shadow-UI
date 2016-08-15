@@ -25,12 +25,10 @@ function updateValue(element) {
     if (addresstype.length === 1)
         addresstype = addresstype.data("value") ? addresstype.data("value") : addresstype.text();
 
-    var prefix = (addresstype == "Group" ? "group_" : "");
-
     if(addresstype == "Group")
         value.replace("group_", "");
 
-    element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + address + '\', \'' + prefix + '\' +this.value);" value="' + value + '" size=60 />'); //
+    element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + address + '\', this.value);" value="' + value + '" size=60 />'); //
 
     function leave(e) {
         var newval = $(".newval");
@@ -64,20 +62,21 @@ function updateValueChat(element, key) {
     if(contact == undefined)
         return false;
 
-    element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + contact.address + '\', \'' + (contact.group ? "group_" : "") + '\' +this.value);" value="' + value + '" size=35 style="display:inline;" />'); //
+    element.html('<input class="new_chat_value" type="text" onchange="bridge.updateAddressLabel(\'' + contact.address + '\', this.value);" value="' + value + '" size=35 style="display:inline;" />'); //
 
-    $("#chat-header .newval").focus();
-    $("#chat-header .newval").on("contextmenu", function(e) {
+    $("#chat-header .new_chat_value").focus();
+    $("#chat-header .new_chat_value").on("contextmenu", function(e) {
         e.stopPropagation();
     });
 
-    $("#chat-header .newval").keypress(function (event) {
+    $("#chat-header .new_chat_value").keypress(function (event) {
         console.log("keypress");
         console.log("keypress called!" + event.which);
         if (event.which == 13){
             event.preventDefault();
-            var localChatheader = $("#chat-header .newval");
-            if(localChatheader == undefined)
+            console.log("keypress was enter");
+            var localChatheader = $("#chat-header .new_chat_value");
+            if(localChatheader == undefined || localChatheader.val() === undefined)
                 return false;
 
             var newval = localChatheader.val().trim();
@@ -85,7 +84,11 @@ function updateValueChat(element, key) {
             if(newval == undefined)
                 return false;
 
-            element.html(curhtml.replace(value, newval));
+
+            if (newval.length === 0)
+                return false;
+            console.log("changing html to= " + curhtml.replace(value, newval));
+            element.html(newval);
             contacts[current_key].label = newval;
             $("#chat-header").data("value", newval);
             $("#contact-" + current_key + " .contact-info .contact-name").text(newval);
@@ -94,15 +97,23 @@ function updateValueChat(element, key) {
         }
     });
 
+    $("#chat-header .new_chat_value").click(function(event){
+        event.stopPropagation();
+    });
+
     $(document).one('click', function () {
-        var localChatheader = $("#chat-header .newval");
-        if(typeof localChatheader === undefined || typeof localChatheader.val() === undefined)
+        var localChatheader = $("#chat-header .new_chat_value");
+        console.log("dogshit = " + typeof localChatheader.val());
+        if(typeof localChatheader === undefined || localChatheader.val() === undefined || typeof localChatheader.val().trim() === undefined)
             return false;
+
         var newval = localChatheader.val().trim();
 
         if(newval == undefined)
             return false;
-        element.html(curhtml.replace(value, newval));
+
+        console.log("changing html to= " + curhtml.replace(value, newval));
+        element.html(newval);
         contacts[current_key].label = newval;
         $("#chat-header").data("value", newval);
         $("#contact-" + current_key + " .contact-info .contact-name").text(newval);
@@ -1594,7 +1605,7 @@ function appendContact (key, openconvo, addressbook) {
         //onClick contact in sidebar list, on hover and on delete.
         contact_el = $("#" + elementName + key)
             .selection('li')
-            .on('click', function click(e) {
+            .on('dblclick', function click(e) {
                 openConversation(key, true);
             }).tooltip();
 
@@ -1715,17 +1726,14 @@ function openConversation(key, click) {
 
             var is_group = contact.group;
 
-            if(!is_group){
-                $("#contact-list").addClass("in-conversation");
-            } else {
-                $("#contact-group-list").addClass("in-conversation");
-            }
 
             //Set label in discussion
             $("#chat-header").text(contact.label).addClass("editable");
             $("#chat-header").data("value", contact.label);
+            $("#chat-header").off();
             $("#chat-header").on("dblclick", function (event) {
                 event.stopPropagation();
+                console.log("problem is here");
                 updateValueChat($(this), contact.key);
             }).attr("data-title", "Double click to edit").tooltip();
 
@@ -1782,6 +1790,15 @@ function openConversation(key, click) {
             } else if(contact.messages.length == 0) {
                  $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li>");
                  $("#message-to-address").val(contact.address);
+            }
+
+            if(!is_group){
+                $("#contact-list").addClass("in-conversation");
+                $("#contact-" + key).prependTo($("#contact-list ul"));
+
+            } else {
+                $("#contact-group-list").addClass("in-conversation");
+                $("#contact-" + key).prependTo($("#contact-group-list ul"));
             }
 
         }
