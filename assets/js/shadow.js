@@ -70,8 +70,6 @@ function updateValueChat(element, key) {
     });
 
     $("#chat-header .new_chat_value").keypress(function (event) {
-        console.log("keypress");
-        console.log("keypress called!" + event.which);
         if (event.which == 13){
             event.preventDefault();
             console.log("keypress was enter");
@@ -87,13 +85,12 @@ function updateValueChat(element, key) {
 
             if (newval.length === 0)
                 return false;
-            console.log("changing html to= " + curhtml.replace(value, newval));
+
             element.html(newval);
             contacts[current_key].label = newval;
             $("#chat-header").data("value", newval);
             $("#contact-" + current_key + " .contact-info .contact-name").text(newval);
             $("#contact-book-" + current_key + " .contact-info .contact-name").text(newval);
-            console.log("reached end of keypress");
         }
     });
 
@@ -103,8 +100,7 @@ function updateValueChat(element, key) {
 
     $(document).one('click', function () {
         var localChatheader = $("#chat-header .new_chat_value");
-        console.log("dogshit = " + typeof localChatheader.val());
-        if(typeof localChatheader === undefined || localChatheader.val() === undefined || typeof localChatheader.val().trim() === undefined)
+        if(typeof localChatheader === undefined || localChatheader.val() === undefined)
             return false;
 
         var newval = localChatheader.val().trim();
@@ -112,7 +108,6 @@ function updateValueChat(element, key) {
         if(newval == undefined)
             return false;
 
-        console.log("changing html to= " + curhtml.replace(value, newval));
         element.html(newval);
         contacts[current_key].label = newval;
         $("#chat-header").data("value", newval);
@@ -1733,7 +1728,6 @@ function openConversation(key, click) {
             $("#chat-header").off();
             $("#chat-header").on("dblclick", function (event) {
                 event.stopPropagation();
-                console.log("problem is here");
                 updateValueChat($(this), contact.key);
             }).attr("data-title", "Double click to edit").tooltip();
 
