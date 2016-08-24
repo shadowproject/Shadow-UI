@@ -1896,7 +1896,7 @@
                       placeholder="Enter a Shadow address (e.g. SXywGBZBowrppUwwNUo1GCRDTibzJi7g2M)"
                       onchange="if(base58.check(this)) { $('#new-contact-name').val(bridge.getAddressLabel(this.value));$('#new-contact-pubkey').val(bridge.getPubKey(this.value, $('#new-contact-name').val())).change()};"
                       maxlength="128"
-                      oninput="base58.check(this);"/><!-- TODO: Move onchange to javascript function... -->
+                      oninput="if(base58.check(this)) { $('#new-contact-name').val(bridge.getAddressLabel(this.value));$('#new-contact-pubkey').val(bridge.getPubKey(this.value, $('#new-contact-name').val())).change()};"/><!-- TODO: Move onchange to javascript function... -->
 
                   </div>
                   <div class="col-sm-4">

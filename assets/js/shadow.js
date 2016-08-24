@@ -751,6 +751,7 @@ function addAddress()
     alert("addAddress with type=" + $("#new-addresstype").val());
     var addresstype = $("#new-addresstype").val();
     var addresslabel = (addresstype == "4") ? "group_" + $("#new-address-label").val() : $("#new-address-label").val();
+
     newAdd = bridge.newAddress(addresslabel, addresstype);
 
     //TODO: Highlight address
@@ -768,10 +769,19 @@ function clearSendAddress()
 
 function addSendAddress()
 {
-    var sendLabel, sendAddress, result;
+    var sendLabel, sendAddress, currentLabel, result;
 
     sendLabel   = $("#new-send-label").val();
     sendAddress = $("#new-send-address").val();
+    alert("triggerd before");
+    currentLabel = bridge.getAddressLabel(sendAddress);
+    alert("triggerd after");
+    if(currentLabel != ""){
+        alert("triggerd currentLabel");
+        $("#new-send-address-error").text("Error: address already in addressbook under \"" +  currentLabel + "\"");
+        $("#new-send-address").addClass('inputError');
+        return 0;
+    }
 
     var addType = 0; // not used
     result = bridge.newAddress(sendLabel, addType, sendAddress, true);
@@ -1342,6 +1352,7 @@ var contact_list;
 var contact_group_list;
 var contact_book_list;
 var current_key = "";
+var initial_boot = true;
 
 function appendMessages(messages, reset) {
     contact_list = $("#contact-list ul");
@@ -1399,7 +1410,12 @@ function appendMessages(messages, reset) {
         //console.log("For loop key" + key);
 
     //console.log("opening first convo=" + contacts[0].address);
-    //openConversation(contacts[0].address, false);
+    if(initial_boot){
+        console.log("initial_boot true opening current_key= copy_in_array=" + current_key);
+        openConversation(contacts[current_key].address, false);
+        console.log("initial_boot set to false");
+        initial_boot = false;
+    }
 
     console.log("Before contact[current_key].group=" + contacts[current_key].group);
 
@@ -1443,7 +1459,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     /* This is just a cheat to test the formatting, because the if clause down below is always returning false.
     It will put all messages under the same contact*/
 
-    if(type == "R" && labelTo.lastIndexOf("group_", 0) === 0){ //Received, to group
+    if(labelTo.lastIndexOf("group_", 0) === 0){ //Received, to group
         label_chat = labelTo.replace('group_', '');
         group = true;
         key =  self;
@@ -1451,12 +1467,13 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
         label_chat = label_value.replace('group_', '');
         group = true;
         key =  them;
-    } else if(label_value.lastIndexOf("group_", 0) === 0 || labelTo.lastIndexOf("group_", 0) === 0){ //sent by group, should not be possible but yeah anything can happen.
-        group = true;
+    /*}  else if(self == "anon" && type == "S"){ //sent by group, should not be possible but yeah anything can happen.
+        console.log("[anon] self == anon true");
+        key = self; */
     } else {
         label_chat = label_msg;
     }
-    console.log("Debug label=" + label_value + " label_msg=" + label_msg + " labelTo=" + labelTo + " group=" + group + " key=" + key + " them=" + them + " self=" + self + " message=" + message + " type=" + type +"\n" );
+    console.log("Debug label=" + label_value + " label_msg=" + label_msg + " labelTo=" + labelTo + "label_chat=" + label_chat + " group=" + group + " key=" + key + " them=" + them + " self=" + self + " message=" + message + " type=" + type +"\n" );
     /*
     Basically I seperated the sender of the message (label_msg) from the contact[key].
     So we can still group by the key, but the messages in the chat have the right sender label.
@@ -1502,8 +1519,8 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
         });
 
         appendContact(key, false);
-        if (current_key == key) //on send of our own message reload convo to add message.
-            openConversation(key, false);
+        if (current_key == key && !initial_boot) //on send of our own message reload convo to add message.
+            openConversation(key, false); //hmm
 
          if (type == "R" && read == 0)
             addNotificationCount(key, 1);
@@ -1511,6 +1528,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 
      if(current_key == "")
         current_key = key;
+
 }
 
 
@@ -1602,7 +1620,10 @@ function appendContact (key, openconvo, addressbook) {
             .selection('li')
             .on('dblclick', function click(e) {
                 openConversation(key, true);
-            }).tooltip();
+                prependContact(key);
+            }).on('click', function click(e) {
+                openConversation(key, true);
+            });
 
 
         if(addressbook)
@@ -1761,11 +1782,19 @@ function openConversation(key, click) {
                            <span class='message-text'>"+micromarkdown.parse(emojione.toImage(message.message)) +  "</span>\
                     </span></li>");
                  $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString()).tooltip();
+                 
 
-                if(message.group && message.type == 'S' && !bSentMessage){ //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
-                    bSentMessage = true;
-                    $("#message-from-address").val(message.self);
-                    $("#message-to-address").val(message.them);
+
+                if(message.type == 'S'){ //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
+                    
+                    $('#' + message.id + ' .user-name').attr('data-title', '' + message.self).tooltip();
+                    if(message.group && !bSentMessage){
+                        bSentMessage = true;
+                        $("#message-from-address").val(message.self);
+                        $("#message-to-address").val(message.them);
+                    }
+                } else {
+                    $('#' + message.id + ' .user-name').attr('data-title', '' + message.them).tooltip();
                 }
             }
 
@@ -1775,7 +1804,7 @@ function openConversation(key, click) {
             //discussion.children("[title]").on("mouseenter", tooltip);
 
             if(!bSentMessage && contact.messages.length > 0) {
-                if(!contact.group){ //normal procedure
+                if(!is_group){ //normal procedure
                     $("#message-from-address").val(message.self);
                     $("#message-to-address").val(message.them); //them
                 } else if(message.type == "R") { //if it's a group, and no messages were sent from it yet, then we have not sent a message to it.
@@ -1786,16 +1815,21 @@ function openConversation(key, click) {
                  $("#message-to-address").val(contact.address);
             }
 
-            if(!is_group){
-                $("#contact-list").addClass("in-conversation");
-                $("#contact-" + key).prependTo($("#contact-list ul"));
-
-            } else {
-                $("#contact-group-list").addClass("in-conversation");
-                $("#contact-" + key).prependTo($("#contact-group-list ul"));
-            }
-
         }
+
+function prependContact(key){
+    var contact = contacts[key];
+
+    if(!contact.group){
+        $("#contact-list").addClass("in-conversation");
+        $("#contact-" + key).prependTo($("#contact-list ul"));
+
+    } else {
+        $("#contact-group-list").addClass("in-conversation");
+        $("#contact-" + key).prependTo($("#contact-group-list ul"));
+    }
+
+}
 
 function addInvite(privkey, label, id){
     $("#group-invite-list").append(
@@ -1916,7 +1950,8 @@ function newConversation() {
 
 function sendMessage() {
     $("#remove-on-send").remove();
-    if(bridge.sendMessage($("#message-to-address").val(), $("#message-text").val(), $("#message-from-address").val()))
+    //$("#message-to-address").val()
+    if(bridge.sendMessage(current_key, $("#message-text").val(), $("#message-from-address").val()))
         $("#message-text").val("");
 }
 
