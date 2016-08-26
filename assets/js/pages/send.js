@@ -283,7 +283,7 @@ var sendPage = (function($) {
 
     function getTransactionType() {
         return ($("[name=transaction_type_from]:checked").val() === "public" ? 0 : 2)
-             + ($("[name=transaction_type_to  ]:checked").val() === "private");
+             + ($("[name=transaction_type_to  ]:checked").val() === "public");
     }
 
     return {
