@@ -476,7 +476,7 @@
                                 class="form-control recipient input_box"
                                 data-title="Enter a label for this address to add it to your address book"
                                 placeholder="Enter a label for this address to add it to your address book"
-                                onchange="$('#new-contact-pubkey').val(bridge.getPubKey($('#new-contact-address').val(), this.value));"
+                                onchange="$('#new-contact-pubkey').val(bridge.getPubKey($('#new-contact-address').val()));"
                                 maxlength="128"/>
                             </div>
                             <select id="new-addresstype" class="recipient select-drop-down" style="width:167px;" onchange="">
@@ -1894,9 +1894,9 @@
                       class="recipient form-control input_box"
                       data-title="The address to send the payment to  (e.g. SXywGBZBowrppUwwNUo1GCRDTibzJi7g2M)"
                       placeholder="Enter a Shadow address (e.g. SXywGBZBowrppUwwNUo1GCRDTibzJi7g2M)"
-                      onchange="if(base58.check(this)) { $('#new-contact-name').val(bridge.getAddressLabel(this.value));$('#new-contact-pubkey').val(bridge.getPubKey(this.value, $('#new-contact-name').val())).change()};"
+                      onchange="if(base58.check(this)) { $('#new-contact-name').val(bridge.getAddressLabel(this.value));$('#new-contact-pubkey').val(bridge.getPubKey(this.value)).change()};"
                       maxlength="128"
-                      oninput="if(base58.check(this)) { $('#new-contact-name').val(bridge.getAddressLabel(this.value));$('#new-contact-pubkey').val(bridge.getPubKey(this.value, $('#new-contact-name').val())).change()};"/><!-- TODO: Move onchange to javascript function... -->
+                      oninput="if(base58.check(this)) { $('#new-contact-name').val(bridge.getAddressLabel(this.value));$('#new-contact-pubkey').val(bridge.getPubKey(this.value)).change()};"/><!-- TODO: Move onchange to javascript function... -->
 
                   </div>
                   <div class="col-sm-4">
@@ -1931,7 +1931,7 @@
                       class="recipient form-control input_box"
                       data-title="Enter a label for this address to add it to your address book"
                       placeholder="Enter a label for this address to add it to your address book"
-                      onchange="bridge.getPubKey($('#new-contact-address').val(), this.value);"
+                      onchange="bridge.getPubKey($('#new-contact-address').val());"
                       maxlength="128"/>
 
                   </div>

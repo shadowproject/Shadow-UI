@@ -1362,6 +1362,20 @@ function appendMessages(messages, reset) {
     {
         //delete contacts; // We have to delete contacts, in order to clear messages when the wallet is locked...
         //contacts = {};
+        console.log(" >>> [appendMessages] reset! <<< ");
+        
+        for(var k in contacts){
+            console.log(k + " typeof=" + typeof contacts[k]);
+            //if (typeof contacts[k] != 'function'){
+                if(contacts[k].messages.length > 0){
+                    console.log(k + " has more than one message" + contacts[k].messages.length);
+                    delete contacts[k].messages;
+                    contacts[k].messages = new Array();
+                }
+        }
+
+        console.log("didn't die lol");
+        initial_boot = true;
         contact_list.html("");
         contact_group_list.html("");
         $("#contact-list").removeClass("in-conversation");
@@ -1377,7 +1391,7 @@ function appendMessages(messages, reset) {
         $("#contact-group-list").on("mouseover", function (){contactGroupScroll.refresh();});
         $("#contact-book-list").on("mouseover", function (){contactBookScroll.refresh();});
 
-        console.log("RESET CALLED!");
+        console.log("END RESET!");
     }
 
     if(messages == "[]")
@@ -1434,7 +1448,7 @@ function appendMessages(messages, reset) {
 }
 
 function appendMessage(id, type, sent_date, received_date, label_value, label, labelTo, to_address, from_address, read, message, initial) {
-    console.log("appendMessage called! type=" + type);
+    //console.log("appendMessage called! type=" + type);
 /*
     if(read==false) { //type=="R"&&
         $(".user-notifications").show();
@@ -1473,7 +1487,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     } else {
         label_chat = label_msg;
     }
-    console.log("Debug label=" + label_value + " label_msg=" + label_msg + " labelTo=" + labelTo + "label_chat=" + label_chat + " group=" + group + " key=" + key + " them=" + them + " self=" + self + " message=" + message + " type=" + type +"\n" );
+    //console.log("Debug label=" + label_value + " label_msg=" + label_msg + " labelTo=" + labelTo + "label_chat=" + label_chat + " group=" + group + " key=" + key + " them=" + them + " self=" + self + " message=" + message + " type=" + type +"\n" );
     /*
     Basically I seperated the sender of the message (label_msg) from the contact[key].
     So we can still group by the key, but the messages in the chat have the right sender label.
@@ -1482,14 +1496,14 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     //INVITE TO GROUP CODE
 
     if(message.lastIndexOf("/invite", 0) === 0 && message.length >= 60){
-        console.log("length of message=" + message.length);
+        //console.log("length of message=" + message.length);
         var group_key = message.match(/[V79e][1-9A-HJ-NP-Za-km-z]{50,51}/g);
                        /*
         var group_key = message.substring(8, 60).replace(/^[V79e][1-9A-HJ-NP-Za-km-z]{50,51}$/, ""); // regex priv keys */
         var group_label = message.substring(61, message.length).replace(/[^A-Za-z0-9\s!?]/g, ""); // regex whitelist only a-z, A-Z, 0-9
 
         if (group_key != null) {
-            console.log("GROUP INVITE | key=" + group_key + " label=" + group_label);
+            //console.log("GROUP INVITE | key=" + group_key + " label=" + group_label);
 
             if(type = "R") { //If message contains /invite privkey label, insert HTML
                 //message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
@@ -1512,6 +1526,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     var contact = contacts[key];
 
     if($.grep(contact.messages, function(a) { return a.id == id; }).length == 0) {
+        console.log("Pushing new message to array");
         contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read});
 
         contact.messages.sort(function (a, b) {
@@ -1550,7 +1565,7 @@ function updateContact(label, address, contact_address){
     //if address is a group address, then we'll be search for contact_address in the group messages
     var contact = contacts[address];
     if (contact != undefined) {
-        console.log("updating key=" + address + " label=" + label);
+        //console.log("updating key=" + address + " label=" + label);
 
         if (contact_address == undefined || address==contact_address)
             contact_address = "";
