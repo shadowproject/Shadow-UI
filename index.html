@@ -6,6 +6,18 @@
     <title>Shadow GUIv2 alpha</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
+    <!-- JS - custom - inline js either before or after resources  -->
+    <script type="text/javascript">
+      // Disable drop/dragging
+      function preventDefault(e) {
+        e = e || event;
+        e.preventDefault();
+      }
+
+      window.addEventListener("dragover", preventDefault, false);
+      window.addEventListener("drop", preventDefault, false);
+    </script>
+
     <!-- default CSS-->
     <link href="assets/plugins/pace/pace-theme-flash.css" rel="stylesheet" type="text/css"/>
     <link href="assets/plugins/boostrapv3/css/bootstrap.css" rel="stylesheet" type="text/css"/>
@@ -25,19 +37,6 @@
 
     <!-- smiley CSS-->
     <link rel="stylesheet" href="assets/plugins/emojione/assets/css/emojione.min.css" type="text/css" media="all" />
-
-    <!-- JS - custom  -->
-    <script type="text/javascript">
-
-      // Disable drop/dragging
-      function preventDefault(e) {
-        e = e || event;
-        e.preventDefault();
-      }
-
-      window.addEventListener("dragover", preventDefault, false);
-      window.addEventListener("drop", preventDefault, false);
-    </script>
 
   </head>
 
@@ -338,6 +337,13 @@
               <div id="status" class="b-grey">
                 <ul class="no-margin hidden-sm hidden-xs no-style p-l-10 p-r-10 p-b-10">
                   <li class="inline p-l-10">
+                  <progress id="syncProgressBar"
+                    max=100
+                    value=1
+                    data-title="Catching up...
+                                downloaded 0 blocks of history..."></progress>
+                  </li>
+                  <li class="inline p-l-10">
                     <div id="tor" class="no-tor" data-title="Tor connection offline"></div>
                   </li>
                   <li class="inline p-l-10">
@@ -476,7 +482,6 @@
                                 class="form-control recipient input_box"
                                 data-title="Enter a label for this address to add it to your address book"
                                 placeholder="Enter a label for this address to add it to your address book"
-                                onchange="$('#new-contact-pubkey').val(bridge.getPubKey($('#new-contact-address').val()));"
                                 maxlength="128"/>
                             </div>
                             <select id="new-addresstype" class="recipient select-drop-down" style="width:167px;" onchange="">
@@ -1931,7 +1936,6 @@
                       class="recipient form-control input_box"
                       data-title="Enter a label for this address to add it to your address book"
                       placeholder="Enter a label for this address to add it to your address book"
-                      onchange="bridge.getPubKey($('#new-contact-address').val());"
                       maxlength="128"/>
 
                   </div>
@@ -2225,7 +2229,7 @@
             <input id="message-to-address" type="hidden">
 
             <input id="pasteTo" type="hidden">
-            <textarea id="message-text" rows='4' maxlength="4000" oninput="this.editor.update()" placeholder="Type your message here ..."></textarea>
+            <textarea id="message-text" rows='4' maxlength="4000" placeholder="Type your message here ..."></textarea>
 
           </form>
         </div>
