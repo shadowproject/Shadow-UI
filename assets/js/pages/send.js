@@ -282,8 +282,19 @@ var sendPage = (function($) {
     }
 
     function getTransactionType() {
-        return ($("[name=transaction_type_from]:checked").val() === "public" ? 0 : 2)
-             + ($("[name=transaction_type_to  ]:checked").val() === "public");
+        /**
+         * TXT_SDC_TO_SDC = 0,
+         * TXT_SDC_TO_ANON,
+         * TXT_ANON_TO_ANON,
+         * TXT_ANON_TO_SDC,
+         */
+        var from_public = $("[name=transaction_type_from]:checked").val() === "public",
+              to_public = $("[name=transaction_type_to  ]:checked").val() === "public";
+
+        if (from_public)
+            return +!to_public; // 0 (SDC_TO_SDC) or 1 (SDC_TO_ANON)
+        else
+            return 2 + to_public; // 2 (ANON_TO_ANON) or 3 (ANON_TO_SDC)
     }
 
     return {
