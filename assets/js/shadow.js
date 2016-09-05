@@ -149,7 +149,7 @@ $(function() {
     addressBookInit();
     shadowChatInit();
     chainDataPage.init();
-    keyManagementPage.init();
+    walletManagementPage.init();
 
     // Initialise row selection
     $(".footable > tbody tr").selection();
@@ -2241,7 +2241,7 @@ var blockExplorerPage =
     }
 }
 
-var keyManagementPage = {
+var walletManagementPage = {
     init: function() {
         setupWizard('new-key-wizard');
         setupWizard('recover-key-wizard');
@@ -2271,7 +2271,8 @@ var keyManagementPage = {
         else
         {
             $("#validate-key-mnemonic").addClass("red");
-            alert("The mnemonic you provided does not match the mnemonic that was generated eariler - please go back and check to make sure you've copied it down correctly."); //TODO: modal or something other than alert...
+            alert("The recovery phrase you provided does not match the recovery phrase that was generated earlier - please go back and check to make sure you have copied it down correctly.")
+
             return false;
         }
     },
@@ -2289,13 +2290,13 @@ var keyManagementPage = {
             })
     },
     updateAccountList: function() {
-        keyManagementPage.accountList = bridge.extKeyAccList();
+        walletManagementPage.accountList = bridge.extKeyAccList();
 
         var tbody = $('#extkey-account-table  > tbody');
         tbody.html('');
-        for (value in keyManagementPage.accountList) {
+        for (value in walletManagementPage.accountList) {
 
-            var acc = keyManagementPage.accountList[value];
+            var acc = walletManagementPage.accountList[value];
 
             tbody.append('<tr data-value='+acc.id+' active-flag=' + acc.active + '>\
                          <td>' +  acc.id   + '</td>\
@@ -2305,7 +2306,7 @@ var keyManagementPage = {
                          <td style="font-size: 1em; margin-bottom: 6px;">' +  ((acc.default_account !== undefined ? "<i class='center fa fa-check'></i>" : "")) + '</td>\
                          </tr>');
         }
-        keyManagementPage.prepareAccountTable();
+        walletManagementPage.prepareAccountTable();
     },
     prepareKeyTable: function()
     {
@@ -2318,13 +2319,13 @@ var keyManagementPage = {
             })
     },
     updateKeyList: function() {
-        keyManagementPage.keyList = bridge.extKeyList();
+        walletManagementPage.keyList = bridge.extKeyList();
 
         var tbody = $('#extkey-table  > tbody');
         tbody.html('');
-        for (value in keyManagementPage.keyList) {
+        for (value in walletManagementPage.keyList) {
 
-            var key = keyManagementPage.keyList[value];
+            var key = walletManagementPage.keyList[value];
             tbody.append('<tr data-value='+key.id+' active-flag=' + key.active + '>\
                          <td>' +  key.id   + '</td>\
                          <td>' +  key.label + '</td>\
@@ -2333,7 +2334,7 @@ var keyManagementPage = {
                          <td style="font-size: 1em; margin-bottom: 6px;">' +  ((key.current_master !== undefined ? "<i class='center fa fa-check'></i>" : "")) + '</td>\
                          </tr>');
         }
-        keyManagementPage.prepareKeyTable();
+        walletManagementPage.prepareKeyTable();
     },
     newKey: function()
     {
@@ -2377,8 +2378,11 @@ var keyManagementPage = {
             if(result.error_msg !== '') {
                 alert(result.error_msg); //TODO: modal or something other than alert...
                 return false;
-            } else
-                keyManagementPage.updateKeyList();
+            }
+            else
+            {
+                walletManagementPage.updateKeyList();
+            }
         }
         else
         {
@@ -2402,11 +2406,15 @@ var keyManagementPage = {
             if(result.error_msg !== '') {
                 alert(result.error_msg); //TODO: modal or something other than alert...
                 return false;
-            } else
-                keyManagementPage.updateAccountList();
-        } else {
-            alert("Select an account from the table to set a default."); //TODO: modal or something other than alert...
-
+            }
+            else
+            {
+                walletManagementPage.updateAccountList();
+            }
+        }
+        else
+        {
+            alert("Select an account from the table to set a default.");
             return false;
         }
     },
@@ -2442,11 +2450,11 @@ var keyManagementPage = {
             {
                 if(forAcc)
                 {
-                    keyManagementPage.updateAccountList();
+                    walletManagementPage.updateAccountList();
                 }
                 else
                 {
-                    keyManagementPage.updateKeyList();
+                    walletManagementPage.updateKeyList();
                 }
             }
         }
