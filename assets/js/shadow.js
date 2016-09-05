@@ -1203,6 +1203,13 @@ function appendTransactions(transactions) {
 
 }
 
+var contacts = {};
+var contact_list;
+var contact_group_list;
+var contact_book_list;
+var current_key = "";
+
+
 function shadowChatInit() {
     var menu = [{
             name: 'Send&nbsp;Shadow',
@@ -1327,14 +1334,13 @@ function shadowChatInit() {
                 removeNotificationCount(current_key);
         });
 
+        $("#contact-list").on("mouseover", function(){ contactScroll.refresh()});
+        $("#contact-group-list").on("mouseover", function(){ contactGroupScroll.refresh()});
+        $("#contact-book-list").on("mouseover", function(){ contactBookScroll.refresh()});
+
 }
 
 
-var contacts = {};
-var contact_list;
-var contact_group_list;
-var contact_book_list;
-var current_key = "";
 
 function appendMessages(messages, reset) {
     contact_list = $("#contact-list ul");
@@ -1357,9 +1363,6 @@ function appendMessages(messages, reset) {
         contactScroll   .scrollTo(0, 0);
         contactGroupScroll   .scrollTo(0, 0);
         contactBookScroll   .scrollTo(0, 0);
-        $("#contact-list").on("mouseover", contactScroll.refresh());
-        $("#contact-group-list").on("mouseover", contactGroupScroll.refresh());
-        $("#contact-book-list").on("mouseover", contactBookScroll.refresh());
     }
 
     if(messages == "[]")
