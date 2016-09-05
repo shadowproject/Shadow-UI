@@ -774,16 +774,15 @@ function addSendAddress()
 
     var addType = 0; // not used
     result = bridge.newAddress(sendLabel, addType, sendAddress, true);
-    updateContact(sendLabel, current_key, sendAddress);
     if (result == "")
     {
         var errorMsg = bridge.lastAddressError();
         $("#new-send-address-error").text("Error: " + errorMsg);
         $("#new-send-address").addClass('inputError');
-    } else
-    {;
-		$('#add-address-modal').modal('hide');
-    };
+    } else {
+        updateContact(sendLabel, current_key, sendAddress, false);
+        $('#add-address-modal').modal('hide');
+    }
 }
 
 function addressBookInit() {
@@ -1491,7 +1490,9 @@ function createContact(label, address, group) {
     }
 }
 
-function updateContact(label, address, contact_address) {
+function updateContact(label, address, contact_address, open_conversation) {
+    open_conversation = (open_conversation !== false);
+
     //if address is a group address, then we'll be search for contact_address in the group messages
     var contact = contacts[address];
     if (contact !== undefined) {
@@ -1511,7 +1512,8 @@ function updateContact(label, address, contact_address) {
             $("#contact-book-" + contact_address + " .contact-info .contact-name").text(label);
             $("#contact-" + contact_address + " .contact-info .contact-name").text(label);
         }
-        openConversation(address, true);
+        if (openConversation)
+            openConversation(address, true);
     }
     //check if current key is ==address
     //loop through messages and change label
