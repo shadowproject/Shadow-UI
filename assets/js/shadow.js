@@ -466,7 +466,7 @@ var overviewPage = {
         this.formatValue("stake",       stake);
         this.formatValue("unconfirmed", unconfirmed);
         this.formatValue("immature",    immature);
-        this.formatValue("total", balance + stake + unconfirmed + immature);
+        this.formatValue("total", balance + stake + unconfirmed + immature + shadowBal);
     },
 
     updateReserved: function(reserved) {
@@ -1357,9 +1357,9 @@ function appendMessages(messages, reset) {
         contactScroll   .scrollTo(0, 0);
         contactGroupScroll   .scrollTo(0, 0);
         contactBookScroll   .scrollTo(0, 0);
-        $("#contact-list").on("mouseover", contactScroll.refresh);
-        $("#contact-group-list").on("mouseover", contactGroupScroll.refresh);
-        $("#contact-book-list").on("mouseover", contactBookScroll.refresh);
+        $("#contact-list").on("mouseover", contactScroll.refresh());
+        $("#contact-group-list").on("mouseover", contactGroupScroll.refresh());
+        $("#contact-book-list").on("mouseover", contactBookScroll.refresh());
     }
 
     if(messages == "[]")
@@ -1551,7 +1551,7 @@ function appendContact (key, openconvo, addressbook) {
         //onClick contact in sidebar list, on hover and on delete.
         contact_el = $("#" + elementName + key)
             .selection('li')
-            .tooltip()
+            //.tooltip()
             .on('dblclick', function click(e) {
                 openConversation(key, true);
                 prependContact(key);
@@ -1798,7 +1798,11 @@ function openInviteModal() {
     $("#new-group-modal").modal('hide');
 
     var group_address = bridge.createGroupChat(group_label);
-    var invited_addresses = bridge.inviteGroupChat(group_address, contacts_to_invite, $("#message-from-address").val()); //SdigvLiftUCM4hsHBhrQC8CtTddQv4y5fx
+
+    var invited_addresses = [];
+
+    if(contacts_to_invite.length > 0)
+        invited_addresses = bridge.inviteGroupChat(group_address, contacts_to_invite, $("#message-from-address").val());
 
     createContact(group_label, group_address, true);
     appendContact(group_address, true, false);
