@@ -161,6 +161,7 @@
 
 .syncing {
   color:#E3223C;
+  whitespace: nowrap;
 }
 
 .transaction-overview {
