@@ -600,6 +600,14 @@ button {
   margin-left: 0;
 }
 
+.chat-header .fa {
+    display: none;
+} 
+
+.chat-header:hover .fa {
+ display: inline-block;
+}
+
 
 .contact-discussion {
   height:300px;
