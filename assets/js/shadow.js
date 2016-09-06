@@ -1832,11 +1832,13 @@ function scrollMessages() {
 }
 
 function newConversation() {
+    var address_to = $("#new-contact-address").val();
     bridge.updateAddressLabel($("#new-contact-address").val(), $("#new-contact-name").val());
 
     $('#new-contact-modal').modal('hide');
     $("#message-to-address").val($("#new-contact-address").val());
     $("#message-text").focus();
+    openConversation(address_to, true);
     $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+$("#new-contact-address").val()+" - "+$("#new-contact-name").val()+"</li>");
 
     $("#new-contact-address").val("");
@@ -1848,6 +1850,7 @@ function newConversation() {
 
     $("#contact-group-list ul li").removeClass("selected");
     $("#contact-group-list").addClass("in-conversation");
+
 }
 
 
