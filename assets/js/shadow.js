@@ -655,9 +655,11 @@ var optionsPage = {
 
             if(element.is(":checkbox"))
                 newvalue = element.prop("checked");
-            else if(element.is("select[multiple]") && element.find("option:not(:selected)").length == 0)
-                newvalue = "*";
-            else
+            else if(element.is("select[multiple]")) {
+                newvalue = element.val();
+                if (newvalue === null)
+                    newvalue = "*";
+            } else
                 newvalue = element.val();
 
             if(oldvalue != newvalue && oldvalue.toString() !== newvalue.toString())
@@ -1832,7 +1834,7 @@ function scrollMessages() {
 function newConversation() {
     bridge.updateAddressLabel($("#new-contact-address").val(), $("#new-contact-name").val());
 
-	$('#new-contact-modal').modal('hide');
+    $('#new-contact-modal').modal('hide');
     $("#message-to-address").val($("#new-contact-address").val());
     $("#message-text").focus();
     $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+$("#new-contact-address").val()+" - "+$("#new-contact-name").val()+"</li>");
