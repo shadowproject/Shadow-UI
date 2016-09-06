@@ -1836,6 +1836,7 @@ function scrollMessages() {
 function newConversation() {
     var address = $('#new-contact-address').val();
     var contact_name = $("#new-contact-name").val();
+    createContact(contact_name, address, false);
     result = bridge.newAddress($("#new-contact-name").val(), 0, $('#new-contact-address').val(), true);
     if (result === "")
         if (bridge.lastAddressError() !== 'Duplicate Address.') {
