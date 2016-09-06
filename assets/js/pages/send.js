@@ -97,9 +97,12 @@ var sendPage = (function($) {
     }
 
     function addRecipientDetail(address, label, narration, amount) {
-        $("#pay_to"+recipientID).val(address).change();
-        $("#label"+recipientID).val(label).change();
-        $("#amount"+recipientID).val(amount).change();
+        clearRecipients();
+        $("#recipient"+(recipientID).toString()+" .pay_to").val(address).change();
+        $("#recipient"+(recipientID).toString()+" .pay_to_label").val(label).change();
+        $("#recipient"+(recipientID).toString()+" .amount").val(amount).change();
+        $("#recipient"+(recipientID).toString()+" .narration").val(narration).change();
+        $('[href=#send]').click();
     }
 
     function clearRecipients() {
