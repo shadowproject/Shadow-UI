@@ -655,9 +655,11 @@ var optionsPage = {
 
             if(element.is(":checkbox"))
                 newvalue = element.prop("checked");
-            else if(element.is("select[multiple]") && element.find("option:not(:selected)").length == 0)
-                newvalue = "*";
-            else
+            else if(element.is("select[multiple]")) {
+                newvalue = element.val();
+                if (newvalue === null)
+                    newvalue = "*";
+            } else
                 newvalue = element.val();
 
             if(oldvalue != newvalue && oldvalue.toString() !== newvalue.toString())
