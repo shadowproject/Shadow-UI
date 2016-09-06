@@ -867,7 +867,6 @@ function appendAddresses(addresses) {
     contact_book_list = $("#contact-book-list ul");
 
     addresses.forEach(function(address) {
-        console.log("Adding address" + address.address);
         var addrRow = $("#"+address.address);
         var page = (address.type == "S" ? "#addressbook" : (address.label.lastIndexOf("group_", 0) !== 0 ? "#receive" : "#addressbook"));
         var addrRowInviteModal = $("#invite-modal-"+address.address);
@@ -903,7 +902,7 @@ function appendAddresses(addresses) {
             appendContact(address.address, false, true);
          }
 
-         console.log("adding address " + address.address + " label=" + address.label + " isGroup=" + isGroup + " isSend=" + isSend + " bHasPubKey=" + bHasPubKey );
+        //console.log("adding address " + address.address + " label=" + address.label + " isGroup=" + isGroup + " isSend=" + isSend + " bHasPubKey=" + bHasPubKey );
 
         /* Fill up addressbook "BOOK" in invite modal  */
          if(!isGroup && isSend && bHasPubKey) {
@@ -1835,6 +1834,8 @@ function scrollMessages() {
 }
 
 function newConversation() {
+    var address = $('#new-contact-address').val();
+    var contact_name = $("#new-contact-name").val();
     result = bridge.newAddress($("#new-contact-name").val(), 0, $('#new-contact-address').val(), true);
     if (result === "")
         if (bridge.lastAddressError() !== 'Duplicate Address.') {
@@ -1847,11 +1848,10 @@ function newConversation() {
     
     bridge.setPubKey($('#new-contact-address').val(), $("#new-contact-pubkey").val());
     bridge.updateAddressLabel($('#new-contact-address').val(), $("#new-contact-name").val());
-    openConversation($('#new-contact-address').val(), true);
     $('#new-contact-modal').modal('hide');
     $("#message-to-address").val($("#new-contact-address").val());
     $("#message-text").focus();
-    $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+$("#new-contact-address").val()+" - "+$("#new-contact-name").val()+"</li>");
+ 
 
     $("#new-contact-address").val("");
     $("#new-contact-name").val("");
@@ -1863,7 +1863,12 @@ function newConversation() {
     $("#contact-group-list ul li").removeClass("selected");
     $("#contact-group-list").addClass("in-conversation");
 
-    
+    setTimeout(function(){
+        openConversation(address, true);
+        $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+address+" - "+contact_name+"</li>");
+    }, 1000);
+
+    console.log("reached end");
 
 }
 
