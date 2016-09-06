@@ -1771,7 +1771,7 @@ function deleteInvite(key, id) {
     $("#invite-" + key + "-" + id).html("");
     bridge.deleteMessage(id);
 }
-//VGFBbN686jRg3sU92XRpwU4PZ3pAvAcNyG2z45XtVQdrQkfSJTCb
+
 function acceptInvite(key, group_label, id) {
     deleteInvite(key, id);
     var group_address = bridge.joinGroupChat(key,group_label);
