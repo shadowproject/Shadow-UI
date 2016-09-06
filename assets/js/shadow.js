@@ -776,7 +776,7 @@ function addSendAddress()
 
     var addType = 0; // not used
     result = bridge.newAddress(sendLabel, addType, sendAddress, true);
-    if (result == "")
+    if (result === "")
     {
         var errorMsg = bridge.lastAddressError();
         $("#new-send-address-error").text("Error: " + errorMsg);
@@ -1832,8 +1832,17 @@ function scrollMessages() {
 }
 
 function newConversation() {
-    var address_to = $("#new-contact-address").val();
-    bridge.updateAddressLabel($("#new-contact-address").val(), $("#new-contact-name").val());
+    result = bridge.newAddress($("#new-contact-name").val(), 0, $('#new-contact-address').val(), true);
+    if (result === "")
+        if (bridge.lastAddressError() !== 'Duplicate Address.') {
+            $("#new-contact-address").css("background", "#E51C39").css("color", "white");
+            return;
+        }
+
+    $("#new-contact-address").css("background", "").css("color", "");
+
+    bridge.updateAddressLabel($('#new-contact-address').val(), $("#new-contact-name").val());
+    bridge.setPubKey($('#new-contact-address').val(), $("#new-contact-pubkey").val());
 
     $('#new-contact-modal').modal('hide');
     $("#message-to-address").val($("#new-contact-address").val());
@@ -1850,6 +1859,8 @@ function newConversation() {
 
     $("#contact-group-list ul li").removeClass("selected");
     $("#contact-group-list").addClass("in-conversation");
+
+    openConversation($('#new-contact-address').val(), true);
 
 }
 
