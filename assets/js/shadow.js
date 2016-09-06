@@ -867,6 +867,7 @@ function appendAddresses(addresses) {
     contact_book_list = $("#contact-book-list ul");
 
     addresses.forEach(function(address) {
+        console.log("Adding address" + address.address);
         var addrRow = $("#"+address.address);
         var page = (address.type == "S" ? "#addressbook" : (address.label.lastIndexOf("group_", 0) !== 0 ? "#receive" : "#addressbook"));
         var addrRowInviteModal = $("#invite-modal-"+address.address);
@@ -901,6 +902,8 @@ function appendAddresses(addresses) {
             createContact(address.label, address.address, isGroup);
             appendContact(address.address, false, true);
          }
+
+         console.log("adding address " + address.address + " label=" + address.label + " isGroup=" + isGroup + " isSend=" + isSend + " bHasPubKey=" + bHasPubKey );
 
         /* Fill up addressbook "BOOK" in invite modal  */
          if(!isGroup && isSend && bHasPubKey) {
@@ -1692,7 +1695,7 @@ function openConversation(key, click) {
                  var timeReceived  = new Date(message.received*1000);
                 //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
                 //TODO: parse with regex to be sure.. do in appendMessage
-                var onclick = (message.label_msg == message.them) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-send-address').show(); $('#new-send-address').val('" + message.them + "')\" " : "";
+                var onclick = (message.label_msg == message.them) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.them + "')\" " : "";
                 discussion.append(
                     "<li id='"+message.id+"' class='"+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
                     <span class='message-content'>\
@@ -1841,13 +1844,13 @@ function newConversation() {
 
     $("#new-contact-address").css("background", "").css("color", "");
 
-    bridge.updateAddressLabel($('#new-contact-address').val(), $("#new-contact-name").val());
+    
     bridge.setPubKey($('#new-contact-address').val(), $("#new-contact-pubkey").val());
-
+    bridge.updateAddressLabel($('#new-contact-address').val(), $("#new-contact-name").val());
+    openConversation($('#new-contact-address').val(), true);
     $('#new-contact-modal').modal('hide');
     $("#message-to-address").val($("#new-contact-address").val());
     $("#message-text").focus();
-    openConversation(address_to, true);
     $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+$("#new-contact-address").val()+" - "+$("#new-contact-name").val()+"</li>");
 
     $("#new-contact-address").val("");
@@ -1860,7 +1863,7 @@ function newConversation() {
     $("#contact-group-list ul li").removeClass("selected");
     $("#contact-group-list").addClass("in-conversation");
 
-    openConversation($('#new-contact-address').val(), true);
+    
 
 }
 
