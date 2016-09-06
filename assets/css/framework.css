@@ -9278,7 +9278,7 @@ div.cs-skin-slide .cs-options ul li.cs-selected span {
 /*** Retina Display Images **/
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 200/100), only screen and (min-device-pixel-ratio: 2) {
   .icon-set {
-    background: url('../img/icons/top_tray_2x.png');
+    background: url('../icons/top_tray_2x.png');
     position: relative;
     background-size: 95px 19px;
   }

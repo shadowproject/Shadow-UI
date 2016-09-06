@@ -1834,7 +1834,7 @@ function scrollMessages() {
 function newConversation() {
     bridge.updateAddressLabel($("#new-contact-address").val(), $("#new-contact-name").val());
 
-	$('#new-contact-modal').modal('hide');
+    $('#new-contact-modal').modal('hide');
     $("#message-to-address").val($("#new-contact-address").val());
     $("#message-text").focus();
     $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+$("#new-contact-address").val()+" - "+$("#new-contact-name").val()+"</li>");
