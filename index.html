@@ -1228,6 +1228,7 @@
 
     <!-- market page -->
     <article id="market" class="bg-white" style="background-color: white;">
+      <div class="bg-white" style="position:fixed;top:0;bottom:0;left:0;right:0;"></div>
       <div class="page-content-wrapper">
         <nav class="navbar navbar-default nav-sub-menu p-t-10 p-r-35 p-l-35" style="min-height:75px; margin-bottom: 0px !important;" role="navigation">
           <div class="pull-left">
@@ -1262,16 +1263,21 @@
               <h5>
                 GET IN TOUCH AND CONTRIBUTE
               </h5>
+              <p style="opacity:6;">
+                Join us on <a href="https://shadowproject.slack.com" target="_blank">Slack</a> (get <a href="https://slack.shadowproject.io" target="_blank">invite here</a>)
+              </p>
             </div>
             <div class="col-sm-6 bg-white m-t-130" style="padding-top: 100px;">
                 <h5>
                   DONATE AND SUPPORT DEVELOPMENT
                 </h5>
-                <p>
-                SDC:
+                <p style="opacity:6;">
+                  <a href="javascript:sendPage.addRecipientDetail('SdcDevWEbq3CZgZc8UNbST1TaYLA5vLZTS', 'SDC Dev Fund', 'keep up the work!', 5)">
+                    SdcDevWEbq3CZgZc8UNbST1TaYLA5vLZTS
+                  </a>
                 </p>
-                <p>
-                BTC:
+                <p style="opacity:6;">
+                  <a href="bitcoin:1GiosBkSpN8RS9pm1kgZU8AZUBEnLKYFem&label=SDC%20Dev%20Fund">1GiosBkSpN8RS9pm1kgZU8AZUBEnLKYFem</a>
                 </p>
             </div>
             <!-- view -->
@@ -1537,7 +1543,7 @@
                                 <div class="col-sm-9">
                                     <div class="row">
                                         <div class="col-sm-9">
-                                            <input class="form-control" id="recipient-template-amount-narration" maxlength="24"
+                                            <input class="form-control narration" id="recipient-template-amount-narration" maxlength="24"
                                                 data-title="Enter a short note to send with payment (max 24 characters)"
                                                 placeholder="Enter a short note to send with a payment (max 24 characters)" />
                                         </div>
