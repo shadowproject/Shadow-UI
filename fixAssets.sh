@@ -7,6 +7,20 @@ sed -i .tmp 's^"assets^"qrc:///assets^g' build/index.html
 assets=`find assets/ -type f`
 > build/shadow.qrc
 IFS=$'\n'
+IGNORE="
+assets//plugins/framework/framework.js
+assets//plugins/boostrapv3/css/bootstrap.css
+assets//css/font-awesome-buttons.css
+assets//css/framework-icons.css
+assets//css/framework.css
+assets//css/shadow.css
+assets//js/navigation.js
+assets//js/pages/send.js
+assets//js/qrcode.js
+assets//js/tooltip.js
+assets//js/shadow.js
+assets/js/shadow.js
+"
 while read line
 do
     echo "$line" >> build/shadow.qrc
@@ -14,6 +28,7 @@ do
     then
         for asset in $assets
         do
+            [[ $IGNORE =~ $asset ]] && continue
             echo '        <file alias="'$asset'">../Shadow-UI/build/'$asset'</file>' >> build/shadow.qrc
         done
     fi

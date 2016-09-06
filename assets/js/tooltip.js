@@ -1,5 +1,5 @@
 (function($) {
-  'use strict';
+  "use strict";
 
   function init(element) {
       if (element === $) {
@@ -9,7 +9,7 @@
       if (element === undefined)
           element = this;
 
-      return element.off('mouseenter').on('mouseenter', createTooltip);
+      return element.off('mouseenter').on('mouseenter', createTooltip)
   }
 
   function createTooltip(event) {

@@ -15,10 +15,10 @@ var showQRCode = (function($, QRCode) {
 
   function showQRCode(address, label) {
 
-      if(address!=undefined)
+      if(address!==undefined)
           qraddress.val(address);
 
-      if(label!=undefined)
+      if(label!==undefined)
           qrlabel.val(label);
 
       qrcode.clear();
@@ -40,4 +40,4 @@ var showQRCode = (function($, QRCode) {
 // jQuery initialized
 jQuery(function() {
     $("#qramount").on("keydown", unit.keydown).on("paste", unit.paste);
-})
+});
