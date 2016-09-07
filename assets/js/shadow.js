@@ -1703,9 +1703,11 @@ function openConversation(key, click) {
                         </span>\
                         <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
                            <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-                           <span class='message-text'>"+micromarkdown.parse(emojione.toImage(message.message)) +  "</span>\
+                           <span class='message-text'>"+micromarkdown.parse(emojione.toImage(message.message)).replace(/<a href="(.+)">.+<\/a>/g, '<a href="$1" data-title="$1">$1</a>') +  "</span>\
                     </span></li>");
-                 $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString()).tooltip();
+                 $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString())
+                    .tooltip().find('.message-text')
+                    .tooltip();
 
 
 
