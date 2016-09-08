@@ -1316,7 +1316,8 @@ function shadowChatInit() {
 
     //ON ENTER SUBMIT MESSAGE
     $("#message-text").keypress(function (e) {
-        if (e.which == 13) {
+        console.log("keypress=" + e.which + " shift=" + event.shiftKey);
+        if (e.which == 13 && !e.shiftKey) {
             e.preventDefault();
 
             if($("#message-text").val() == "")
@@ -1346,11 +1347,13 @@ function shadowChatInit() {
 
 
 function appendMessages(messages, reset) {
+    console.log("appendMessages length="+ messages.length);
     contact_list = $("#contact-list ul");
     contact_group_list = $("#contact-group-list ul");
 
     if(reset) {
         // We have to delete clear messages when wallet is locked...
+        console.log("reset called");
         for(var k in contacts)
             if(contacts[k].messages.length > 0)
                 contacts[k].messages = []; // [] is 50% faster than new Array(), and delete causes unecessary overhead in the garbage collector;
@@ -1370,9 +1373,10 @@ function appendMessages(messages, reset) {
 
     if(messages == "[]")
         return;
+    console.log(messages);
 
     messages = JSON.parse(messages.replace(/,\]$/, "]"));
-
+    console.log("after json parse");
     // Message data
     messages.forEach(function(message) {
         appendMessage(message.id,
@@ -1396,7 +1400,7 @@ function appendMessages(messages, reset) {
 }
 
 function appendMessage(id, type, sent_date, received_date, label_value, label, labelTo, to_address, from_address, read, message, initial) {
-
+    console.log("appendMessage called");
     var them = type == "S" ? to_address   : from_address;
     var self = type == "S" ? from_address : to_address;
     var contact_address = them;
@@ -1547,13 +1551,13 @@ function appendContact (key, openconvo, addressbook) {
              + "</li>";
 
         if (addressbook) {
-            contact_book_list.prepend(contact_html);
+            contact_book_list.append(contact_html);
             $("#"+ elementName + key).find(".delete").hide();
         } else if(contact.group) { //if not group
 
-            contact_group_list.prepend(contact_html);
+            contact_group_list.append(contact_html);
         } else
-            contact_list.prepend(contact_html);
+            contact_list.append(contact_html);
 
 
 
@@ -1609,7 +1613,9 @@ function removeNotificationCount(key) {
         key = current_key;
 
     //iscrollReload();
-    scrollMessages(); //THIS ONE WORKS
+    //scrollMessages(); //THIS ONE WORKS
+    console.log("refresh scoll");
+    messagesScroller.refresh();
 
     //NOTIFICATION IN CONTACT LIST
     var contact = contacts[key];
@@ -1677,6 +1683,7 @@ function openConversation(key, click) {
             }).attr("data-title", "Double click to edit").tooltip();
 
             var message;
+            var prev_message;
             var bSentMessage = false;
 
             if(click)
@@ -1684,10 +1691,19 @@ function openConversation(key, click) {
 
             for(var i=0;i<contact.messages.length;i++)
             {
+
+                
                 message = contact.messages[i];
+                if(i>0){
+                    prev_message = contact.messages[i-1];
+                    if(combineMessages(prev_message, message)){
+                        $("#" + prev_message.id + " .message-text").append(micromarkdown.parse(emojione.toImage(message.message)));
+                        continue;
+                    }
+                }
 
 					//<span class='info'>\
-                        //<img src='"+contact.avatar+"' />\
+                        //<img src='' />\
                     //</span>\
 
                  var time  = new Date(message.sent*1000);//.toLocaleString()
@@ -1703,7 +1719,11 @@ function openConversation(key, click) {
                         </span>\
                         <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
                            <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-                           <span class='message-text'>"+micromarkdown.parse(emojione.toImage(message.message)) +  "</span>\
+                            <span class='info'>\
+                            </span>\
+                           <span class='message-text'>"
+                           +micromarkdown.parse(emojione.toImage(message.message)) +  
+                           "</span>\
                     </span></li>");
                  $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString()).tooltip();
 
@@ -1712,17 +1732,19 @@ function openConversation(key, click) {
                 if(message.type == 'S') { //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
 
                     $('#' + message.id + ' .user-name').attr('data-title', '' + message.self).tooltip();
+                    addRandomAvatar(message.id, message.self);
                     if(message.group && !bSentMessage) {
                         bSentMessage = true;
                         $("#message-from-address").val(message.self);
                         $("#message-to-address").val(message.them);
                     }
-                } else
+                } else{
                     $('#' + message.id + ' .user-name').attr('data-title', '' + message.them).tooltip();
+                    addRandomAvatar(message.id, message.them);
+                }
             }
 
 
-            scrollMessages();
 
             //discussion.children("[title]").on("mouseenter", tooltip);
 
@@ -1738,7 +1760,32 @@ function openConversation(key, click) {
                  $("#message-to-address").val(contact.address);
             }
 
+            console.log("REFRESHING"); 
+            setTimeout(function() {scrollMessages();}, 200);
+
         }
+
+function combineMessages(prev_message, message){
+    return false;
+
+    if(prev_message.type != message.type)
+        return false;
+
+    if(message.type == "R" && prev_message.them == message.them)
+        return true;
+
+    if(message.type == "S" && prev_message.self == message.self)
+        return true;
+
+    console.log("Messages are not going to combine!");
+    return false;
+}
+
+function addRandomAvatar(id, key){
+     $("#"+id + " .info").append($("<canvas/>")
+        .attr({ "width": 40, "height": 40 })
+        .jdenticon(md5(key)));
+}
 
 function prependContact(key) {
     var contact = contacts[key];
@@ -1755,8 +1802,12 @@ function prependContact(key) {
 }
 
 function addInvite(privkey, label, id) {
+    if($("#invite-" + privkey + "-" + id ).length != 0)
+        return false; 
+
+
     $("#group-invite-list").append(
-            "<div id=invite-" + privkey + "-" + id + ">" +
+            "<div id='invite-" + privkey + "-" + id + "'>" +
                  "<a class='group-invite'>"+
                   "<i class=\"fa fa-envelope\"></i>"+
                   "<span class=\"group-invite-label\"> " + label + " </span>"+
@@ -1768,8 +1819,8 @@ function addInvite(privkey, label, id) {
 }
 
 function deleteInvite(key, id) {
-    $("#invite-" + key + "-" + id).html("");
     bridge.deleteMessage(id);
+    $("#invite-" + key + "-" + id).html("");
 }
 
 function acceptInvite(key, group_label, id) {

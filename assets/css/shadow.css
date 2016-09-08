@@ -661,6 +661,14 @@ button {
   margin-bottom: 5px;
 }
 
+.contact-discussion ul li .info canvas {
+  width: 40px;
+  /*border-radius: 100%;*/
+  float: left;
+  margin-bottom: 5px;
+  border: 1px solid black;
+}
+
 .contact-discussion ul li .user-name {
   display: inline-block;
   font-size: 12px;
