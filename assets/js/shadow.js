@@ -1353,10 +1353,11 @@ function appendMessages(messages, reset) {
 
     if(reset) {
         // We have to delete clear messages when wallet is locked...
-        console.log("reset called");
         for(var k in contacts)
             if(contacts[k].messages.length > 0)
                 contacts[k].messages = []; // [] is 50% faster than new Array(), and delete causes unecessary overhead in the garbage collector;
+
+            $("#chat-menu-link .details").hide();
 
         contact_list.html("");
         contact_group_list.html("");
@@ -1374,9 +1375,10 @@ function appendMessages(messages, reset) {
     if(messages == "[]")
         return;
     console.log(messages);
+    //JSON doesn't play well with some characters http://www.jslint.com/help.html
+    var banned_json_regex = /([\u0000-\u001f])|([\u007f-\u009f])|([\u00ad])|([\u0600-\u0604])|([\u070f])|([\u17b4-\u17b5])|([\u200c-\u200f])|([\u2028-\u202f])|([\u2060-\u206f])|([\ufeff])|([\ufff0-\uffff])+/g;
+    messages = JSON.parse(messages.replace(/,\]$/, "]").replace(banned_json_regex,""));
 
-    messages = JSON.parse(messages.replace(/,\]$/, "]"));
-    console.log("after json parse");
     // Message data
     messages.forEach(function(message) {
         appendMessage(message.id,
@@ -1600,7 +1602,7 @@ function addNotificationCount(key, unread_count) {
     notifications_contact
         .text(parseInt(notifications_contact_value) + parseInt(unread_count))
         .show();
-
+    $("#chat-menu-link .details").show();
     $(".user-notifications").show();
     $("#message-count").text(parseInt($("#message-count").text())+1).show();
 
@@ -1638,8 +1640,10 @@ function removeNotificationCount(key) {
 
     notifications_menu.text(notifications_menu_value);
 
-    if(notifications_menu_value==0)
+    if(notifications_menu_value==0){
         notifications_menu.hide();
+        $("#chat-menu-link .details").hide();
+    }
     else
         notifications_menu.show();
 
@@ -1719,7 +1723,7 @@ function openConversation(key, click) {
                         </span>\
                         <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
                            <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-                            <span class='info'>\
+                            <span class='info'></span>\
                            <span class='message-text'>"+micromarkdown.parse(emojione.toImage(message.message)).replace(/<a href="(.+)">.+<\/a>/g, '<a href="$1" data-title="$1">$1</a>') +  "</span>\
                     </span></li>");
                  $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString())
