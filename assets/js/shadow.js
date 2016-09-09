@@ -1374,7 +1374,6 @@ function appendMessages(messages, reset) {
 
     if(messages == "[]")
         return;
-    console.log(messages);
     //JSON doesn't play well with some characters http://www.jslint.com/help.html
     var banned_json_regex = /([\u0000-\u001f])|([\u007f-\u009f])|([\u00ad])|([\u0600-\u0604])|([\u070f])|([\u17b4-\u17b5])|([\u200c-\u200f])|([\u2028-\u202f])|([\u2060-\u206f])|([\ufeff])|([\ufff0-\uffff])+/g;
     messages = JSON.parse(messages.replace(/,\]$/, "]").replace(banned_json_regex,""));
@@ -1402,7 +1401,6 @@ function appendMessages(messages, reset) {
 }
 
 function appendMessage(id, type, sent_date, received_date, label_value, label, labelTo, to_address, from_address, read, message, initial) {
-    console.log("appendMessage called");
     var them = type == "S" ? to_address   : from_address;
     var self = type == "S" ? from_address : to_address;
     var contact_address = them;
@@ -1616,7 +1614,6 @@ function removeNotificationCount(key) {
 
     //iscrollReload();
     //scrollMessages(); //THIS ONE WORKS
-    console.log("refresh scoll");
     messagesScroller.refresh();
 
     //NOTIFICATION IN CONTACT LIST
@@ -1763,7 +1760,6 @@ function openConversation(key, click) {
                  $("#message-to-address").val(contact.address);
             }
 
-            console.log("REFRESHING"); 
             setTimeout(function() {scrollMessages();}, 200);
 
         }
