@@ -1261,6 +1261,7 @@ function shadowChatInit() {
        $(e.target).closest('li').click();
     }).contextMenu(menu, {triggerOn:'contextmenu', sizeStyle: 'content'});
 
+    /*
     menu = [{
             name: 'Copy&nbsp;Message',
             fun: function () {
@@ -1270,13 +1271,13 @@ function shadowChatInit() {
                 $.each(contacts[selected.attr("contact-key")].messages, function(index){if(this.id == id) copy(this.message, 'copy');});
             }
         },
-        /*
+        
         {
             name: 'Send&nbsp;File',
             fun: function () {
                 copy('#transactions .footable .selected .address', "data-label");
             }
-        },*/
+        },
         {
             name: 'Delete&nbsp;Message',
             fun: function () {
@@ -1287,6 +1288,7 @@ function shadowChatInit() {
     $('.contact-discussion').on('contextmenu', function(e) {
         $(e.target).closest('li').addClass("selected");
     }).contextMenu(menu, {triggerOn:'contextmenu', sizeStyle: 'content'});
+    */
 
     menu = [
         {
@@ -1695,12 +1697,18 @@ function openConversation(key, click) {
 
                 
                 message = contact.messages[i];
+                console.log("Before IF");
                 if(i>0){
                     prev_message = contact.messages[i-1];
+                    console.log("Before combineMessages");
                     if(combineMessages(prev_message, message)){
-                        $("#" + prev_message.id + " .message-text").append(micromarkdown.parse(emojione.toImage(message.message)));
+                        console.log("Combine true! adding " + message.message + " to " + prev_message.id);
+                        $("#"+ prev_message.id).attr("id", message.id);
+                        $("#" + message.id + " .message-text").append(processMessageForDisplay(message.message));
+                        console.log("After combine true!");
                         continue;
                     }
+                    console.log("Combine false!" + message.message);
                 }
 
 					//<span class='info'>\
@@ -1721,7 +1729,7 @@ function openConversation(key, click) {
                         <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
                            <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
                             <span class='info'></span>\
-                           <span class='message-text'>"+micromarkdown.parse(emojione.toImage(message.message)).replace(/<a href="(.+)">.+<\/a>/g, '<a href="$1" data-title="$1">$1</a>') +  "</span>\
+                           <span class='message-text'>"+ processMessageForDisplay(message.message) +  "</span>\
                     </span></li>");
                  $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString())
                     .tooltip().find('.message-text')
@@ -1764,9 +1772,11 @@ function openConversation(key, click) {
 
         }
 
-function combineMessages(prev_message, message){
-    return false;
+function processMessageForDisplay(message){
+    return micromarkdown.parse(emojione.toImage(message)).replace(/<a class="mmd_shadowcash" href="(.+)">(.+)<\/a>/g, '<a class="mmd_shadowcash" onclick="if(confirm(\'Let me stop you right there you fool\\n\\nAre you sure you want to open this link?\\n\\n It WILL leak your IP address and other browser metadata, the least we can do is advice you to copy the link and open it in a _Tor Browser_ instead.\')){return confirm(\'We\\\'re not fucking around here, are you freaking sure?\')} return false;" target="_blank" href="$1" data-title="$1">$1</a>');
+}
 
+function combineMessages(prev_message, message){
     if(prev_message.type != message.type)
         return false;
 
