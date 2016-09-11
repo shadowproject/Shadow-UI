@@ -1395,6 +1395,9 @@ function appendMessages(messages, reset) {
         contactScroll   .scrollTo(0, 0);
         contactGroupScroll   .scrollTo(0, 0);
         contactBookScroll   .scrollTo(0, 0);
+
+        $("#invite-group-btn").hide();
+        $("#leave-group-btn").hide();
     }
 
     if(messages == "[]")
@@ -1697,6 +1700,14 @@ function openConversation(key, click) {
 
 
             var is_group = contact.group;
+
+            if(is_group){
+                $("#invite-group-btn").show();
+                $("#leave-group-btn").show();
+            } else {
+                $("#invite-group-btn").hide();
+                $("#leave-group-btn").hide();
+            }
 
 
             //Set label in discussion
