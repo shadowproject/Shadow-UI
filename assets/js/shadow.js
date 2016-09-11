@@ -1697,18 +1697,14 @@ function openConversation(key, click) {
 
                 
                 message = contact.messages[i];
-                console.log("Before IF");
                 if(i>0){
                     prev_message = contact.messages[i-1];
-                    console.log("Before combineMessages");
                     if(combineMessages(prev_message, message)){
-                        console.log("Combine true! adding " + message.message + " to " + prev_message.id);
                         $("#"+ prev_message.id).attr("id", message.id);
                         $("#" + message.id + " .message-text").append(processMessageForDisplay(message.message));
-                        console.log("After combine true!");
+
                         continue;
                     }
-                    console.log("Combine false!" + message.message);
                 }
 
 					//<span class='info'>\
