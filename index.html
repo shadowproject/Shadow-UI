@@ -1991,7 +1991,7 @@
 
     <!-- messages modal -->
 
-    <!-- invite group modal style="max-height: 500px;" -->
+    <!-- create group modal style="max-height: 500px;" -->
     <div class="modal fade stick-up" id="new-group-modal" tabindex="-1" role="dialog" aria-hidden="true">
       <div class="modal-dialog" >
         <div class="modal-content p-b-25" style="background:#fff;">
@@ -2016,12 +2016,16 @@
               </div>
               <div class="col-sm-4 p-t-15">
                 <div class="pull-right m-t-25">
-                  <a class="btn btn-danger" onclick="openInviteModal();">Create Group
+                  <a class="btn btn-danger" onclick="createGroupChat();">Create Group
                     <i class="fa fa-check"></i>
                   </a>
                 </div>
               </div>
             </div>
+
+            <br />
+            <br />
+            <h5 class="p-l-10" style="border-bottom: 1px solid #F0F1F3">Invite others</h5>
 
             <div class="form-group">
               <div class="col-sm-12 p-t-15">
@@ -2039,6 +2043,93 @@
                       <div class="panel full-width">
 
                         <table cellspacing="0" class="footable shadow table table-hover" data-filter="#filter-new-group" data-page-size="20" width="100%" style="border-bottom: 1px solid rgba(230, 230, 230, 0.7)">
+                          <thead>
+                            <tr>
+                              <th style="padding-left:18px;" data-sort-initial="true" data-toggle="true">
+                                Label
+                              </th>
+                              <th data-hide="phone">
+                                Address
+                              </th>
+                              <th data-hide="phone">
+                                Invite
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody id="group-modal-tbody">
+
+                          </tbody>
+                          <tfoot>
+                            <tr>
+                              <td colspan="3">
+                                <div class="pagination pager hide-if-no-paging"></div>
+                              </td>
+                            </tr>
+                          </tfoot>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- create group modal -->
+
+    <!-- start invite to group modal -->
+    <div class="modal fade stick-up" id="invite-to-group-modal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog" >
+        <div class="modal-content p-b-25" style="background:#fff;">
+
+          <div class="modal-header clearfix text-left ">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              <i class="pg-close fs-20"></i>
+            </button>
+            <h5 class="p-l-10" style="border-bottom: 1px solid #F0F1F3">Invite others to group</h5>
+
+            <div class="form-group">
+              <div class="col-sm-8 p-t-15">
+                <label for="existing-group-name">Group name:
+                </label>
+                    <input
+                      id="existing-group-name"
+                      class="recipient form-control input_box"
+                      data-title="Enter a label for this group"
+                      placeholder="Enter a label for this group"
+                      onchange=""
+                      maxlength="128"
+                      disabled/>
+              </div>
+              <div class="col-sm-4 p-t-15">
+                <div class="pull-right m-t-25">
+                  <a class="btn btn-danger" onclick="submitInviteModal();"> Invite to Group
+                    <i class="fa fa-check"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12 p-t-15">
+                <label for="filter-new-group">Search
+                </label>
+                    <input class="form-control input_box" id="filter-existing-group" placeholder="Search by label or address...">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12 p-t-15">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="panel full-width bg-transparent">
+                      <div class="panel full-width">
+
+                        <table cellspacing="0" class="footable shadow table table-hover" data-filter="#filter-existing-group" data-page-size="20" width="100%" style="border-bottom: 1px solid rgba(230, 230, 230, 0.7)">
                           <thead>
                             <tr>
                               <th style="padding-left:18px;" data-sort-initial="true" data-toggle="true">
@@ -2076,7 +2167,7 @@
       </div>
     </div>
 
-    <!-- invite group modal -->
+    <!-- end invite to group modal -->
 
     <!-- begin chatmenu (right) -->
     <div id="quickview" class="quickview-wrapper" data-framework="quickview" style="z-index:99999;">
@@ -2143,7 +2234,7 @@
           <div class="view-port clearfix" id="alerts">
 
             <a href="#" data-target="#new-group-modal" data-toggle="modal" id='start-conversation'>
-              <i class="fa fa-plus margin-right-10" onClick="openInviteModal()"></i>
+              <i class="fa fa-plus margin-right-10" onClick=""></i>
               Start group conversation</a>
             <div id="group-invite-list">
             </div>
@@ -2187,13 +2278,28 @@
           </h4>
           <i class="fa fa-pencil"></i>
         </div>
+
+        <!-- Open Chat Sidebar -->
         <div class="p-t-15 pull-right">
-
           <a href="#" class="btn-link" data-toggle="quickview" data-toggle-element="#quickview">
-            <span class="hide-this-icon icon-set menu-hambuger-plus"></span>
+            <span class="hide-this-icon icon-set menu-hambuger"></span>
           </a>
-
         </div>
+
+        <!-- Leave group  -->
+        <div class="p-t-15 p-r-10 pull-right">
+          <a href="#" class="btn-link" data-toggle="quickview" data-toggle-element="#quickview">
+            <span class="fa fa-sign-out"></span>
+          </a>
+        </div>
+
+        <!-- Open Invite modal  -->
+        <div class="p-t-15 p-r-10 pull-right">
+          <a href="#" class="btn-link" data-toggle="modal" data-target="#invite-to-group-modal" onclick="openInviteModal()">
+            <span class="fa fa-envelope"></span>
+          </a>
+        </div>
+
         <div class="container-fluid">
           <!-- brand and toggle get grouped for better mobile display -->
           <div class="navbar-header"></div>

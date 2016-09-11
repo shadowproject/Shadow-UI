@@ -870,6 +870,7 @@ function appendAddresses(addresses) {
         var addrRow = $("#"+address.address);
         var page = (address.type == "S" ? "#addressbook" : (address.label.lastIndexOf("group_", 0) !== 0 ? "#receive" : "#addressbook"));
         var addrRowInviteModal = $("#invite-modal-"+address.address);
+        var addrRowGroupModal = $("#invite-modal-"+address.address);
 
         /* add address to chat dropdown box to choose sender from */
         if(address.type == "R" && sendPage.initSendBalance(address) && address.address.length < 75 && address.label.lastIndexOf("group_", 0) !== 0) {
@@ -885,6 +886,7 @@ function appendAddresses(addresses) {
                 initialAddress = false;
             }
         }
+
         /* remove group_ prefix from labels*/
         var isGroup = (address.at == 4 || address.label.lastIndexOf("group_", 0) === 0);
         var isSend = (address.type == "S");
@@ -906,16 +908,37 @@ function appendAddresses(addresses) {
 
         /* Fill up addressbook "BOOK" in invite modal  */
          if(!isGroup && isSend && bHasPubKey) {
+
+            // (1) append address to table of invite modal
             if (addrRowInviteModal.length==0) {
-                $( "#invite-modal-tbody").append(
-                    "<tr id='#invite-modal-"+address.address+"' lbl='"+address.label+"'>\
+
+                var dataToAppend = 
+                    "<tr id='invite-modal-"+address.address+"' lbl='"+address.label+"'>\
                    <td style='padding-left:18px;' class='label2' data-value='"+address.label_value+"'>"+address.label+"</td>\
                    <td class='address'>"+address.address+"</td>\
                    <td class='invite footable-visible footable-last-column'><input type='checkbox' class='checkbox'></input></td>\
-                   </tr>");
+                   </tr>";
+
+                $( "#invite-modal-tbody").append(dataToAppend);
             }
             else {
                 $("#invite-modal-"+address.address+" .label2").text(address.label);
+            }
+
+            // (2) append address to table of new group modal
+            if (addrRowGroupModal.length==0) {
+
+                var dataToAppend = 
+                    "<tr  id='group-modal-"+address.address+"' lbl='"+address.label+"'>\
+                   <td style='padding-left:18px;' class='label2' data-value='"+address.label_value+"'>"+address.label+"</td>\
+                   <td class='address'>"+address.address+"</td>\
+                   <td class='invite footable-visible footable-last-column'><input type='checkbox' class='checkbox'></input></td>\
+                   </tr>";
+
+                $( "#group-modal-tbody").append(dataToAppend);
+            }
+            else {
+                $("#group-modal-"+address.address+" .label2").text(address.label);
             }
          }
 
@@ -1806,6 +1829,29 @@ function prependContact(key) {
 
 }
 
+function createGroupChat() {
+    var group_label = $("#new-group-name").val();
+
+    if(group_label == "")
+        return false;
+
+    $("#filter-new-group").text("");
+
+
+
+    $("#new-group-modal").modal('hide');
+
+    var group_address = bridge.createGroupChat(group_label);
+    inviteGroupChat(group_address);
+
+    createContact(group_label, group_address, true);
+    appendContact(group_address, true, false);
+}
+
+/*
+    All code related to "inviting" to groupchat
+                    -begin-
+*/
 function addInvite(privkey, label, id) {
     if($("#invite-" + privkey + "-" + id ).length != 0)
         return false; 
@@ -1842,36 +1888,55 @@ function acceptInvite(key, group_label, id) {
 
 }
 
-function openInviteModal() {
+
+function inviteGroupChat(group_address){
     var contacts_to_invite = [];
-    var group_label = $("#new-group-name").val();
+    var element = "#invite-modal-tbody";
 
-    if(group_label == "")
-        return false;
+    if(group_address != undefined)
+        element = "group-modal-tbody";
+    else 
+        group_address = current_key;
 
-    $("#filter-new-group").text("");
-
-    $("#invite-modal-tbody tr" ).each(function() {
+    $(element + " tr" ).each(function() {
         var address = $(this).find(".address").text();
         var checked = $(this).find(".invite .checkbox").is(':checked');
 
-        if(checked)
+        if(checked){
             contacts_to_invite.push(address);
+            $(this).find(".invite .checkbox").attr("checked", false);
+        }
 
     });
-
-    $("#new-group-modal").modal('hide');
-
-    var group_address = bridge.createGroupChat(group_label);
 
     var invited_addresses = [];
 
     if(contacts_to_invite.length > 0)
         invited_addresses = bridge.inviteGroupChat(group_address, contacts_to_invite, $("#message-from-address").val());
 
-    createContact(group_label, group_address, true);
-    appendContact(group_address, true, false);
 }
+
+function openInviteModal(){
+    if(current_key.length == 0){
+        return false;
+    }
+
+    var label = bridge.getAddressLabel(current_key).replace("group_","");
+    $("#existing-group-name").val(label);
+}
+
+function submitInviteModal(){
+    //triggered on btn push of invite modal
+
+    inviteGroupChat();
+    $("#invite-to-group-modal").hide();
+
+}
+
+/*
+                    -end-
+    All code related to "inviting" to groupchat
+*/
 
 function scrollMessages() {
     messagesScroller.refresh();
