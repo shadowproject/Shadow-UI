@@ -1689,23 +1689,24 @@ function openConversation(key, click) {
     if(click)
          $("#chat-menu-link").click();//open chat window when on other page
 
-    current_key = key;
-    //TODO: detect wether user is typing, if so do not reload page to other conversation..
-    //$(this).addClass("selected").siblings("li").removeClass("selected");
-    var discussion = $(".contact-discussion ul");
-    var contact = contacts[key];
+            current_key = key;
+            //TODO: detect wether user is typing, if so do not reload page to other conversation..
+            //$(this).addClass("selected").siblings("li").removeClass("selected");
+            var discussion = $(".contact-discussion ul");
+            var contact = contacts[key];
 
-    discussion.html("");
+            discussion.html("");
 
-    var is_group = contact.group;
 
-    if(is_group){
-        $("#invite-group-btn").show();
-        $("#leave-group-btn").show();
-    } else {
-        $("#invite-group-btn").hide();
-        $("#leave-group-btn").hide();
-    }
+            var is_group = contact.group;
+
+            if(is_group){
+                $("#invite-group-btn").show();
+                //$("#leave-group-btn").show();
+            } else {
+                $("#invite-group-btn").hide();
+                $("#leave-group-btn").hide();
+            }
 
 
     //Set label in discussion
@@ -1929,7 +1930,6 @@ function inviteGroupChat(group_address){
 }
 
 function leaveGroupChat(){
-    console.log("js leave");
     var result = bridge.leaveGroupChat(current_key);
     return result;
 }
