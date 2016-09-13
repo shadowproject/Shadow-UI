@@ -4,6 +4,7 @@ rm -rf build
 mkdir -p build
 cp -rp !(build) build/
 sed -i .tmp 's^"assets^"qrc:///assets^g' build/index.html
+#mv build/index.html.min build/index.html
 assets=`find assets/ -type f`
 > build/shadow.qrc
 IFS=$'\n'

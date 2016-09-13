@@ -957,7 +957,7 @@ function appendAddresses(addresses) {
                     event.stopPropagation();
                     updateValue($(this));
                 }).attr("data-title", "Double click to edit")
-	    .tooltip();
+        .tooltip();
         }
         else
         {
@@ -990,7 +990,7 @@ function addressLookup(returnFields, receive, filterType)
                     .text($(this).attr("lbl").trim())
                     .change();
             }
-			$('#address-lookup-modal').modal('hide');
+            $('#address-lookup-modal').modal('hide');
         });
 
     function doFilter() {
@@ -1151,7 +1151,7 @@ var Transactions = [],
 
 function formatTransaction(transaction) {
     return "<tr id='"+transaction.id+"' data-title='"+transaction.tt+"'>\
-	                <td data-value='"+transaction.d+"'>"+transaction.d_s+"</td>\
+                    <td data-value='"+transaction.d+"'>"+transaction.d_s+"</td>\
                     <td class='trans-status' data-value='"+transaction.c+"'><center><i class='fa fa-lg "+transaction.s+"'></center></td>\
                     <td class='trans_type'><img height='15' width='15' src='assets/icons/tx_"+transaction.t+".png' /> "+transaction.t_l+"</td>\
                     <td class='address' style='color:"+transaction.a_c+";' data-value='"+transaction.ad+"' data-label='"+transaction.ad_l+"'><span class='editable'>"+transaction.ad_d+"</span></td>\
@@ -1179,7 +1179,7 @@ function bindTransactionTableEvents() {
     .on("dblclick", function(e) {
         $(this).attr("href", "#transaction-info-modal");
 
-		$('#transaction-info-modal').appendTo("body").modal('show');
+        $('#transaction-info-modal').appendTo("body").modal('show');
 
         $("#transaction-info").html(bridge.transactionDetails($(this).attr("id")));
         $(this).click();
@@ -1225,7 +1225,7 @@ function appendTransactions(transactions) {
 
     overviewPage.recent(transactions.slice(0,7));
 
-	$("#transactions .footable").trigger("footable_redraw");
+    $("#transactions .footable").trigger("footable_redraw");
 
 }
 
@@ -1686,8 +1686,8 @@ function removeNotificationCount(key) {
 //OpenConversation is split off to allow for opening conversation automatically without removing notification.
 function openConversation(key, click) {
 
-            if(click)
-                 $("#chat-menu-link").click();//open chat window when on other page
+    if(click)
+         $("#chat-menu-link").click();//open chat window when on other page
 
             current_key = key;
             //TODO: detect wether user is typing, if so do not reload page to other conversation..
@@ -1709,97 +1709,96 @@ function openConversation(key, click) {
             }
 
 
-            //Set label in discussion
-            $("#chat-header").text(contact.label).addClass("editable");
-            $("#chat-header").data("value", contact.label);
-            $("#chat-header").off();
-            $("#chat-header").on("dblclick", function (event) {
-                event.stopPropagation();
-                updateValueChat($(this), contact.key);
-            }).attr("data-title", "Double click to edit").tooltip();
+    //Set label in discussion
+    $("#chat-header").text(contact.label).addClass("editable");
+    $("#chat-header").data("value", contact.label);
+    $("#chat-header").off();
+    $("#chat-header").on("dblclick", function (event) {
+        event.stopPropagation();
+        updateValueChat($(this), contact.key);
+    }).attr("data-title", "Double click to edit").tooltip();
 
-            var message;
-            var prev_message;
-            var bSentMessage = false;
+    var message;
+    var prev_message;
+    var bSentMessage = false;
 
-            if(click)
-                removeNotificationCount(contact.key);
+    if(click)
+        removeNotificationCount(contact.key);
 
-            for(var i=0;i<contact.messages.length;i++)
-            {
+    function processMessageForDisplay(message) {
+        return micromarkdown.parse(
+            emojione.toImage(message)).replace(
+                /<a class="mmd_shadowcash" href="(.+)">(.+)<\/a>/g,
+                '<a onclick="return confirmConversationOpenLink()" target="_blank" href="$1" data-title="$1">$1</a>');
+    }
 
-                
-                message = contact.messages[i];
-                if(i>0){
-                    prev_message = contact.messages[i-1];
-                    if(combineMessages(prev_message, message)){
-                        $("#"+ prev_message.id).attr("id", message.id);
-                        $("#" + message.id + " .message-text").append(processMessageForDisplay(message.message));
+    contact.messages.forEach(function(message) {
+        if (prev_message && combineMessages(prev_message, message)) {
+            $("#"+ prev_message.id).attr("id", message.id);
+            $("#" + message.id + " .message-text").append(processMessageForDisplay(message.message));
+            prev_message = message;
+            return;
+         }
 
-                        continue;
-                    }
-                }
+        //<span class='info'>\
+            //<img src='' />\
+        //</span>\
 
-					//<span class='info'>\
-                        //<img src='' />\
-                    //</span>\
+        var time  = new Date(message.sent*1000);//.toLocaleString()
+        var timeReceived  = new Date(message.received*1000);
 
-                 var time  = new Date(message.sent*1000);//.toLocaleString()
-                 var timeReceived  = new Date(message.received*1000);
-                //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
-                //TODO: parse with regex to be sure.. do in appendMessage
-                var onclick = (message.label_msg == message.them) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.them + "')\" " : "";
-                discussion.append(
-                    "<li id='"+message.id+"' class='message-wrapper "+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
-					<span class='message-content'>\
-					 <span class='info'></span>\
-                        <span class='user-name' " + onclick + ">"
-                            +(message.label_msg)+"\
-                        </span>\
-                        <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
-                           <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-                           <span class='message-text'>"+ processMessageForDisplay(message.message) +  "</span>\
-                   </span></li>");
-                 $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString())
-                    .tooltip().find('.message-text')
-                    .tooltip();
-				
+        //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
+        //TODO: parse with regex to be sure.. do in appendMessage
+        var onclick = (message.label_msg == message.them) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.them + "')\" " : "";
+        discussion.append(
+            "<li id='"+message.id+"' class='message-wrapper "+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
+            <span class='info'></span>\
+                <span class='user-name' " + onclick + ">"
+                    +(message.label_msg)+"\
+                </span>\
+                <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
+                   <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
+                   <span class='message-text'>"+ processMessageForDisplay(message.message) +  "</span>\
+            </span></li>");
+         $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString())
+            .tooltip().find('.message-text')
+            .tooltip();
 
-                if(message.type == 'S') { //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
+        if(message.type == 'S') { //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
 
-                    $('#' + message.id + ' .user-name').attr('data-title', '' + message.self).tooltip();
-                    addRandomAvatar(message.id, message.self);
-                    if(message.group && !bSentMessage) {
-                        bSentMessage = true;
-                        $("#message-from-address").val(message.self);
-                        $("#message-to-address").val(message.them);
-                    }
-                } else{
-                    $('#' + message.id + ' .user-name').attr('data-title', '' + message.them).tooltip();
-                    addRandomAvatar(message.id, message.them);
-                }
+            $('#' + message.id + ' .user-name').attr('data-title', '' + message.self).tooltip();
+            addRandomAvatar(message.id, message.self);
+            if(message.group && !bSentMessage) {
+                bSentMessage = true;
+                $("#message-from-address").val(message.self);
+                $("#message-to-address").val(message.them);
             }
-
-            //discussion.children("[title]").on("mouseenter", tooltip);
-
-            if(!bSentMessage && contact.messages.length > 0) {
-                if(!is_group) { //normal procedure
-                    $("#message-from-address").val(message.self);
-                    $("#message-to-address").val(message.them); //them
-                } else if(message.type == "R") { //if it's a group, and no messages were sent from it yet, then we have not sent a message to it.
-                    $("#message-to-address").val(message.self);
-                }
-            } else if(contact.messages.length == 0) {
-                 $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li>");
-                 $("#message-to-address").val(contact.address);
-            }
-
-            setTimeout(function() {scrollMessages();}, 200);
-
+        } else {
+            $('#' + message.id + ' .user-name').attr('data-title', '' + message.them).tooltip();
+            addRandomAvatar(message.id, message.them);
         }
+    });
 
-function processMessageForDisplay(message){
-    return micromarkdown.parse(emojione.toImage(message)).replace(/<a class="mmd_shadowcash" href="(.+)">(.+)<\/a>/g, '<a class="mmd_shadowcash" onclick="if(confirm(\'Let me stop you right there you fool\\n\\nAre you sure you want to open this link?\\n\\n It WILL leak your IP address and other browser metadata, the least we can do is advice you to copy the link and open it in a _Tor Browser_ instead.\')){return confirm(\'We\\\'re not fucking around here, are you freaking sure?\')} return false;" target="_blank" href="$1" data-title="$1">$1</a>');
+    //discussion.children("[title]").on("mouseenter", tooltip);
+
+    if(!bSentMessage && contact.messages.length > 0) {
+        if(!is_group) { //normal procedure
+            $("#message-from-address").val(message.self);
+            $("#message-to-address").val(message.them); //them
+        } else if(message.type == "R") { //if it's a group, and no messages were sent from it yet, then we have not sent a message to it.
+            $("#message-to-address").val(message.self);
+        }
+    } else if(contact.messages.length == 0) {
+         $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li>");
+         $("#message-to-address").val(contact.address);
+    }
+
+    setTimeout(function() {scrollMessages();}, 200);
+}
+
+function confirmConversationOpenLink() {
+    // TODO: Disable convirm option.
+    return (confirm('Are you sure you want to open this link?\n\nIt will leak your IP address and other browser metadata, the least we can do is advice you to copy the link and open it in a _Tor Browser_ instead.\n\n You can disable this message in options.'));
 }
 
 function combineMessages(prev_message, message){
@@ -2327,7 +2326,7 @@ var blockExplorerPage =
 
                         .on("dblclick", function(e) {
 
-							$('#blkexp-txn-modal').appendTo('body').modal('show');
+                            $('#blkexp-txn-modal').appendTo('body').modal('show');
 
                             selectedTxn = bridge.txnDetails(blkHash , $(this).attr("data-value").trim());
 
@@ -2385,7 +2384,7 @@ var blockExplorerPage =
                 })
             .on("dblclick", function(e)
             {
-				$('#block-info-modal').appendTo('body').modal('show');
+                $('#block-info-modal').appendTo('body').modal('show');
 
                 selectedBlock = bridge.blockDetails($(this).attr("data-value").trim()) ;
 
@@ -2654,7 +2653,7 @@ function setupWizard(section) {
     steps.each(function (i) {
             $(this).addClass("step" + i)
             $(this).hide();
-			$("#backWiz").hide();
+            $("#backWiz").hide();
         }
     );
 }
@@ -2681,13 +2680,13 @@ function gotoWizard(section, step, runStepJS) {
     var steps = $("#" + section + " > div[class^=step]");
     var gotoStep = step;
     if (gotoStep == null) { gotoStep = 0;
-	}
+    }
 
     if(gotoStep == 0) {
         $("#" + section + " #backWiz").attr( 'onclick', '$(".wizardback").hide(); $("#wizards").show();' )
         $("#" + section + " #fwdWiz").attr( 'onclick', '$(".wizardback").hide(); gotoWizard("' + section + '", 1, true);' )
-		// $("#" + section + " #fwdWiz").attr( 'onclick', '$(".wizardback").show(); gotoWizard("' + section + '", 1, true);' )
-		$("#backWiz").hide();
+        // $("#" + section + " #fwdWiz").attr( 'onclick', '$(".wizardback").show(); gotoWizard("' + section + '", 1, true);' )
+        $("#backWiz").hide();
     }
     else
     {
@@ -2715,5 +2714,5 @@ function gotoWizard(section, step, runStepJS) {
         eval(stepJS);
     }
     $("#" + section + " .step" + gotoStep ).fadeIn(0);
-	//$("#" + section + " .step" + gotoStep ).fadeIn(500);
+    //$("#" + section + " .step" + gotoStep ).fadeIn(500);
 }
