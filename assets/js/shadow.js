@@ -1371,7 +1371,6 @@ function shadowChatInit() {
 
 
 function appendMessages(messages, reset) {
-    console.log("appendMessages length="+ messages.length);
     contact_list = $("#contact-list ul");
     contact_group_list = $("#contact-group-list ul");
 
@@ -1729,14 +1728,15 @@ function openConversation(key, click) {
         return micromarkdown.parse(
             emojione.toImage(message)).replace(
                 /<a class="mmd_shadowcash" href="(.+)">(.+)<\/a>/g,
-                '<a onclick="return confirmConversationOpenLink()" target="_blank" href="$1" data-title="$1">$1</a>');
+                '<a class="mmd_shadowcash" onclick="return confirmConversationOpenLink()" target="_blank" href="$1" data-title="$1">$1</a>');
     }
 
-    contact.messages.forEach(function(message) {
-        if (prev_message && combineMessages(prev_message, message)) {
+    contact.messages.forEach(function(message, index) {
+        if (index > 0 && combineMessages(prev_message, message)) {
             $("#"+ prev_message.id).attr("id", message.id);
             $("#" + message.id + " .message-text").append(processMessageForDisplay(message.message));
 
+            prev_message = message;
             return;
          }
          prev_message = message;
@@ -1781,21 +1781,22 @@ function openConversation(key, click) {
             $('#' + message.id + ' .user-name').attr('data-title', '' + message.them).tooltip();
             addRandomAvatar(message.id, message.them);
         }
+
+        //discussion.children("[title]").on("mouseenter", tooltip);
+
+        if(!bSentMessage && contact.messages.length > 0) {
+            if(!is_group) { //normal procedure
+                $("#message-from-address").val(message.self);
+                $("#message-to-address").val(message.them); //them
+            } else if(message.type == "R") { //if it's a group, and no messages were sent from it yet, then we have not sent a message to it.
+                $("#message-to-address").val(message.self);
+            }
+        } else if(contact.messages.length == 0) {
+             $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li>");
+             $("#message-to-address").val(contact.address);
+        }
     });
 
-    //discussion.children("[title]").on("mouseenter", tooltip);
-
-    if(!bSentMessage && contact.messages.length > 0) {
-        if(!is_group) { //normal procedure
-            $("#message-from-address").val(message.self);
-            $("#message-to-address").val(message.them); //them
-        } else if(message.type == "R") { //if it's a group, and no messages were sent from it yet, then we have not sent a message to it.
-            $("#message-to-address").val(message.self);
-        }
-    } else if(contact.messages.length == 0) {
-         $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li>");
-         $("#message-to-address").val(contact.address);
-    }
 
     setTimeout(function() {scrollMessages();}, 200);
 }
@@ -1815,7 +1816,6 @@ function combineMessages(prev_message, message){
     if(message.type == "S" && prev_message.self == message.self)
         return true;
 
-    console.log("Messages are not going to combine!");
     return false;
 }
 
@@ -2011,8 +2011,6 @@ function newConversation() {
         openConversation(address, true);
         $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+address+" - "+contact_name+"</li>");
     }, 1000);
-
-    console.log("reached end");
 
 }
 
