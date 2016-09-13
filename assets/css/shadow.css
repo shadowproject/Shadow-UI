@@ -790,6 +790,41 @@ textarea {
   margin-bottom: -0.25em;
 }
 
+.global-chat-btn {
+  border: 1px solid #ededed;
+  margin-right: -15px;
+  padding: 10px;
+  padding-bottom: 5px;
+  margin-left: 5px;
+  padding-right: 25px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.global-chat-btn .fa {
+  color: #2c2c2c;
+  font-size: 16px;
+  position: absolute;
+}
+
+.global-chat-btn:hover .fa {
+  color: #E3223C;
+}
+
+
+.chat-header .fa {
+  display: none;
+} 
+
+.chat-header:hover .fa {
+  display: inline-block;
+} 
+
+#remove-on-send {
+	padding:20px;
+}
+
 /*------------------------------------------------------------------
 [Scrollbars]
 */
@@ -1238,41 +1273,4 @@ progress::-webkit-progress-value {
 
 .radio label.form-controlring_size:before {
   display: none;
-}
-
-/* global chat */
-
-.global-chat-btn {
-  border: 1px solid #ededed;
-  margin-right: -15px;
-  padding: 10px;
-  padding-bottom: 5px;
-  margin-left: 5px;
-  padding-right: 25px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-}
-
-.global-chat-btn .fa {
-  color: #2c2c2c;
-  font-size: 16px;
-  position: absolute;
-}
-
-.global-chat-btn:hover .fa {
-  color: #E3223C;
-}
-
-
-.chat-header .fa {
-  display: none;
-} 
-
-.chat-header:hover .fa {
-  display: inline-block;
-} 
-
-#remove-on-send {
-	padding:20px;
 }
