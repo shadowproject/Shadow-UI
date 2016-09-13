@@ -735,14 +735,29 @@
         $('[data-framework="quickview"]').each(function() {
             var $quickview = $(this)
             $quickview.quickview($quickview.data())
-        })
+        });
     });
 
 
     $(document).on('click.pg.quickview.data-api touchstart', '[data-toggle="quickview"]', function(e) {
         var elem = $(this).attr('data-toggle-element');
+
         if (Modernizr.csstransitions) {
-            $(elem).toggleClass('open');
+            var elemClick = this.click.bind(this),
+                hideQuickview = function (e) {
+                e = e || event;
+                if ($.contains($(elem)[0], e.target))
+                    return true;
+
+                $(document).off(e);
+                elemClick();
+            }
+
+            if ($(elem).toggleClass('open').hasClass('open'))
+                $(document).on('click.pg.quickview.hide', hideQuickview);
+            else
+                $(document).off('click.pg.quickview.hide');
+
         } else {
             var width = $(elem).width();
             if (!$(elem).hasClass('open-ie')) {
