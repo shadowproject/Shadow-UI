@@ -1925,6 +1925,16 @@ function inviteGroupChat(group_address){
     if(contacts_to_invite.length > 0)
         invited_addresses = bridge.inviteGroupChat(group_address, contacts_to_invite, $("#message-from-address").val());
 
+    if(invited_addresses.length > 0){
+
+    }
+
+}
+
+function leaveGroupChat(){
+    console.log("js leave");
+    var result = bridge.leaveGroupChat(current_key);
+    return result;
 }
 
 function openInviteModal(){
