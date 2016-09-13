@@ -1817,10 +1817,13 @@ function combineMessages(prev_message, message){
     return false;
 }
 
-function addRandomAvatar(id, key){
+function addRandomAvatar(id, key){ //0ad71697420c69134e40051891af6328
+    var data = new Identicon(key, 40).toString();
+    $("#"+id + " .info").append('<img width=40 height=40 src="data:image/png;base64,' + data + '">');
+    /*
      $("#"+id + " .info").append($("<canvas/>")
         .attr({ "width": 40, "height": 40 })
-        .jdenticon(md5(key)));
+        .jdenticon(md5(key)));*/
 }
 
 function prependContact(key) {
