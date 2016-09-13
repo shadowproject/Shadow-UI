@@ -994,6 +994,12 @@ progress::-webkit-progress-value {
   width:16px;
 }
 
+.chat-icon {
+  background: url('../icons/chat_bubble.png');
+  height:16px;
+  width:26px;
+}
+
 /*------------------------------------------------------------------
 [Sign/Ver Modal]
 */
