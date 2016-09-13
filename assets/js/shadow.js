@@ -1341,7 +1341,6 @@ function shadowChatInit() {
 
     //ON ENTER SUBMIT MESSAGE
     $("#message-text").keypress(function (e) {
-        console.log("keypress=" + e.which + " shift=" + event.shiftKey);
         if (e.which == 13 && !e.shiftKey) {
             e.preventDefault();
 
@@ -1751,14 +1750,13 @@ function openConversation(key, click) {
         //TODO: parse with regex to be sure.. do in appendMessage
         var onclick = (message.label_msg == message.them) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.them + "')\" " : "";
         discussion.append(
-            "<li id='"+message.id+"' class='"+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
-            <span class='message-content'>\
+            "<li id='"+message.id+"' class='message-wrapper "+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
+            <span class='info'></span>\
                 <span class='user-name' " + onclick + ">"
                     +(message.label_msg)+"\
                 </span>\
                 <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
                    <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-                    <span class='info'></span>\
                    <span class='message-text'>"+ processMessageForDisplay(message.message) +  "</span>\
             </span></li>");
          $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString())
@@ -1795,7 +1793,6 @@ function openConversation(key, click) {
     }
 
     setTimeout(function() {scrollMessages();}, 200);
-
 }
 
 function confirmConversationOpenLink() {
@@ -1817,10 +1814,13 @@ function combineMessages(prev_message, message){
     return false;
 }
 
-function addRandomAvatar(id, key){
+function addRandomAvatar(id, key){ //0ad71697420c69134e40051891af6328
+    var data = new Identicon(key, 40).toString();
+    $("#"+id + " .info").append('<img width=40 height=40 src="data:image/png;base64,' + data + '">');
+    /*
      $("#"+id + " .info").append($("<canvas/>")
         .attr({ "width": 40, "height": 40 })
-        .jdenticon(md5(key)));
+        .jdenticon(md5(key)));*/
 }
 
 function prependContact(key) {
@@ -1922,6 +1922,16 @@ function inviteGroupChat(group_address){
     if(contacts_to_invite.length > 0)
         invited_addresses = bridge.inviteGroupChat(group_address, contacts_to_invite, $("#message-from-address").val());
 
+    if(invited_addresses.length > 0){
+
+    }
+
+}
+
+function leaveGroupChat(){
+    console.log("js leave");
+    var result = bridge.leaveGroupChat(current_key);
+    return result;
 }
 
 function openInviteModal(){
