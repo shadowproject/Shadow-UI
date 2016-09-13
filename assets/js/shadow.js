@@ -1702,7 +1702,7 @@ function openConversation(key, click) {
 
             if(is_group){
                 $("#invite-group-btn").show();
-                $("#leave-group-btn").show();
+                //$("#leave-group-btn").show();
             } else {
                 $("#invite-group-btn").hide();
                 $("#leave-group-btn").hide();
@@ -1931,7 +1931,6 @@ function inviteGroupChat(group_address){
 }
 
 function leaveGroupChat(){
-    console.log("js leave");
     var result = bridge.leaveGroupChat(current_key);
     return result;
 }
