@@ -13,12 +13,9 @@
 (function() {
     var PNGlib;
     if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-        console.log("identicon method 1")
         PNGlib = require('./pnglib');
     } else {
-        console.log("identicon method 2");
         PNGlib = window.PNGlib;
-        console.log("identicon didnt die")
     }
 
     var Identicon = function(hash, options){

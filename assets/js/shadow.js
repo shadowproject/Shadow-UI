@@ -1341,7 +1341,6 @@ function shadowChatInit() {
 
     //ON ENTER SUBMIT MESSAGE
     $("#message-text").keypress(function (e) {
-        console.log("keypress=" + e.which + " shift=" + event.shiftKey);
         if (e.which == 13 && !e.shiftKey) {
             e.preventDefault();
 
