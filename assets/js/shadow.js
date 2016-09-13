@@ -1751,21 +1751,20 @@ function openConversation(key, click) {
                 //TODO: parse with regex to be sure.. do in appendMessage
                 var onclick = (message.label_msg == message.them) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.them + "')\" " : "";
                 discussion.append(
-                    "<li id='"+message.id+"' class='"+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
-                    <span class='message-content'>\
+                    "<li id='"+message.id+"' class='message-wrapper "+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
+					<span class='message-content'>\
+					 <span class='info'></span>\
                         <span class='user-name' " + onclick + ">"
                             +(message.label_msg)+"\
                         </span>\
                         <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
                            <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-                            <span class='info'></span>\
                            <span class='message-text'>"+ processMessageForDisplay(message.message) +  "</span>\
-                    </span></li>");
+                   </span></li>");
                  $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString())
                     .tooltip().find('.message-text')
                     .tooltip();
-
-
+				
 
                 if(message.type == 'S') { //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
 
@@ -1781,8 +1780,6 @@ function openConversation(key, click) {
                     addRandomAvatar(message.id, message.them);
                 }
             }
-
-
 
             //discussion.children("[title]").on("mouseenter", tooltip);
 
