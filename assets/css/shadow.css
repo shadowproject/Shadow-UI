@@ -1264,44 +1264,14 @@ progress::-webkit-progress-value {
   color: #4c4a55;
 }
 
- 
-.chat-header .fa {
-  display: none;
-} 
-
-.chat-header:hover .fa {
-  display: inline-block;
-} 
-.global-chat-btn {
-  border: 1px solid #ededed;
-  margin-right: -15px;
-  padding: 10px;
-  padding-bottom: 5px;
-  margin-left: 5px;
-  padding-right: 25px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-}
-
-.global-chat-btn .fa {
-  color: #2c2c2c;
-  font-size: 16px;
-  position: absolute;
-}
-
 .global-chat-btn:hover .fa {
-  color: #E3223C;
-}
 
- 
 .chat-header .fa {
   display: none;
 } 
 
 .chat-header:hover .fa {
   display: inline-block;
- 
 } 
 
 #remove-on-send {
