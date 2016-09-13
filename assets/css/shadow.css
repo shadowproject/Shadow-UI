@@ -1303,3 +1303,7 @@ progress::-webkit-progress-value {
   display: inline-block;
  
 } 
+
+#remove-on-send {
+	padding:20px;
+}
