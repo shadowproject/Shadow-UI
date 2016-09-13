@@ -351,6 +351,11 @@
                   <li class="inline p-l-10">
                     <div id="syncingIcon" class="syncing-spinner" data-title="Wallet is syncing"></div>
                     <div id="blocksIcon"  class="no-syncing none" data-title="Wallet is syncing"></div>
+                  </li>				  
+				  <li class="inline p-l-10">
+                   <a href="#" class="global-chat-btn" data-toggle="quickview" data-toggle-element="#quickview">
+                      <i class="fa fa-comment"></i>
+                    </a>
                   </li>
                 </ul>
               </div>
@@ -2273,30 +2278,33 @@
 
       <nav class="navbar navbar-default nav-sub-menu p-t-10 p-b-10 p-r-35 p-l-35" style="min-height:75px;margin-bottom:0px;" role="navigation">
         <div class="pull-left chat-header">
+		
           <h4 style="font-weight:bolder;" id="chat-header" data-value="">
             CHAT
+			  <i class="fa fa-pencil"></i>
           </h4>
-          <i class="fa fa-pencil"></i>
         </div>
 
         <!-- Open Chat Sidebar -->
-        <div class="p-t-15 pull-right">
+       <!--<div class="p-t-15 pull-right">
           <a href="#" class="btn-link" data-toggle="quickview" data-toggle-element="#quickview">
             <span class="hide-this-icon icon-set menu-hambuger"></span>
           </a>
-        </div>
-
+        </div>  -->
+				        
         <!-- Leave group  -->
-        <div id="leave-group-btn" class="p-t-15 p-r-10 pull-right" style="display: none;">
-          <a href="#" class="btn-link" onclick="leaveGroupChat()">
-            <span class="fa fa-sign-out"></span>
+        <div id="leave-group-btn" class="p-t-10 p-r-10 pull-right" style="display:none;">
+          <a href="#" class="btn btn-default btn-cons" data-toggle="quickview" data-toggle-element="#quickview">
+              <i class="fa fa-sign-out"></i>
+              Leave Group
           </a>
         </div>
 
         <!-- Open Invite modal  -->
-        <div id="invite-group-btn" class="p-t-15 p-r-10 pull-right" style="display: none;">
-          <a href="#" class="btn-link" data-toggle="modal" data-target="#invite-to-group-modal" onclick="openInviteModal()">
-            <span class="fa fa-envelope"></span>
+        <div id="invite-group-btn" class="p-t-10 p-r-10 pull-right" style="display:none;">
+          <a href="#" class="btn btn-default btn-cons" data-toggle="modal" data-target="#invite-to-group-modal" onclick="openInviteModal()">
+			 <i class="fa fa-user-plus"></i>
+			 Invite
           </a>
         </div>
 
@@ -2349,7 +2357,7 @@
             </a>
 
             <label for="message-from-address"></label>
-            <select class="select-drop-down" id="message-from-address" placeholder="From address:"></select>
+            <select class="select-drop-down-chat" id="message-from-address" placeholder="From address:"></select>
             <input id="message-to-address" type="hidden">
 
             <input id="pasteTo" type="hidden">
