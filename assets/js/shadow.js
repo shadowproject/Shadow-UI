@@ -900,7 +900,7 @@ function appendAddresses(addresses) {
         var bHasPubKey = (address.pubkey !== "n/a" ? true : false);
 
         if (isSend && bHasPubKey) {
-            createContact(address.label, address.address, isGroup);
+            createContact(address.label, address.address, isGroup, true);
             appendContact(address.address, false, true);
          }
 
@@ -1434,6 +1434,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     var label_msg = type == "S" ? (labelTo == "(no label)" ? self : labelTo) : (label == "(no label)" ? them : label);
     var label_chat;
     var key = them;
+    var key_msg = type == "S" ? self : them;
 
     var group = false;
     //Setup instructions: make sure the receiving address is named 'group_ANYTHING'.
@@ -1450,6 +1451,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
         label_chat = label_value.replace('group_', '');
         group = true;
         key =  them;
+        key_msg = self;
     /*}  else if(self == "anon" && type == "S") { //sent by group, should not be possible but yeah anything can happen.
         console.log("[anon] self == anon true");
         key = self; */
@@ -1485,12 +1487,20 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
             message = "The group invitation was a malconfigured private key.";
     }
 
+    //create group
     createContact(label_chat, key, group);
+
+    //create contact and link it to the group
+    if(group){
+        createContact(label_msg, them, false, false);
+        addContactToGroup(key_msg, key);
+    }
+
     var contact = contacts[key];
 
     if($.grep(contact.messages, function(a) { return a.id == id; }).length == 0) {
 
-        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read});
+        contact.messages.push({id:id, them: them, self: self, label_msg: label_msg, key_msg: key_msg, group: group, message: message, type: type, sent: sent_date, received: received_date, read: read});
 
         contact.messages.sort(function (a, b) {
             return a.received - b.received;
@@ -1509,8 +1519,110 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 
 }
 
+/*
+    VERIFIED LIST
+*/
 
-function createContact(label, address, group) {
+ var verified_list = 
+        {
+            /* TEAM */
+            "sdcdev-slack": {
+                "username": "sdcdev-slack",
+                "title": "Shadowteam",
+                "custom_avatar" : false
+            },
+            "SR46wGPK5sGwT9qymRNTVtF9ExHHvVuDXQ": {
+                "username": "crz",
+                "title": "Shadowteam",
+                "custom_avatar" : false
+            },
+            "SVY9s4CySAXjECDUwvMHNM6boAZeYuxgJE": {
+                "username": "kewde",
+                "title": "Shadowteam",
+                "custom_avatar" : true
+            },
+            "dasource": {
+                "username": "dasource",
+                "title": "Shadowteam",
+                "custom_avatar" : false
+            },
+            "SNLYNVwWQNgPqxND5iWyRfnGbEPnvSGVLw": {
+                "username": "ffmad",
+                "title": "Shadowteam",
+                "custom_avatar" : false
+            },
+            "STWYshQBdzk47swrp2S77jHLxjrNAWUNdq": {
+                "username": "ludx",
+                "title": "Shadowteam",
+                "custom_avatar" : false
+            },
+            "edu-online": {
+                "username": "edu-online",
+                "title": "Shadowteam",
+                "custom_avatar" : false
+            },
+            "arcanum": {
+                "username": "arcanum",
+                "title": "Shadowteam",
+                "custom_avatar" : false
+            },
+            "SQqVGXi9Hi1CJv7Qy4gjvxyVinemTx8nK7": {
+                "username": "allien",
+                "title": "Shadowteam",
+                "custom_avatar" : false
+            },
+            "sebsebastian": {
+                "username": "sebsebastian",
+                "title": "Shadowteam",
+                "custom_avatar" : false
+            }
+            /* Contributors */
+            ,
+            "SPXkEj2Daa9un5uzKHFNpseAfirsygCAhq": {
+                "username": "litebit",
+                "title": "Contributor",
+                "custom_avatar" : true
+            } 
+            /* Verified */ 
+            ,
+            "SZxH6HNYAh9iNaGLdoHYjSN2qWvfjahrF1": {
+                "username": "6ea86b96",
+                "title": "Verified"
+            },           
+            "ShKkz1b6XD4ASgTP9BAh8C3zi4Z9HsCH5F": {               
+                "username": "dadon",               
+                "title": "Verified"           
+            },
+            "ScrvNCexThmfctYcLZLwzFCcaH6znW69sj": {
+                "username": "dzarmush",
+                "title": "Verified"
+            },           
+            "SZ8bMXxkBELD6s5jSsBRLCwvkXibwRWw4q": {               
+                "username": "GRE3N",               
+                "title": "Verified"           
+            },         
+            "SPAfq2i8cP1SMcaTT8nMTxa2Fg9LNNJSyk": {              
+                "username": "NGS",              
+                "title": "Verified"          
+            },
+            "SWUBRJUdgck6d8tiM5hf4wEAAp3J8JyuQj": {
+                "username": "The-C-Word",
+                "title": "Verified"
+            },
+            "SgyxAj1j2ebtecYAFu5McPyzZUqDX3UpBP": {
+                "username": "tintifax",
+                "title": "Verified"
+            },
+            "SWG4eCfpsrFwB64owwrLjvDnyYkdCp2oPi": {
+                "username": "wwonka36",
+                "title": "Verified"
+            }
+}
+
+/*
+    Contact functions
+*/
+function createContact(label, address, is_group, in_addressbook) {
     var contact = contacts[address];
     if (contacts[address] == undefined) {
         contacts[address] = {},
@@ -1518,10 +1630,68 @@ function createContact(label, address, group) {
         contact.key = address,
         contact.label = label,
         contact.address = address,
-        contact.group = group,
-        contact.avatar = (false ? '' : 'qrc:///images/default'), // TODO: Avatars!!
+        contact.group = is_group,
+        contact.addressbook = (in_addressbook == undefined ? false : in_addressbook),
+        contact.title = (is_group ? "Untrusted" : (contact.addressbook ? "Verified" : "Unverified")), //If message sent from group address mark it as untrusted as it is impossible to do with GUI. Manipulation
+        contact.avatar_type = 0,
+        contact.avatar = "", // TODO: Avatars!!
         contact.messages  = [];
+
+        if(is_group) 
+            contact.contacts  = [];
+        if(address == "SPXkEj2Daa9un5uzKHFNpseAfirsygCAhq")
+            console.log("creating contact litebit");
+
+        updateContactTitle(address);
+
+        if(address == "SPXkEj2Daa9un5uzKHFNpseAfirsygCAhq")
+            console.log("created title litebit title=" + contact.title);
     }
+}
+
+function addContactToGroup(key, group_key){
+    //check if group contact exists
+    if(contacts[group_key] == undefined)
+        return false;
+
+
+
+    //check if contact exists
+    if(contacts[key] == undefined)
+        return false;
+
+    //check if contact is already in group
+    if(!existsContactInGroup(key, group_key)){
+        contacts[group_key].contacts.push(key);
+        return true;
+    } 
+
+    return false;
+}
+
+function existsContact(address){
+    return (contacts[address] != undefined);
+}
+
+function existsContactInGroup(key, group_key){
+    return(!contacts[group_key].contacts.indexOf(key) == -1);
+}
+
+function updateContactTitle(key){
+    if(!existsContact(key))
+        return false;
+
+    if(contacts[key].group)
+        return false;
+
+    if(!isStaticVerified(key))
+        return false;
+
+    console.log("hit");
+
+    contacts[key].title = verified_list[key].title;
+    return true;
+
 }
 
 function updateContact(label, address, contact_address, open_conversation) {
@@ -1533,6 +1703,7 @@ function updateContact(label, address, contact_address, open_conversation) {
         if (contact_address === undefined || address==contact_address)
             contact_address = "";
 
+        //loop through messages and change name
         contact.messages.forEach(function(message) {
             if (message.type === "R" && (message.them === address || message.them === contact_address))
                 message.label_msg = label;
@@ -1616,6 +1787,51 @@ function appendContact (key, openconvo, addressbook) {
     }
 }
 
+function getContactUsername(key){
+    var bridge_label;
+    //check if in verified list
+    if(typeof verified_list[key] === "object")
+        return verified_list[key]["username"];
+
+    //check if backend has label for it
+    bridge_label = bridge.getAddressLabel(key);
+    if(typeof bridge_label == "string"){
+        return bridge_label.replace("group_","");
+    }
+    //no label
+    return key;
+}
+console.log("verified list" + verified_list["SVY9s4CySAXjECDUwvMHNM6boAZeYuxgJE"]["username"]);
+//console.log("getContactName" + getContactUsername("SVY9s4CySAXjECDUwvMHNM6boAZeYuxgJE"));
+
+function isStaticVerified(key){
+    return (typeof verified_list[key] === "object");
+}
+
+function allowCustomAvatar(key){
+    //return false;
+    return (typeof verified_list[key] === "object" && typeof verified_list[key].custom_avatar === "boolean" && verified_list[key].custom_avatar);
+}
+
+function getIconTitle(title){
+    if(title == "unverified"){
+        return "fa fa-cross ";
+    } else if(title == "verified"){
+        return "fa fa-check ";
+    } else if(title == "contributor"){
+        return "fa fa-cog ";
+    } else if(title == "shadowteam"){
+        return "fa fa-code ";
+    }
+    return "";
+}
+
+/*
+        end
+    Contact functions
+    
+*/
+
 function addNotificationCount(key, unread_count) {
 
     if(contacts[key] == undefined)
@@ -1688,24 +1904,25 @@ function openConversation(key, click) {
     if(click)
          $("#chat-menu-link").click();//open chat window when on other page
 
-            current_key = key;
-            //TODO: detect wether user is typing, if so do not reload page to other conversation..
-            //$(this).addClass("selected").siblings("li").removeClass("selected");
-            var discussion = $(".contact-discussion ul");
-            var contact = contacts[key];
+    current_key = key;
+    //TODO: detect wether user is typing, if so do not reload page to other conversation..
+    //$(this).addClass("selected").siblings("li").removeClass("selected");
+    var discussion = $(".contact-discussion ul");
+    var contact = contacts[key];
 
-            discussion.html("");
+    discussion.html("");
 
 
-            var is_group = contact.group;
+    var is_group = contact.group;
 
-            if(is_group){
-                $("#invite-group-btn").show();
-                //$("#leave-group-btn").show();
-            } else {
-                $("#invite-group-btn").hide();
-                $("#leave-group-btn").hide();
-            }
+    if(is_group){
+        $("#invite-group-btn").show();
+        //$("#leave-group-btn").show();
+    } else {
+        $("#invite-group-btn").hide();
+        $("#leave-group-btn").hide();
+    }
+
 
 
     //Set label in discussion
@@ -1732,6 +1949,7 @@ function openConversation(key, click) {
     }
 
     contact.messages.forEach(function(message, index) {
+
         if (index > 0 && combineMessages(prev_message, message)) {
             $("#"+ prev_message.id).attr("id", message.id);
             $("#" + message.id + " .message-text").append(processMessageForDisplay(message.message));
@@ -1751,13 +1969,17 @@ function openConversation(key, click) {
 
         //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
         //TODO: parse with regex to be sure.. do in appendMessage
-        var onclick = (message.label_msg == message.them) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.them + "')\" " : "";
+        addAvatar(message.them);
+
+        var onclick = (message.label_msg == message.key_msg) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.key_msg + "')\" " : "";
         discussion.append(
             "<li id='"+message.id+"' class='message-wrapper "+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
                 <span class='message-content'>\
-                    <span class='info'></span>\
+                    <span class='info'>"+ (message.type=='S'? getAvatar(message.self) : getAvatar(message.them))+ "</span>\
                     <span class='user-name' " + onclick + ">"
                         +(message.label_msg)+"\
+                    </span>\
+                    <span class='title'>\
                     </span>\
                     <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
                        <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
@@ -1768,18 +1990,18 @@ function openConversation(key, click) {
             .tooltip().find('.message-text')
             .tooltip();
 
+        insertTitleHTML(message.id, message.key_msg);
+
         if(message.type == 'S') { //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
 
             $('#' + message.id + ' .user-name').attr('data-title', '' + message.self).tooltip();
-            addRandomAvatar(message.id, message.self);
             if(message.group && !bSentMessage) {
-                bSentMessage = true;
+                //bSentMessage = true;
                 $("#message-from-address").val(message.self);
                 $("#message-to-address").val(message.them);
             }
         } else {
             $('#' + message.id + ' .user-name').attr('data-title', '' + message.them).tooltip();
-            addRandomAvatar(message.id, message.them);
         }
 
         //discussion.children("[title]").on("mouseenter", tooltip);
@@ -1801,6 +2023,30 @@ function openConversation(key, click) {
     setTimeout(function() {scrollMessages();}, 200);
 }
 
+function insertTitleHTML(id, key){
+    //id = message id
+    if(!existsContact(key))
+        return false;
+
+    var contact = contacts[key];
+    console.log("insertTitleHTML key=" + key + " title=" + contact.title);
+    var title = contacts[key].title.toLowerCase();
+    $("#" + id + " .title").addClass(getIconTitle(title) + title + "-mark");
+    $("#" + id + " .title").hover(
+        function ()
+        {
+            //on hover
+            $(this).text(" " + title);
+        },
+        function ()
+        {
+            //off hover
+            $(this).text("");
+        }
+    );
+}
+
+
 function confirmConversationOpenLink() {
     // TODO: Disable convirm option.
     return (confirm('Are you sure you want to open this link?\n\nIt will leak your IP address and other browser metadata, the least we can do is advice you to copy the link and open it in a _Tor Browser_ instead.\n\n You can disable this message in options.'));
@@ -1819,14 +2065,57 @@ function combineMessages(prev_message, message){
     return false;
 }
 
-function addRandomAvatar(id, key){ //0ad71697420c69134e40051891af6328
-    var data = new Identicon(key, 40).toString();
-    $("#"+id + " .info").append('<img width=40 height=40 src="data:image/png;base64,' + data + '">');
+function addRandomAvatar(key){ 
+
+    if(!existsContact(key))
+        return false;
+
+
+    contacts[key].avatar_type = 1;
+    contacts[key].avatar = generateRandomAvatar(key);
+
     /*
      $("#"+id + " .info").append($("<canvas/>")
         .attr({ "width": 40, "height": 40 })
         .jdenticon(md5(key)));*/
 }
+
+function generateRandomAvatar(key){
+    var shaObj = new jsSHA("SHA-512", "TEXT");
+    shaObj.update(key);
+    var hash = shaObj.getHash("HEX");
+    var data = new Identicon(hash, 40).toString();
+    return '<img width=40 height=40 src="data:image/png;base64,' + data + '">';
+    //$("#"+id + " .info").append('<img width=40 height=40 src="data:image/png;base64,' + data + '">');
+}
+
+
+function addCustomAvatar(key){
+    contacts[key].avatar_type = 2;
+    contacts[key].avatar = '<img width=40 height=40 src="assets/img/avatars/' + contacts[key].label + '.png">';
+    //load custom avatar html
+}
+
+function addAvatar(key){
+    if(allowCustomAvatar(key)){
+        addCustomAvatar(key);
+    }
+    else
+        addRandomAvatar(key);
+
+}
+
+function getAvatar(key){
+    if(isStaticVerified(key))
+        return '<img width=40 height=40 src="assets/img/avatars/' + verified_list[key].username + '.png">';
+
+    if(!existsContact(key)){
+        return generateRandomAvatar(key);
+    }
+    
+    return contacts[key].avatar;
+}
+
 
 function prependContact(key) {
     var contact = contacts[key];

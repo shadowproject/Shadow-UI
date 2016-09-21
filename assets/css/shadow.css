@@ -491,6 +491,7 @@ button {
   color: green;
 }
 
+
 .group-invite-close {
   padding: 3%;
   color: #fff;
@@ -620,6 +621,61 @@ button {
 .chat-header:hover .fa {
  display: inline-block;
 }
+
+/* MARKS*/
+
+
+.verified-mark{
+  color: white;
+  background-color: green;
+  border-radius:15px 15px 15px 15px;
+  padding-left:3px;
+  padding-right:3px;
+  padding-top:3px;
+  padding-bottom:3px;
+}
+
+/* normal */
+.verified-mark:hover{
+  border-radius:10px 10px 10px 10px;
+  padding-left:10px;
+  padding-right:10px;
+}
+
+.contributor-mark{
+  color: white;
+  background-color: rgb(241, 20, 38);
+  border-radius:15px 15px 15px 15px;
+  padding-left:5px;
+  padding-right:5px;
+  padding-top:5px;
+  padding-bottom:5px;
+}
+
+.contributor-mark:hover{
+  border-radius:10px 10px 10px 10px;
+  padding-left:10px;
+  padding-right:10px;
+}
+
+.shadowteam-mark{
+  color: white;
+  background-color: rgb(4, 4, 61);
+  border-radius:15px 15px 15px 15px;
+  padding-left:3px;
+  padding-right:3px;
+  padding-top:3px;
+  padding-bottom:3px;
+}
+
+.shadowteam-mark:hover{
+  border-radius:10px 10px 10px 10px;
+  padding-left:10px;
+  padding-right:10px;
+}
+
+/* MARKS*/
+/* END OF MARKS*/
 
 .contact-discussion {
   height:300px;
