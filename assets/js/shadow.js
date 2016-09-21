@@ -2106,7 +2106,7 @@ function addAvatar(key){
 }
 
 function getAvatar(key){
-    if(isStaticVerified(key))
+    if(allowCustomAvatar(key))
         return '<img width=40 height=40 src="assets/img/avatars/' + verified_list[key].username + '.png">';
 
     if(!existsContact(key)){
