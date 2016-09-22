@@ -3,7 +3,7 @@ shopt -s extglob
 rm -rf build
 mkdir -p build
 cp -rp !(build) build/
-sed -i .tmp 's^"assets^"qrc:///assets^g' build/index.html
+sed -i 's^"assets^"qrc:///assets^g' build/index.html
 #mv build/index.html.min build/index.html
 assets=`find assets/ -type f`
 > build/shadow.qrc
@@ -66,10 +66,10 @@ do
             if [[ $filename == "../"* ]]
             then
               replacement=`echo $filename|sed 's!^..!qrc:///'$PREVDIR'!'`
-              sed -i.tmp 's^url(['\''"]\?'$filename'['\''"]\?)^url('$replacement')^g' $file
+              sed -i 's^url(['\''"]\?'$filename'['\''"]\?)^url('$replacement')^g' $file
             else
               replacement="qrc:///$DIR/$filename"
-              sed -i.tmp 's^url(['\''"]\?'$filename'['\''"]\?)^url('$replacement')^g' $file
+              sed -i 's^url(['\''"]\?'$filename'['\''"]\?)^url('$replacement')^g' $file
               #sed -i '
             fi
         done
@@ -78,8 +78,8 @@ do
 
     if [[ $file == *".js" ]] && [ $(fgrep "assets" $file -l) ]
     then
-        sed -i.tmp 's^\(assets/\(js\|icons\|images\|plugins\)\)^qrc:///\1^g' $file
-        sed -i.tmp 's^\./qrc:///^qrc:///^g' $file
+        sed -i 's^\(assets/\(js\|icons\|images\|plugins\)\)^qrc:///\1^g' $file
+        sed -i 's^\./qrc:///^qrc:///^g' $file
 
         echo $file
     fi
