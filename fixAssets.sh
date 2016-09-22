@@ -28,11 +28,12 @@ assets/js/shadow.js
 for file in $MINIFY
 do
     echo minify $file
-    filename=build/${file%.*}
+    filename=${file%.*}
     extension=${file##*.}
 
-    minify "$file" > $filename.min.$extension
+    minify "$file" > build/$filename.min.$extension
     rm build/$file
+    sed -i 's^'$file'^'$filename.min.$extension'^' build/index.html
 done
 
 cd build
