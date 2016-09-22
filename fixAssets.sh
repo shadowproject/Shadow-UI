@@ -11,6 +11,7 @@ mv build/index.min.html build/index.html
 IFS=$'\n'
 MINIFY="
 assets/plugins/framework/framework.js
+assets/plugins/boostrapv3/js/bootstrap.js
 assets/plugins/boostrapv3/css/bootstrap.css
 assets/plugins/jquery-scrollbar/jquery.scrollbar.js
 assets/css/font-awesome-buttons.css
@@ -26,7 +27,7 @@ assets/js/shadow.js
 
 for file in $MINIFY
 do
-    echo $file
+    echo minify $file
     filename=build/${file%.*}
     extension=${file##*.}
 
@@ -35,7 +36,7 @@ do
 done
 
 cd build
-assets=`find assets/ -type f`
+assets=`find assets/ -type f|sort`
 cd ..
 
 while read line
@@ -46,7 +47,7 @@ do
         for asset in $assets
         do
             [[ $MINIFY =~ $asset ]] && continue
-            echo '        <file alias="'$asset'">qt/src/res/'$asset'</file>' >> build/shadow.qrc
+            echo '        <file alias="'$asset'">src/qt/res/'$asset'</file>' >> build/shadow.qrc
         done
     fi
 done < shadow.qrc
@@ -94,7 +95,7 @@ do
 
     if [[ $file == *".js" ]] && [ $(fgrep "assets" $file -l) ]
     then
-        sed -i 's^\(assets/\(js\|icons\|images\|plugins\)\)^qrc:///\1^g' $file
+        sed -i 's^\(assets/\(js\|icons\|img\|plugins\)\)^qrc:///\1^g' $file
         sed -i 's^\./qrc:///^qrc:///^g' $file
 
         echo $file
