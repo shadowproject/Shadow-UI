@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="src/qt/res/index.html">../Shadow-UI/build/index.html</file>
+        <file alias="src/qt/res/index.html">qt/src/res/index.html</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="shadow">src/qt/res/icons/shadowcoin-80.png</file>

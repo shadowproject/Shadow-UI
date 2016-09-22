@@ -4,24 +4,40 @@ rm -rf build
 mkdir -p build
 cp -rp !(build) build/
 sed -i 's^"assets^"qrc:///assets^g' build/index.html
+minify build/index.html > build/index.min.html
+mv build/index.min.html build/index.html
 #mv build/index.html.min build/index.html
-assets=`find assets/ -type f`
 > build/shadow.qrc
 IFS=$'\n'
-IGNORE="
-assets//plugins/framework/framework.js
-assets//plugins/boostrapv3/css/bootstrap.css
-assets//css/font-awesome-buttons.css
-assets//css/framework-icons.css
-assets//css/framework.css
-assets//css/shadow.css
-assets//js/navigation.js
-assets//js/pages/send.js
-assets//js/qrcode.js
-assets//js/tooltip.js
-assets//js/shadow.js
+MINIFY="
+assets/plugins/framework/framework.js
+assets/plugins/boostrapv3/css/bootstrap.css
+assets/plugins/jquery-scrollbar/jquery.scrollbar.js
+assets/css/font-awesome-buttons.css
+assets/css/framework-icons.css
+assets/css/framework.css
+assets/css/shadow.css
+assets/js/navigation.js
+assets/js/pages/send.js
+assets/js/qrcode.js
+assets/js/tooltip.js
 assets/js/shadow.js
 "
+
+for file in $MINIFY
+do
+    echo $file
+    filename=build/${file%.*}
+    extension=${file##*.}
+
+    minify "$file" > $filename.min.$extension
+    rm build/$file
+done
+
+cd build
+assets=`find assets/ -type f`
+cd ..
+
 while read line
 do
     echo "$line" >> build/shadow.qrc
@@ -29,8 +45,8 @@ do
     then
         for asset in $assets
         do
-            [[ $IGNORE =~ $asset ]] && continue
-            echo '        <file alias="'$asset'">../Shadow-UI/build/'$asset'</file>' >> build/shadow.qrc
+            [[ $MINIFY =~ $asset ]] && continue
+            echo '        <file alias="'$asset'">qt/src/res/'$asset'</file>' >> build/shadow.qrc
         done
     fi
 done < shadow.qrc
@@ -44,9 +60,9 @@ do
     [ "$line" == '</qresource>' ] && break
     if [ "$RES" = true ]
     then
-        line=`echo $line | sed 's^<file alias="\(.*\)">\(.*\)</file>^\1,\2^'`
-        ALIASES+=(${line%,*})
-        FILES+=(${line#*,})
+        line=`echo $line | sed 's^<file alias="\(.*\)">.*</file>^\1^'`
+        ALIASES+=(${line})
+        FILES+=("build/${line}")
     fi
 done < build/shadow.qrc
 
