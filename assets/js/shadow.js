@@ -1643,13 +1643,13 @@ function createContact(label, address, is_group, in_addressbook) {
 
         if(is_group) 
             contact.contacts  = [];
-        if(address == "SPXkEj2Daa9un5uzKHFNpseAfirsygCAhq")
+        /*if(address == "SPXkEj2Daa9un5uzKHFNpseAfirsygCAhq")
             console.log("creating contact litebit");
 
         updateContactTitle(address);
 
         if(address == "SPXkEj2Daa9un5uzKHFNpseAfirsygCAhq")
-            console.log("created title litebit title=" + contact.title);
+            console.log("created title litebit title=" + contact.title);*/
     }
 }
 
@@ -1690,7 +1690,6 @@ function updateContactTitle(key){
 
     if(!isStaticVerified(key))
         return false;
-
 
     contacts[key].title = verified_list[key].title;
     return true;
@@ -1804,7 +1803,7 @@ function getContactUsername(key){
     //no label
     return key;
 }
-console.log("verified list" + verified_list["SVY9s4CySAXjECDUwvMHNM6boAZeYuxgJE"]["username"]);
+//console.log("verified list" + verified_list["SVY9s4CySAXjECDUwvMHNM6boAZeYuxgJE"]["username"]);
 //console.log("getContactName" + getContactUsername("SVY9s4CySAXjECDUwvMHNM6boAZeYuxgJE"));
 
 function isStaticVerified(key){
@@ -2032,7 +2031,7 @@ function insertTitleHTML(id, key){
         return false;
 
     var contact = contacts[key];
-    console.log("insertTitleHTML key=" + key + " title=" + contact.title);
+    //console.log("insertTitleHTML key=" + key + " title=" + contact.title);
     var title = contacts[key].title.toLowerCase();
     $("#" + id + " .title").addClass(getIconTitle(title) + title + "-mark");
     $("#" + id + " .title").hover(
