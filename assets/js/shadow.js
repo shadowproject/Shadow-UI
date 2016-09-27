@@ -1605,6 +1605,10 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
                 "username": "NGS",              
                 "title": "Verified"          
             },
+            "ShFr9RAZuMsCUK7ZKDxukCDbCtBER4CHC7": {
+                "username": "rustynailer",
+                "title": "Verified"
+            },
             "SWUBRJUdgck6d8tiM5hf4wEAAp3J8JyuQj": {
                 "username": "The-C-Word",
                 "title": "Verified"
@@ -1687,7 +1691,6 @@ function updateContactTitle(key){
     if(!isStaticVerified(key))
         return false;
 
-    console.log("hit");
 
     contacts[key].title = verified_list[key].title;
     return true;
