@@ -195,6 +195,7 @@ function connectSignals() {
     overviewPage.clientInfo();
     optionsPage.update();
     chainDataPage.updateAnonOutputs();
+    translateStrings();
 }
 
 function triggerElement(el, trigger) {
@@ -3006,4 +3007,39 @@ function gotoWizard(section, step, runStepJS) {
     }
     $("#" + section + " .step" + gotoStep ).fadeIn(0);
     //$("#" + section + " .step" + gotoStep ).fadeIn(500);
+}
+
+function dumpStrings() {
+    var strings = '';
+
+    function buildStr(str) {
+        return 'QT_TRANSLATE_NOOP("ShadowBridge", "' + str + '"),\n';
+    }
+
+    $(".translate").each(function(el) {
+        var str = buildStr($(this).text().trim());
+        if (strings.indexOf(str) == -1)
+            strings += str;
+    });
+
+    $("[data-title]").each(function(el) {
+        var str = buildStr($(this).attr('data-title').trim());
+        if (strings.indexOf(str) == -1)
+            strings += str;
+    })
+    console.log(strings);
+}
+
+function translateStrings() {
+    $(".translate").each(function(el) {
+        var str = $(this).text();
+
+        $(this).text(str.replace(str, bridge.translateHtmlString(str.trim())));
+    });
+
+    $("[data-title]").each(function(el) {
+        var str = $(this).attr('data-title');
+
+        $(this).attr('data-title', str.replace(str, bridge.translateHtmlString(str.trim())));
+    });
 }
