@@ -761,9 +761,9 @@ function clearSendAddress()
 function addSendAddress()
 {
     var sendLabel, sendAddress, currentLabel, result;
-
-    sendLabel   = $("#new-send-label").val();
+    sendLabel   =  $("#new-send-label").val();
     sendAddress = $("#new-send-address").val();
+
 
     currentLabel = bridge.getAddressLabel(sendAddress);
 
@@ -773,18 +773,21 @@ function addSendAddress()
 
         return;
     }
-
-    var addType = 0; // not used
-    result = bridge.newAddress(sendLabel, addType, sendAddress, true);
+    result = addSendAddressBackend(sendLabel, sendAddress);
     if (result === "")
     {
         var errorMsg = bridge.lastAddressError();
         $("#new-send-address-error").text("Error: " + errorMsg);
         $("#new-send-address").addClass('inputError');
     } else {
-        updateContact(sendLabel, current_key, sendAddress, false);
+        updateContact(sendLabel, sendAddress, sendAddress, false);
         $('#add-address-modal').modal('hide');
     }
+}
+
+function addSendAddressBackend(arg_sendLabel, arg_sendAddress){
+    return bridge.newAddress(arg_sendLabel, 0, arg_sendAddress, true);
+
 }
 
 function addressBookInit() {
@@ -1526,7 +1529,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
  var verified_list = 
         {
             /* TEAM */
-            "sdcdev-slack": {
+            "SdcDevWEbq3CZgZc8UNbST1TaYLA5vLZTS": {
                 "username": "sdcdev-slack",
                 "title": "Shadowteam",
                 "custom_avatar" : false
@@ -1561,12 +1564,12 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
                 "title": "Shadowteam",
                 "custom_avatar" : false
             },
-            "arcanum": {
+            "SU9FqHpVg929arDpT9TjTc5XkSxGgzHvff": {
                 "username": "arcanum",
                 "title": "Shadowteam",
                 "custom_avatar" : false
             },
-            "SQqVGXi9Hi1CJv7Qy4gjvxyVinemTx8nK7": {
+            "STAKEbLd2DecHRadoXyBE5jmZrJztLr9TE": {
                 "username": "allien",
                 "title": "Shadowteam",
                 "custom_avatar" : false
@@ -1628,28 +1631,22 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 */
 function createContact(label, address, is_group, in_addressbook) {
     var contact = contacts[address];
+    var small_label_hack = getContactUsername(address);
     if (contacts[address] == undefined) {
         contacts[address] = {},
         contact = contacts[address],
         contact.key = address,
-        contact.label = label,
+        contact.label = small_label_hack, /* og: label; */
         contact.address = address,
         contact.group = is_group,
         contact.addressbook = (in_addressbook == undefined ? false : in_addressbook),
-        contact.title = (is_group ? "Untrusted" : (contact.addressbook ? "Verified" : "Unverified")), //If message sent from group address mark it as untrusted as it is impossible to do with GUI. Manipulation
+        contact.title = (isStaticVerified(address) ? verified_list[address].title : (is_group ? "Untrusted" : (contact.addressbook ? "Verified" : "Unverified"))), //If message sent from group address mark it as untrusted as it is impossible to do with GUI. Manipulation
         contact.avatar_type = 0,
         contact.avatar = "", // TODO: Avatars!!
         contact.messages  = [];
 
         if(is_group) 
             contact.contacts  = [];
-        /*if(address == "SPXkEj2Daa9un5uzKHFNpseAfirsygCAhq")
-            console.log("creating contact litebit");
-
-        updateContactTitle(address);
-
-        if(address == "SPXkEj2Daa9un5uzKHFNpseAfirsygCAhq")
-            console.log("created title litebit title=" + contact.title);*/
     }
 }
 
@@ -1657,8 +1654,6 @@ function addContactToGroup(key, group_key){
     //check if group contact exists
     if(contacts[group_key] == undefined)
         return false;
-
-
 
     //check if contact exists
     if(contacts[key] == undefined)
@@ -1681,6 +1676,7 @@ function existsContactInGroup(key, group_key){
     return(!contacts[group_key].contacts.indexOf(key) == -1);
 }
 
+/*
 function updateContactTitle(key){
     if(!existsContact(key))
         return false;
@@ -1693,8 +1689,8 @@ function updateContactTitle(key){
 
     contacts[key].title = verified_list[key].title;
     return true;
-
 }
+*/
 
 function updateContact(label, address, contact_address, open_conversation) {
     open_conversation = (open_conversation !== false);
@@ -1789,7 +1785,9 @@ function appendContact (key, openconvo, addressbook) {
     }
 }
 
-function getContactUsername(key){
+function getContactUsername(key, no_key_return){
+    //set no_key_return to anything and it won't return the address if no label is found.
+
     var bridge_label;
     //check if in verified list
     if(typeof verified_list[key] === "object")
@@ -1797,12 +1795,16 @@ function getContactUsername(key){
 
     //check if backend has label for it
     bridge_label = bridge.getAddressLabel(key);
-    if(typeof bridge_label == "string"){
-        return bridge_label.replace("group_","");
+    if(typeof bridge_label == "string" && bridge_label != ""){
+            return bridge_label.replace("group_","");
     }
     //no label
-    return key;
+    if(no_key_return != undefined)
+        return ""; //no_key_return to returning empty
+
+    return key; //returning address
 }
+
 //console.log("verified list" + verified_list["SVY9s4CySAXjECDUwvMHNM6boAZeYuxgJE"]["username"]);
 //console.log("getContactName" + getContactUsername("SVY9s4CySAXjECDUwvMHNM6boAZeYuxgJE"));
 
@@ -1938,7 +1940,6 @@ function openConversation(key, click) {
 
     var message;
     var prev_message;
-    var bSentMessage = false;
 
     if(click)
         removeNotificationCount(contact.key);
@@ -1962,9 +1963,7 @@ function openConversation(key, click) {
          prev_message = message;
 
 
-        //<span class='info'>\
-            //<img src='' />\
-        //</span>\
+
 
         var time  = new Date(message.sent*1000);//.toLocaleString()
         var timeReceived  = new Date(message.received*1000);
@@ -1973,13 +1972,19 @@ function openConversation(key, click) {
         //TODO: parse with regex to be sure.. do in appendMessage
         addAvatar(message.them);
 
-        var onclick = (message.label_msg == message.key_msg) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.key_msg + "')\" " : "";
+        var label_msg;
+        if(contacts[message.key_msg] != undefined)
+            label_msg = contacts[message.key_msg].label;
+        else
+            label_msg = getContactUsername(message.key_msg);
+
+        var onclick = (label_msg == message.key_msg) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.key_msg + "')\" " : "";
         discussion.append(
             "<li id='"+message.id+"' class='message-wrapper "+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
                 <span class='message-content'>\
                     <span class='info'>"+ (message.type=='S'? getAvatar(message.self) : getAvatar(message.them))+ "</span>\
                     <span class='user-name' " + onclick + ">"
-                        +(message.label_msg)+"\
+                        +(label_msg)+"\
                     </span>\
                     <span class='title'>\
                     </span>\
@@ -1994,28 +1999,14 @@ function openConversation(key, click) {
 
         insertTitleHTML(message.id, message.key_msg);
 
-        if(message.type == 'S') { //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
-
-            $('#' + message.id + ' .user-name').attr('data-title', '' + message.self).tooltip();
-            if(message.group && !bSentMessage) {
-                //bSentMessage = true;
-                $("#message-from-address").val(message.self);
-                $("#message-to-address").val(message.them);
-            }
-        } else {
-            $('#' + message.id + ' .user-name').attr('data-title', '' + message.them).tooltip();
-        }
-
+        //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
+        $('#' + message.id + ' .user-name').attr('data-title', '' + (message.type == "S" ? message.self : message.them)).tooltip();
+ 
+        getOurAddress(key, true);
         //discussion.children("[title]").on("mouseenter", tooltip);
 
-        if(!bSentMessage && contact.messages.length > 0) {
-            if(!is_group) { //normal procedure
-                $("#message-from-address").val(message.self);
-                $("#message-to-address").val(message.them); //them
-            } else if(message.type == "R") { //if it's a group, and no messages were sent from it yet, then we have not sent a message to it.
-                $("#message-to-address").val(message.self);
-            }
-        } else if(contact.messages.length == 0) {
+
+        if(contact.messages.length == 0) {
              $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li>");
              $("#message-to-address").val(contact.address);
         }
@@ -2023,6 +2014,39 @@ function openConversation(key, click) {
 
 
     setTimeout(function() {scrollMessages();}, 200);
+}
+
+function getOurAddress(key, set){
+    //returns the address to which the message was sent, or in the case of a group check
+    // key = address of the other party
+    // set = true or false, set the chat receiver and sender addresses for the current session
+    if(!existsContact(key))
+        return false;
+
+    var contact = contacts[key];
+    var is_group = contact.group;
+
+    if(contact.messages.length == 0){
+        //TODO: open up choose sender dialog
+        return false;
+    }
+
+    var r = false;
+    contact.messages.some(function(message, index) {
+        if(!is_group || message.type == "S") { //if it's not a group, do the normal procedure. If it's group it must be a sent message.
+
+            if(set)
+                setSenderAndReceiver(message.self, key);
+            r = message.self;
+            return true;
+        }
+    });
+    return r;
+}
+
+function setSenderAndReceiver(sender, receiver){
+    $("#message-from-address").val(sender);
+    $("#message-to-address").val(receiver);
 }
 
 function insertTitleHTML(id, key){
@@ -2252,26 +2276,46 @@ function submitInviteModal(){
 */
 
 function scrollMessages() {
+
+    var old_y = messagesScroller.y;
+    var old_max = messagesScroller.maxScrollY;
+
     messagesScroller.refresh();
 
-    var scrollerBottom = function() {
+    var scrollerBottom = function(old_y, old_max) {
+        var new_max = messagesScroller.maxScrollY;
 
-        var max = messagesScroller.y;
-
-        messagesScroller.refresh();
-
-        if(max !== messagesScroller.maxScrollY)
+        if(old_max > new_max && old_max == old_y)
             messagesScroller.scrollTo(0, messagesScroller.maxScrollY, 100);
     };
 
-    setTimeout(scrollerBottom, 100);
+    setTimeout(scrollerBottom(old_y, old_max), 100);
 }
 
-function newConversation() {
+function openNewConversationModal(){
     var address = $('#new-contact-address').val();
     var contact_name = $("#new-contact-name").val();
+
+    console.log("newConvo called!");
+    console.log("length=" + $("#contact-"+address).length);
+
+    if($("#contact-"+address).length == 1){
+
+        if(bridge.getAddressLabel(address) != contact_name)
+            addSendAddressBackend(contact_name, address);
+
+        setTimeout(function(){
+            updateContact(contact_name, address);
+            openConversation(address, false);
+            cleanNewConversationModal();
+            console.log("cleaned");
+        }, 500);
+
+        return closeNewConversationModal();
+    }
+
     createContact(contact_name, address, false);
-    result = bridge.newAddress($("#new-contact-name").val(), 0, $('#new-contact-address').val(), true);
+    result = bridge.newAddress(contact_name, 0, address, true);
     if (result === "")
         if (bridge.lastAddressError() !== 'Duplicate Address.') {
             $("#new-contact-address").css("background", "#E51C39").css("color", "white");
@@ -2288,9 +2332,6 @@ function newConversation() {
     $("#message-text").focus();
  
 
-    $("#new-contact-address").val("");
-    $("#new-contact-name").val("");
-    $("#new-contact-pubkey").val("");
 
     $("#contact-list ul li").removeClass("selected");
     $("#contact-list").addClass("in-conversation");
@@ -2298,13 +2339,59 @@ function newConversation() {
     $("#contact-group-list ul li").removeClass("selected");
     $("#contact-group-list").addClass("in-conversation");
 
-    setTimeout(function(){
+    /* setTimeout(function(){
         openConversation(address, true);
         $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+address+" - "+contact_name+"</li>");
-    }, 1000);
+    }, 1000);*/
+
+    //temp shutdown
+
+    closeNewConversationModal();
+    openPickSenderMsgAddrModal();
+    return true;
 
 }
 
+function closeNewConversationModal(){
+    // clean up new new-contact-modal and close it.
+    $('#new-contact-modal').modal('hide');
+    return true;
+}
+function cleanNewConversationModal(){
+    $("#new-contact-address").val("");
+    $("#new-contact-name").val("");
+    $("#new-contact-pubkey").val("");
+}
+
+function openPickSenderMsgAddrModal(){
+    //This function opens the dialog and copies all the identities from the original select input (#message-from-address)
+    var select_html = "<option title='Please select and address to send from' value='none'>Select identity</option>" + $("#message-from-address").html();
+    $("#pick-sender-msg-selector").html(select_html);
+    $("#pick-sender-msg-modal").modal('show');
+}
+
+function startNewConversation(){
+    console.log("startNewConversation");
+    var sender_msg_address = $("#pick-sender-msg-selector").val();
+    alert(sender_msg_address);
+
+    if(sender_msg_address == "none"){
+        alert("Please select an address.");
+        return false;
+    }
+
+    $("#message-from-address").val(sender_msg_address);
+
+    var receiver_msg_address = $("#new-contact-address").val();
+    openConversation(receiver_msg_address, true);
+    closePickSenderMsgAddrModal();
+    //verify that sender msg selector is not none..
+}
+
+function closePickSenderMsgAddrModal(){
+    cleanNewConversationModal();
+    $("#pick-sender-msg-modal").modal('hide');
+}
 
 function sendMessage() {
     $("#remove-on-send").remove();

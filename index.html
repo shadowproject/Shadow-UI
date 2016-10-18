@@ -1923,7 +1923,7 @@
                       class="recipient form-control input_box"
                       data-title="The address to send the payment to  (e.g. SXywGBZBowrppUwwNUo1GCRDTibzJi7g2M)"
                       placeholder="Enter a Shadow address (e.g. SXywGBZBowrppUwwNUo1GCRDTibzJi7g2M)"
-                      onchange="if(base58.check(this)) { $('#new-contact-name').val(bridge.getAddressLabel(this.value));$('#new-contact-pubkey').val(bridge.getPubKey(this.value)).change()};"
+                      onchange="if(base58.check(this)) {    var label = getContactUsername(this.value, true); if(label == '(no label)'){ label = ''} $('#new-contact-name').val(label);$('#new-contact-pubkey').val(bridge.getPubKey(this.value)).change()};"
                       maxlength="128"
                       oninput="base58.check(this); this.value.trim();"/><!-- TODO: Move onchange to javascript function... -->
                   </div>
@@ -1985,7 +1985,7 @@
             </div>
 
             <div class="pull-right m-r-10 m-t-25">
-              <a class="btn btn-danger btn-cons" href="#" onclick="newConversation();">Start Conversation
+              <a class="btn btn-danger btn-cons" href="#" onclick="openNewConversationModal();">Start Conversation
                 <i class="fa fa-check"></i>
               </a>
             </div>
@@ -1994,8 +1994,74 @@
         </div>
       </div>
     </div>
-
     <!-- messages modal -->
+
+    <!-- choose sender address for conversation modal -->
+    <div class="modal fade stick-up" id="pick-sender-msg-modal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content p-b-25" style="background:#fff;">
+
+          <div class="modal-header clearfix text-left ">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              <i class="pg-close fs-20"></i>
+            </button>
+            <h5 class="p-l-10" style="border-bottom: 1px solid #F0F1F3">Choose identity</h5>
+
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label for="pick-sender-msg-address">Identity:
+                </label>
+                <div class="row">
+
+                  <div class="col-sm-10">
+
+                    <select id="pick-sender-msg-selector" class="select-drop-down-chat">
+                    </select>
+
+                  </div>
+
+                  <div class="col-sm-2">
+
+                    <div class="btn-group">
+                      <a class="btn btn-default" data-title="Choose address from address book" data-toggle="modal" data-target="#address-lookup-modal" href="#" onclick="addressLookup('new-contact-address,new-contact-name', false, 'Normal')">
+                        <i class="fa fa-plus"></i>
+                      </a>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" id="pick-sender-msg-create-identity-formgroup" style="display: none">
+              <div class="col-sm-12 p-t-15">
+                <label for="pick-sender-msg-address">Name:
+                </label>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <input
+                      id="pick-sender-msg-name"
+                      class="recipient form-control input_box"
+                      data-title="Enter a label for this address to add it to your address book"
+                      placeholder="Enter a label for this address to add it to your address book"
+                      maxlength="128"/>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pull-right m-r-10 m-t-25">
+              <a class="btn btn-danger btn-cons" href="#" onclick="startNewConversation()">Start Conversation
+                <i class="fa fa-check"></i>
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- choose sender address for conversation modal -->
 
     <!-- create group modal style="max-height: 500px;" -->
     <div class="modal fade stick-up" id="new-group-modal" tabindex="-1" role="dialog" aria-hidden="true">
