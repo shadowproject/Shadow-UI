@@ -1379,10 +1379,10 @@ function appendMessages(messages, reset) {
     contact_group_list = $("#contact-group-list ul");
 
     if(reset) {
-        // We have to delete clear messages when wallet is locked...
+        // We have to delete/clear messages when wallet is locked...
         for(var k in contacts)
             if(contacts[k].messages.length > 0)
-                contacts[k].messages = []; // [] is 50% faster than new Array(), and delete causes unecessary overhead in the garbage collector;
+                contacts[k].messages = [];
 
             $("#chat-menu-link .details").hide();
 
@@ -1402,11 +1402,13 @@ function appendMessages(messages, reset) {
         $("#leave-group-btn").hide();
     }
 
-    if(messages == "[]")
+    if(messages == undefined)
         return;
-    //JSON doesn't play well with some characters http://www.jslint.com/help.html
+    /*
+    Keep this in for further reference: JSON doesn't play well with some characters http://www.jslint.com/help.html
     var banned_json_regex = /([\u0000-\u001f])|([\u007f-\u009f])|([\u00ad])|([\u0600-\u0604])|([\u070f])|([\u17b4-\u17b5])|([\u200c-\u200f])|([\u2028-\u202f])|([\u2060-\u206f])|([\ufeff])|([\ufff0-\uffff])+/g;
     messages = JSON.parse(messages.replace(/,\]$/, "]").replace(banned_json_regex,""));
+    */
 
     // Message data
     messages.forEach(function(message) {
@@ -1414,9 +1416,9 @@ function appendMessages(messages, reset) {
                       message.type,
                       message.sent_date,
                       message.received_date,
-                      message.label_value,
-                      message.label,
-                      message.labelTo,
+                      message.label_from_role,
+                      message.label_from,
+                      message.label_to,
                       message.to_address,
                       message.from_address,
                       message.read,
@@ -2191,8 +2193,8 @@ function addInvite(privkey, label, id) {
                  "<a class='group-invite'>"+
                   "<i class=\"fa fa-envelope\"></i>"+
                   "<span class=\"group-invite-label\"> " + label + " </span>"+
-                  "<i class=\"fa fa-check group-invite-check\" onclick=\"acceptInvite('" + privkey + "','" + label + "', '" + id + "');\"></i>"+
-                  "<i class=\"fa fa-close group-invite-close\" onclick=\"deleteInvite('" + privkey + "','" + id + "');\"></i>"+
+                  "<i class=\"fa fa-check group-invite-check\" onclick='acceptInvite(\"" + privkey + "\",\"" + label + "\", \"" + id + "\");'></i>"+
+                  "<i class=\"fa fa-close group-invite-close\" onclick='deleteInvite(\"" + privkey + "\",\"" + id + "\");'></i>"+
                 "</a>"+
              "</div>"
     );
