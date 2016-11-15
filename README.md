@@ -12,3 +12,6 @@ in /opt, `git clone git@github.com:shadowproject/Shadow-UI.git shadow`
 Feel free to customise it :)
 
 To compile into executable, run `fixAssets.sh`, copy `build/*` into appropriate directories.
+
+Depends:
+https://www.npmjs.com/package/minify
