@@ -1616,7 +1616,7 @@
                       </div>
                       <div class="form-group" style="border-bottom: 1px solid #F0F1F3">
                           <label class="col-sm-3 control-label option p-l-20" for="send-balance-amount" class="recipient">
-				  <span class="translate">Amount</span>
+                          <span class="translate">Amount</span>
                             <a href="#"><i class="p-b-5 fa fa-question-circle" data-title="Amount to transfer" style="color:#626262;"></i></a>
                            </label>
                           <div class="col-sm-9">
@@ -1643,16 +1643,16 @@
 
               <div class="pull-right m-r-15 m-t-10 m-b-25">
                 <a id="add_recipient" class="btn btn-default btn-cons" data-title="Send to multiple recipients at once" onclick="sendPage.addRecipient();">
-			<span class="translate">Add Recipient</span></a>
+                  <span class="translate">Add Recipient</span></a>
                 <a class="btn btn-default btn-cons" onclick="sendPage.clearRecipients();">
                   <i class="fa fa-close"></i>
-			<span class="translate">Clear All</span>
+                  <span class="translate">Clear All</span>
                 </a>
                 <a class="btn btn-default btn-cons" href="javascript:sendPage.suggestRingSize();" id="suggest_ring_size">
                   <i class="fa fa-calculator"></i>
-			<span class="translate">Suggest Ring Size</span></a>
+                  <span class="translate">Suggest Ring Size</span></a>
                 <a class="btn btn-primary btn-cons" onclick="sendPage.sendCoins();">
-			<span class="translate">Send Payment</span>
+                  <span class="translate">Send Payment</span>
                   <i class="fa fa-arrow-right"></i>
                 </a>
               </div>
@@ -1674,7 +1674,7 @@
 
           <div class="pull-left">
             <h4 style="font-weight:bolder;">
-		    <span class="translate">RECEIVE</span>
+            <span class="translate">RECEIVE</span>
             </h4>
           </div>
 
@@ -1721,16 +1721,16 @@
               <thead>
                 <tr>
                   <th style="padding-left:18px;" data-sort-initial="true" data-toggle="true">
-			  <span class="translate">Label</span>
+                    <span class="translate">Label</span>
                   </th>
                   <th data-hide="phone">
-			  <span class="translate">Address</span>
+                    <span class="translate">Address</span>
                   </th>
                   <th data-hide="phone" data-sort-ignore="true">
-			  <span class="translate">Public Key</span>
+                    <span class="translate">Public Key</span>
                   </th>
                   <th data-hide="phone">
-			  <span class="translate">Type</span>
+                    <span class="translate">Type</span>
                   </th>
                 </tr>
               </thead>
@@ -1747,16 +1747,16 @@
             <div class="center-div m-t-25 m-b-25">
               <a class="btn btn-default btn-cons" data-target="#qrcode-modal" data-toggle="modal" onclick="showQRCode($('#receive .footable .selected .address').text(), $('#receive .footable .selected .label2').attr('data-value'));">
                 <i class="fa fa-qrcode"></i>
-		      <span class="translate">Show QR Code</span></a>
+                <span class="translate">Show QR Code</span></a>
               <a class="btn btn-default btn-cons" data-target="#add-address-modal" data-toggle="modal" onclick="clearRecvAddress(); $('#add-rcv-address').show(); $('#add-send-address').hide();">
                 <i class="fa fa-plus"></i>
-		      <span class="translate">New Address</span></a>
+                <span class="translate">New Address</span></a>
               <a class="btn btn-default btn-cons" href="javascript:copy('#receive .footable .selected .address');">
                 <i class="fa fa-copy"></i>
-		      <span class="translate">Copy Address</span></a>
+                <span class="translate">Copy Address</span></a>
               <a class="btn btn-default btn-cons" id="sign-message-button" data-target="#verify-sign-message-modal" data-toggle="modal" onclick="$('#sign-href').click(); $('#sign-address').val($('#receive .footable .selected .address').text()); ">
                 <i class="fa fa-pencil-square-o"></i>
-		      <span class="translate">Sign Message</span></a>
+                <span class="translate">Sign Message</span></a>
             </div>
 
             <div class="clearfix"></div>
@@ -1775,7 +1775,7 @@
 
           <div class="pull-left">
             <h4 style="font-weight:bolder;">
-		    <span class="translate">TRANSACTIONS</span>
+              <span class="translate">TRANSACTIONS</span>
             </h4>
           </div>
 
@@ -1798,16 +1798,16 @@
               <thead>
                 <tr>
                   <th data-type="numeric" data-sort-initial="descending" data-title="Date and time that the transaction was received.">
-			  <span class="translate">Date</span></th>
+                  <span class="translate">Date</span></th>
                   <th data-hide="phone" style="text-align:center;padding-left:12px;" data-toggle="true" data-type="numeric" data-title="Transaction status. Hover over this field to show number of confirmations."></th>
                   <th data-hide="phone" data-title="Type of transaction.">
-			  <span class="translate">Type</span></th>
+                  <span class="translate">Type</span></th>
                   <th data-title="Destination address of transaction.">
-			  <span class="translate">Address</span></th>
+                  <span class="translate">Address</span></th>
                   <th data-hide="phone" data-title="Short payment note.">
-			  <span class="translate">Narration</span></th>
+                  <span class="translate">Narration</span></th>
                   <th data-type="numeric" data-title="Amount removed from or added to balance.">
-			  <span class="translate">Amount</span></th>
+                  <span class="translate">Amount</span></th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -1832,7 +1832,7 @@
 
           <div class="pull-left">
             <h4 style="font-weight:bolder;">
-		    <span class="translate">ADDRESSBOOK</span>
+              <span class="translate">ADDRESSBOOK</span>
             </h4>
           </div>
 
@@ -1860,16 +1860,16 @@
                 <thead>
                   <tr>
                     <th style="padding-left:18px;" data-sort-initial="true" data-toggle="true">
-			    <span class="translate">Label</span>
+                      <span class="translate">Label</span>
                     </th>
                     <th data-hide="phone">
-			    <span class="translate">Address</span>
+                      <span class="translate">Address</span>
                     </th>
                     <th data-hide="phone">
-			    <span class="translate">Public Key</span>
+                      <span class="translate">Public Key</span>
                     </th>
                     <th data-hide="phone">
-			    <span class="translate">Type</span>
+                      <span class="translate">Type</span>
                     </th>
                   </tr>
                 </thead>
@@ -1885,19 +1885,19 @@
               <div class="center-div m-t-25 m-b-25">
                 <a class="btn btn-default btn-cons" data-target="#add-address-modal" data-toggle="modal" onclick="$('#add-rcv-address').hide(); clearSendAddress(); $('#add-send-address').show();">
                   <i class="fa fa-plus"></i>
-			<span class="translate">New Address</span></a>
+                <span class="translate">New Address</span></a>
                 <a class="btn btn-default btn-cons" href="javascript:copy('#addressbook .footable .selected .address');">
                   <i class="fa fa-copy"></i>
-			<span class="translate">Copy Address</span></a>
+                <span class="translate">Copy Address</span></a>
                 <a class="btn btn-default btn-cons" data-target="#qrcode-modal" data-toggle="modal" onclick="showQRCode($('#addressbook .footable .selected .address').text(), $('#addressbook .footable .selected .label').attr('data-value'));">
                   <i class="fa fa-qrcode"></i>
-			<span class="translate">Show QR Code</span></a>
+                <span class="translate">Show QR Code</span></a>
                 <a class="btn btn-default btn-cons" data-target="#verify-sign-message-modal" data-toggle="modal" onclick="$('#verify-href').click(); $('#verify-address').val($('#addressbook .footable .selected .address').text());">
                   <i class="fa fa-check"></i>
-			<span class="translate">Verify Message</span></a>
+                <span class="translate">Verify Message</span></a>
                 <a class="btn btn-default btn-cons" href="#filter-addressbook" onclick="var addr=$('#addressbook .footable .selected .address');if(bridge.deleteAddress(addr.text()))addr.closest('tr').remove()">
                   <i class="fa fa-close"></i>
-			<span class="translate">Delete</span></a>
+                <span class="translate">Delete</span></a>
               </div>
 
               <div class="clearfix"></div>
@@ -1923,7 +1923,7 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <label for="new-contact-address">
-			<span class="translate">Address:</span>
+                <span class="translate">Address:</span>
                 </label>
                 <div class="row">
                   <div class="col-sm-8">
@@ -1960,7 +1960,7 @@
             <div class="form-group">
               <div class="col-sm-12 p-t-15">
                 <label for="new-contact-name">
-			<span class="translate">Name:</span>
+                <span class="translate">Name:</span>
                 </label>
                 <div class="row">
                   <div class="col-sm-12">
@@ -1979,7 +1979,7 @@
             <div class="form-group">
               <div class="col-sm-12 p-t-15">
                 <label for="new-contact-pubkey">
-			<span class="translate">Public Key:</span>
+                <span class="translate">Public Key:</span>
                 </label>
                 <div class="row">
                   <div class="col-sm-12">
@@ -1989,7 +1989,7 @@
                       data-title="Enter a public key for the address above"
                       placeholder="Enter a public key for the address above"
                       oninput="base58.check(this);"
-                      onchange="invalid($(this), bridge.setPubKey($('#new-contact-address').val(), this.value))"/>
+                      onchange="invalid($(this), bridge.setPubKey(getAddressForNewChat(this.value), this.value))"/>
                   </div>
                 </div>
               </div>
@@ -1997,7 +1997,7 @@
 
             <div class="pull-right m-r-10 m-t-25">
               <a class="btn btn-danger btn-cons" href="#" onclick="openNewConversationModal();">
-		      <span class="translate">Start Conversation</span>
+                <span class="translate">Start Conversation</span>
                 <i class="fa fa-check"></i>
               </a>
             </div>
@@ -2022,7 +2022,7 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <label for="pick-sender-msg-address">
-			<span class="translate">Identity:</span>
+                <span class="translate">Identity:</span>
                 </label>
                 <div class="row">
 
@@ -2049,7 +2049,7 @@
             <div class="form-group" id="pick-sender-msg-create-identity-formgroup" style="display: none">
               <div class="col-sm-12 p-t-15">
                 <label for="pick-sender-msg-address">
-			<span class="translate">Name:</span>
+                <span class="translate">Name:</span>
                 </label>
                 <div class="row">
                   <div class="col-sm-12">
@@ -2067,7 +2067,7 @@
 
             <div class="pull-right m-r-10 m-t-25">
               <a class="btn btn-danger btn-cons" href="#" onclick="startNewConversation()">
-		      <span class="translate">Start Conversation</span>
+                <span class="translate">Start Conversation</span>
                 <i class="fa fa-check"></i>
               </a>
             </div>
@@ -2092,7 +2092,7 @@
             <div class="form-group">
               <div class="col-sm-8 p-t-15">
                 <label for="new-group-name">
-			<span class="translate">Group name:</span>
+                <span class="translate">Group name:</span>
                 </label>
                     <input
                       id="new-group-name"
@@ -2105,7 +2105,7 @@
               <div class="col-sm-4 p-t-15">
                 <div class="pull-right m-t-25">
                   <a class="btn btn-danger" onclick="createGroupChat();">
-			  <span class="translate">Create Group</span>
+                    <span class="translate">Create Group</span>
                     <i class="fa fa-check"></i>
                   </a>
                 </div>
@@ -2119,7 +2119,7 @@
             <div class="form-group">
               <div class="col-sm-12 p-t-15">
                 <label for="filter-new-group">
-			<span class="translate">Search</span>
+                <span class="translate">Search</span>
                 </label>
                     <input class="form-control input_box" id="filter-new-group" placeholder="Search by label or address...">
               </div>
@@ -2136,10 +2136,10 @@
                           <thead>
                             <tr>
                               <th style="padding-left:18px;" data-sort-initial="true" data-toggle="true">
-				      <span class="translate">Label</span>
+                              <span class="translate">Label</span>
                               </th>
                               <th data-hide="phone">
-				      <span class="translate">Address</span>
+                              <span class="translate">Address</span>
                               </th>
                               <th data-hide="phone">
                                 Invite
@@ -2185,7 +2185,7 @@
             <div class="form-group">
               <div class="col-sm-8 p-t-15">
                 <label for="existing-group-name">
-			<span class="translate">Group name:</span>
+                <span class="translate">Group name:</span>
                 </label>
                     <input
                       id="existing-group-name"
@@ -2199,7 +2199,7 @@
               <div class="col-sm-4 p-t-15">
                 <div class="pull-right m-t-25">
                   <a class="btn btn-danger" onclick="submitInviteModal();"> 
-			  <span class="translate">Invite to Group</span>
+                    <span class="translate">Invite to Group</span>
                     <i class="fa fa-check"></i>
                   </a>
                 </div>
@@ -2209,7 +2209,7 @@
             <div class="form-group">
               <div class="col-sm-12 p-t-15">
                 <label for="filter-new-group">
-			<span class="translate">Search</span>
+                <span class="translate">Search</span>
                 </label>
                     <input class="form-control input_box" id="filter-existing-group" placeholder="Search by label or address...">
               </div>
@@ -2226,13 +2226,13 @@
                           <thead>
                             <tr>
                               <th style="padding-left:18px;" data-sort-initial="true" data-toggle="true">
-				      <span class="translate">Label</span>
+                              <span class="translate">Label</span>
                               </th>
                               <th data-hide="phone">
-				      <span class="translate">Address</span>
+                              <span class="translate">Address</span>
                               </th>
                               <th data-hide="phone">
-				      <span class="translate">Invite</span>
+                              <span class="translate">Invite</span>
                               </th>
                             </tr>
                           </thead>
@@ -2270,17 +2270,17 @@
         <li id="quickview-private-tab" onclick="contactScroll.refresh()">
           <a href="#quickview-private" data-toggle="tab">
             <i class="fa fa-user"></i>
-		  <span class="translate">PRIVATE</span></a>
+            <span class="translate">PRIVATE</span></a>
         </li>
         <li id="quickview-group-tab" onclick="contactGroupScroll.refresh()">
           <a href="#quickview-group" data-toggle="tab">
             <i class="fa fa-users"></i>
-		  <span class="translate">GROUP</span></a>
+            <span class="translate">GROUP</span></a>
         </li>
         <li id="quickview-book-tab" onclick="">
           <a href="#quickview-book" data-toggle="tab">
             <i class="fa fa-bars"></i>
-		  <span class="translate">BOOK</span></a>
+            <span class="translate">BOOK</span></a>
         </li>
         <!--
      <li class="active">
@@ -2298,7 +2298,7 @@
 
             <a href="#" data-target="#new-contact-modal" data-toggle="modal" id='start-conversation'>
               <i class="fa fa-plus margin-right-10"></i>
-		    <span class="translate">Start private conversation</span></a>
+              <span class="translate">Start private conversation</span></a>
             <div class="view bg-white" style="height: auto;">
 
               <div id="contact-list" class="contact-list">
@@ -2328,7 +2328,7 @@
 
             <a href="#" data-target="#new-group-modal" data-toggle="modal" id='start-conversation'>
               <i class="fa fa-plus margin-right-10" onClick=""></i>
-		    <span class="translate">Start group conversation</span></a>
+              <span class="translate">Start group conversation</span></a>
             <div id="group-invite-list">
             </div>
 
@@ -2366,9 +2366,9 @@
 
       <nav class="navbar navbar-default nav-sub-menu p-t-10 p-b-10 p-r-35 p-l-35" style="min-height:75px;margin-bottom:0px;" role="navigation">
         <div class="pull-left chat-header">
-		
+
           <h4 style="font-weight:bolder;" id="chat-header" data-value="">
-		  <span class="translate">CHAT</span>
+          <span class="translate">CHAT</span>
           </h4>
         </div>
 
@@ -2378,20 +2378,20 @@
             <span class="hide-this-icon icon-set menu-hambuger"></span>
           </a>
         </div>  -->
-				        
+
         <!-- Leave group  -->
         <div id="leave-group-btn" class="p-t-10 p-r-10 pull-right" style="display:none;">
           <a href="#" class="btn btn-default btn-cons" data-toggle="quickview" data-toggle-element="#quickview">
-              <i class="fa fa-sign-out"></i>
-		  <span class="translate">Leave Group</span>
+            <i class="fa fa-sign-out"></i>
+            <span class="translate">Leave Group</span>
           </a>
         </div>
 
         <!-- Open Invite modal  -->
         <div id="invite-group-btn" class="p-t-10 p-r-10 pull-right" style="display:none;">
           <a href="#" class="btn btn-default btn-cons" data-toggle="modal" data-target="#invite-to-group-modal" onclick="openInviteModal()">
-			 <i class="fa fa-user-plus"></i>
-		  <span class="translate">Invite</span>
+            <i class="fa fa-user-plus"></i>
+            <span class="translate">Invite</span>
           </a>
         </div>
 
@@ -2409,7 +2409,7 @@
 
             <div class="contact-discussion">
               <ul>
-			  </ul>
+              </ul>
             </div>
 
           </div>
@@ -2465,7 +2465,7 @@
         <nav class="navbar navbar-default nav-sub-menu p-t-10 p-b-10 p-r-35 p-l-35" style="min-height:75px;" role="navigation">
           <div class="pull-left">
             <h4 style="font-weight:bolder;">
-		    <span class="translate">CHAIN DATA</span>
+            <span class="translate">CHAIN DATA</span>
             </h4>
           </div>
           <div class="p-t-10 pull-right">
@@ -2487,19 +2487,19 @@
                 <thead>
                   <tr>
                     <th class="sorting" data-sort-initial="ascending" data-toggle="true" data-type="numeric" title="Coin Value">
-			    <span class="translate">Coin Value</span>
+                    <span class="translate">Coin Value</span>
                     </th>
                     <th class="sorting" data-hide="phone,tablet" data-type="numeric" title="No. Owned Mature">
-			    <span class="translate">Owned (Mature)</span>
+                    <span class="translate">Owned (Mature)</span>
                     </th>
                     <th class="sorting" data-hide="phone" data-type="numeric" title="No. System Mature">
-			    <span class="translate">System (Mature)</span>
+                    <span class="translate">System (Mature)</span>
                     </th>
                     <th class="sorting" data-type="numeric" title="No. Spends">
-			    <span class="translate">Spends</span>
+                    <span class="translate">Spends</span>
                     </th>
                     <th class="sorting" data-hide="phone" data-type="numeric" title="Chain Least Depth">
-			    <span class="translate">Least Depth</span>
+                    <span class="translate">Least Depth</span>
                     </th>
                   </tr>
                 </thead>
@@ -2526,7 +2526,7 @@
         <nav class="navbar navbar-default nav-sub-menu p-t-10 p-b-10 p-r-35 p-l-35" style="min-height:75px;" role="navigation">
           <div class="pull-left">
             <h4 style="font-weight:bolder;">
-		    <span class="translate">BLOCK EXPLORER</span>
+            <span class="translate">BLOCK EXPLORER</span>
             </h4>
           </div>
 
@@ -2552,16 +2552,16 @@
                 <thead>
                   <tr>
                     <th class="sorting" data-sort-initial="ascending" data-toggle="true" title="Hash">
-			    <span class="translate">Hash</span>
+                    <span class="translate">Hash</span>
                     </th>
                     <th class="sorting" data-sort-initial="ascending" data-toggle="true" data-type="numeric" title="Height">
-			    <span class="translate">Height</span>
+                    <span class="translate">Height</span>
                     </th>
                     <th class="sorting" data-type="numeric" title="Timestamp">
-			    <span class="translate">Timestamp</span>
+                    <span class="translate">Timestamp</span>
                     </th>
                     <th class="sorting" data-type="numeric" title="Transactions">
-			    <span class="translate">Transactions</span>
+                    <span class="translate">Transactions</span>
                     </th>
                   </tr>
                 </thead>
@@ -2572,10 +2572,10 @@
                 <thead>
                   <tr>
                     <th data-sort-initial="ascending" data-toggle="true" title="Transaction Hash">
-			    <span class="translate">Transaction Hash</span>
+                    <span class="translate">Transaction Hash</span>
                     </th>
                     <th data-sort-initial="ascending" data-toggle="true" data-type="numeric" title="Value Out">
-			    <span class="translate">Value Out</span>
+                    <span class="translate">Value Out</span>
                     </th>
                   </tr>
                 </thead>
@@ -2601,7 +2601,7 @@
         <nav class="navbar navbar-default nav-sub-menu p-t-10 p-b-10 p-r-35 p-l-35" style="min-height:75px;" role="navigation">
           <div class="pull-left">
             <h4 style="font-weight:bolder;">
-		    <span class="translate">OPTIONS</span>
+            <span class="translate">OPTIONS</span>
             </h4>
           </div>
 
@@ -2623,32 +2623,32 @@
                 <ul class="nav nav-tabs nav-tabs-simple nav-tabs-simple-bg">
                   <li class="active" style="font-weight:bolder;color: #333;">
                     <a data-toggle="tab" href="#tab1main">
-			    <span class="translate">Main</span></a>
+                    <span class="translate">Main</span></a>
                   </li>
 
                   <li style="font-weight:bolder;color: #333;">
                     <a data-toggle="tab" href="#tab1network">
-			    <span class="translate">Network</span></a>
+                    <span class="translate">Network</span></a>
                   </li>
 
                   <li style="font-weight:bolder;color: #333;">
                     <a data-toggle="tab" href="#tab1window">
-			    <span class="translate">Window</span></a>
+                    <span class="translate">Window</span></a>
                   </li>
 
                   <li style="font-weight:bolder;color: #333;">
                     <a data-toggle="tab" href="#tab1display">
-			    <span class="translate">Display</span></a>
+                    <span class="translate">Display</span></a>
                   </li>
 
                   <li style="font-weight:bolder;color: #333;">
                     <a data-toggle="tab" href="#tab1i2p">
-			    <span class="translate">I2P</span></a>
+                    <span class="translate">I2P</span></a>
                   </li>
 
                   <li style="font-weight:bolder;color: #333;">
                     <a data-toggle="tab" href="#tab1tor">
-			    <span class="translate">Tor</span></a>
+                    <span class="translate">Tor</span></a>
                   </li>
                 </ul>
 
@@ -2686,16 +2686,16 @@
                               <input id="optFee" class="form-control-options-page" onchange="unit.parse(this, $('#optFeeunit').val());" placeholder="0.00000000" step="0.01" type="number" value="0.00000000">
                               <select class="select-drop-down" id="optFeeunit" onchange="unit.format('#optFee', $(this).val());">
                                 <option title="Shadow" value="0">
-					<span class="translate">SDC</span>
+                                <span class="translate">SDC</span>
                                 </option>
                                 <option title="Milli-Shadow (1 / 1000)" value="1">
-					<span class="translate">mSDC</span>
+                                <span class="translate">mSDC</span>
                                 </option>
                                 <option title="Micro-Shadow (1 / 1000000)" value="2">
-					<span class="translate">&micro;SDC</span>
+                                <span class="translate">&micro;SDC</span>
                                 </option>
                                 <option title="Shadowshi (1 / 100000000)" value="3">
-					<span class="translate">Shadowshi</span>
+                                <span class="translate">Shadowshi</span>
                                 </option>
                               </select>
                             </div>
@@ -2718,16 +2718,16 @@
                               <input id="optReserveBalance" class="form-control-options-page" onchange="unit.parse(this, $('#optReserveBalanceunit').val());" placeholder="0.00000000" step="0.01" type="number" value="0.00000000">
                               <select class="select-drop-down" id="optReserveBalanceunit" onchange="unit.format('#optReserveBalance', $(this).val());">
                                 <option title="Shadow" value="0">
-					<span class="translate">SDC</span>
+                                <span class="translate">SDC</span>
                                 </option>
                                 <option title="Milli-Shadow (1 / 1000)" value="1">
-					<span class="translate">mSDC</span>
+                                <span class="translate">mSDC</span>
                                 </option>
                                 <option title="Micro-Shadow (1 / 1000000)" value="2">
-					<span class="translate">&micro;SDC</span>
+                                <span class="translate">&micro;SDC</span>
                                 </option>
                                 <option title="Shadowshi (1 / 100000000)" value="3">
-					<span class="translate">Shadowshi</span>
+                                <span class="translate">Shadowshi</span>
                                 </option>
                               </select>
                             </div>
@@ -2919,16 +2919,16 @@
                               <div class="option">
                                 <select class="select-drop-down" id="optDisplayUnit">
                                   <option title="Shadow" value="0">
-					  <span class="translate">SDC</span>
+                                    <span class="translate">SDC</span>
                                   </option>
                                   <option title="Milli-Shadow (1 / 1000)" value="1">
-					  <span class="translate">mSDC</span>
+                                    <span class="translate">mSDC</span>
                                   </option>
                                   <option title="Micro-Shadow (1 / 1000000)" value="2">
-					  <span class="translate">&micro;SDC</span>
+                                    <span class="translate">&micro;SDC</span>
                                   </option>
                                   <option title="Shadowshi (1 / 100000000)" value="3">
-					  <span class="translate">Shadowshi</span>
+                                    <span class="translate">Shadowshi</span>
                                   </option>
                                 </select>
                               </div>
@@ -3006,7 +3006,7 @@
                     <div class="row">
                       <div class="col-md-12">
                         <div id="options-display">
-				<span class="translate">I2P (coming soon)</span>
+                        <span class="translate">I2P (coming soon)</span>
                         </div>
                         <!-- /options-i2p -->
                       </div>
@@ -3017,7 +3017,7 @@
                     <div class="row">
                       <div class="col-md-12">
                         <div id="options-display">
-				<span class="translate">TOR (coming soon)</span>
+                        <span class="translate">TOR (coming soon)</span>
                         </div>
                         <!-- /options-tor -->
                       </div>
@@ -3028,7 +3028,7 @@
                 <div class="center-div m-t-25 m-b-25 p-t-25" style="border-top: 1px solid rgba(230, 230, 230, 0.7)">
                   <a class="btn btn-default btn-cons" id="options-cancel" onclick="optionsPage.update();prevPage.click();">
                     <i class="fa fa-times"></i>
-			  <span class="translate">Cancel</span></a>
+                    <span class="translate">Cancel</span></a>
                   <a class="btn btn-default btn-cons translate" id="options-apply" onclick="if(this.className.indexOf('disabled') == -1) optionsPage.save();">Apply
                     <i class="fa fa-check"></i>
                   </a>
@@ -3196,8 +3196,8 @@
                       <div class="pull-left m-r-15 m-t-25 m-b-25">
                         <div id="backWiz" class="btn btn-default btn-cons wizzardback" onclick="$('.wizardback').show(); gotoWizard('new-key-wizard', 0 , false);">
                           <i class="fa fa-arrow-left"></i>
-				<span class="translate">Back</span>
-			</div>
+                          <span class="translate">Back</span>
+                      </div>
                       </div>
                       <div class="pull-right m-l-15 m-t-25 m-b-25">
                         <div id="fwdWiz" class="btn btn-danger btn-cons wizzardfwd translate" onclick="$('.wizardback').show(); gotoWizard('new-key-wizard', 2, true);">Next Step
@@ -3246,8 +3246,8 @@
                       <div class="pull-left m-r-15 m-t-25 m-b-25">
                         <div id="backWiz" class="btn btn-default btn-cons wizzardback" onclick="$('.wizardback').show(); gotoWizard('new-key-wizard', 1 , false);">
                           <i class="fa fa-arrow-left"></i>
-				<span class="translate">Back</span>
-			</div>
+                          <span class="translate">Back</span>
+                      </div>
                       </div>
                       <div class="pull-right m-l-15 m-t-25 m-b-25">
                         <div id="fwdWiz" class="btn btn-danger btn-cons wizzardfwd translate" onclick="$('.wizardback').show(); gotoWizard('new-key-wizard', 3, true);">Next Step
@@ -3425,7 +3425,7 @@
                 <div class="panel-heading">
                   <div class="panel-title">
                     <p style="font-weight:bolder;">
-			<span class="translate">Accounts</span>
+                    <span class="translate">Accounts</span>
                     </p>
                   </div>
                 </div>
@@ -3450,7 +3450,7 @@
                 <div class="panel-heading">
                   <div class="panel-title">
                     <p style="font-weight:bolder;">
-			<span class="translate">Wallet Keys</span>
+                    <span class="translate">Wallet Keys</span>
                     </p>
                   </div>
                 </div>
@@ -3471,13 +3471,13 @@
                 <div class="center-div p-t-25 p-b-25">
                   <a class="btn btn-default btn-cons" id="btn-make-default-key" href="#" onclick="walletManagementPage.setDefault();">
                     <i class="fa fa-pencil-square-o"></i>
-			<span class="translate">Make Default</span></a>
+                    <span class="translate">Make Default</span></a>
                   <a class="btn btn-default btn-cons" id="btn-activate-deactivate" href="#" onclick="walletManagementPage.changeActiveFlag();">
                     <i class="fa fa-pencil-square-o"></i>
-			<span class="translate">Activate/Deactivate</span></a>
+                    <span class="translate">Activate/Deactivate</span></a>
                   <a class="btn btn-default btn-cons" id="btn-set-master" href="#" onclick="walletManagementPage.setMaster();">
                     <i class="fa fa-pencil-square-o"></i>
-			<span class="translate">Set as Master</span></a>
+                    <span class="translate">Set as Master</span></a>
                 </div>
 
               </div>

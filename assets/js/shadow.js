@@ -9,6 +9,25 @@ function invalid(el, valid) {
     return (valid == true);
 }
 
+function getAddressForNewChat(pubkey) {
+    // if new-contact-address is empty get the address from the pubkey
+    var address = $("#new-contact-address").val();
+    if (address.length > 0)
+        return address;
+
+    address = bridge.addressForPubKey(pubkey);
+
+    if (address.length > 0) {
+        $("#new-contact-address").val(address);
+        var label = getContactUsername(address, true);
+        if (label == '(no label)')
+            label = '';
+        $('#new-contact-name').val(label);
+    }
+
+    return address;
+}
+
 function updateValue(element) {
     //TODO: add prefix label group_ when addresstype AT = 4. So we can remove it from the label being shown and handle it in the background..
     var curhtml = element.html(),
@@ -2373,12 +2392,11 @@ function openPickSenderMsgAddrModal(){
     $("#pick-sender-msg-modal").modal('show');
 }
 
-function startNewConversation(){
+function startNewConversation() {
     console.log("startNewConversation");
     var sender_msg_address = $("#pick-sender-msg-selector").val();
-    alert(sender_msg_address);
 
-    if(sender_msg_address == "none"){
+    if (sender_msg_address == "none") {
         alert("Please select an address.");
         return false;
     }
@@ -2391,7 +2409,7 @@ function startNewConversation(){
     //verify that sender msg selector is not none..
 }
 
-function closePickSenderMsgAddrModal(){
+function closePickSenderMsgAddrModal() {
     cleanNewConversationModal();
     $("#pick-sender-msg-modal").modal('hide');
 }
