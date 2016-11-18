@@ -1950,7 +1950,7 @@ function openConversation(key, click) {
     function processMessageForDisplay(message) {
         return micromarkdown.parse(emojione.toImage(message));
     }
-//<img src="http://blogs-images.forbes.com/parmyolson/files/2011/08/anonymous-mask.png" alt="imageinfo" title="imageinfo">
+
     contact.messages.forEach(function(message, index) {
 
         if (index > 0 && combineMessages(prev_message, message)) {
