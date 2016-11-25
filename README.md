@@ -24,8 +24,13 @@ Now move to the directory where your shadow fork is stored or clone the repo if 
 
 `git clone git@github.com:shadowproject/shadow.git`
 
+Move into the directory
+`cd shadow`
+
 Then symlink /opt/shadow
 `ln -s that_pwd_path /opt/shadow`
+
+RUn ./umbra and the GUI should be loaded from Shadow-UI
 
 
 
