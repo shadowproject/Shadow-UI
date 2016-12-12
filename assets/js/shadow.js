@@ -1535,6 +1535,8 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
         if (current_key == key && !initial) //on send of our own message reload convo to add message.
             openConversation(key, false); //hmm
 
+        prependContact(key);
+        
          if (type == "R" && read == 0)
             addNotificationCount(key, 1);
      }
