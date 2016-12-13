@@ -1667,7 +1667,8 @@ function createContact(label, address, is_group, in_addressbook) {
         contact.title = (isStaticVerified(address) ? verified_list[address].title : (is_group ? "Untrusted" : (contact.addressbook ? "Verified" : "Unverified"))), //If message sent from group address mark it as untrusted as it is impossible to do with GUI. Manipulation
         contact.avatar_type = 0,
         contact.avatar = "", // TODO: Avatars!!
-        contact.messages  = [];
+        contact.messages  = [],
+        contact.show_messages = 50; //load this many messages on opening
 
         if(is_group) 
             contact.contacts  = [];
@@ -1962,8 +1963,6 @@ function openConversation(key, click) {
         updateValueChat($(this), contact.key);
     }).attr("data-title", "Double click to edit").tooltip();
 
-    var message;
-    var prev_message;
 
     if(click)
         removeNotificationCount(contact.key);
@@ -1975,8 +1974,16 @@ function openConversation(key, click) {
                 '<a class="mmd_shadowcash" onclick="return confirmConversationOpenLink()" target="_blank" href="$1" data-title="$1">$1</a>');
     }
 
+    //TODO: display load more messages, segmenting loading from x to x+50 so it does not have to re-do all loaded messages and saves the DOM some time
+
+
+    var message;
+    var prev_message;
+
+    //loads all messages 
     contact.messages.forEach(function(message, index) {
 
+        //combine consecutive chat messages into one big message
         if (index > 0 && combineMessages(prev_message, message)) {
             $("#"+ prev_message.id).attr("id", message.id);
             $("#" + message.id + " .message-text").append(processMessageForDisplay(message.message));
@@ -2001,6 +2008,7 @@ function openConversation(key, click) {
             label_msg = contacts[message.key_msg].label;
         else
             label_msg = getContactUsername(message.key_msg);
+        //      ^this is to get our own username, we do not load or own addresses in the contacts array
 
         var onclick = (label_msg == message.key_msg) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.key_msg + "')\" " : "";
         discussion.append(
@@ -2332,7 +2340,6 @@ function openNewConversationModal(){
             updateContact(contact_name, address);
             openConversation(address, false);
             cleanNewConversationModal();
-            console.log("cleaned");
         }, 500);
 
         return closeNewConversationModal();
@@ -2377,11 +2384,12 @@ function openNewConversationModal(){
 }
 
 function closeNewConversationModal(){
-    // clean up new new-contact-modal and close it.
+    // close up new-contact-modal
     $('#new-contact-modal').modal('hide');
     return true;
 }
 function cleanNewConversationModal(){
+    // clean up new-contact-modal
     $("#new-contact-address").val("");
     $("#new-contact-name").val("");
     $("#new-contact-pubkey").val("");

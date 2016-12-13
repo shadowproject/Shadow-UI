@@ -744,6 +744,8 @@ button {
   margin-left: 0;
   font-style: normal;
   text-decoration: none;
+  -webkit-user-select: all;
+  user-select: all;
 }
 
 .contact-discussion ul li .message-content .timestamp {
@@ -758,6 +760,8 @@ button {
   width: 36px;
   margin-right: 5px;
   margin-left: 0;
+  -webkit-user-select: all;
+  user-select: all;
 }
 
 .contact-discussion ul li.user-message .message-content .timestamp {
@@ -769,6 +773,8 @@ button {
   display: block;
   min-height: 1rem;
   line-height: 24px;
+  -webkit-user-select: all;
+  user-select: all;
 }
 
 .contact-discussion ul li .message-content .message-text:after
