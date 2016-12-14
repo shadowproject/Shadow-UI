@@ -1533,7 +1533,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 
         appendContact(key, false);
         if (current_key == key && !initial) //on send of our own message reload convo to add message.
-            openConversation(key, false); //hmm
+            loadNewMessage(key); 
 
         prependContact(key);
         
@@ -1668,7 +1668,7 @@ function createContact(label, address, is_group, in_addressbook) {
         contact.avatar_type = 0,
         contact.avatar = "", // TODO: Avatars!!
         contact.messages  = [],
-        contact.show_messages = 50; //load this many messages on opening
+        contact.mesage_height; //messages are loaded backwards in batches of 100 up until a certain message height. 
 
         if(is_group) 
             contact.contacts  = [];
@@ -1933,14 +1933,16 @@ function openConversation(key, click) {
     if(click)
          $("#chat-menu-link").click();//open chat window when on other page
 
-    current_key = key;
+
     //TODO: detect wether user is typing, if so do not reload page to other conversation..
     //$(this).addClass("selected").siblings("li").removeClass("selected");
-    var discussion = $(".contact-discussion ul");
     var contact = contacts[key];
 
-    discussion.html("");
+    if(current_key != key)
+        cleanUpAfterCurrentKey();
+        
 
+    current_key = key;
 
     var is_group = contact.group;
 
@@ -1967,6 +1969,75 @@ function openConversation(key, click) {
     if(click)
         removeNotificationCount(contact.key);
 
+
+    loadMessages(key);
+
+    setTimeout(function() {scrollMessages();}, 200);
+}
+
+var lol = 1;
+function loadMessages(key){
+    lol++;
+    console.log("starting\n");
+    var discussion = $(".contact-discussion ul");
+    var contact = contacts[key];
+    var amount_to_load = 50;
+
+    var message;
+    var prev_message;
+
+    //nothing has been loaded yet, initialize the height (loaded = 0)
+    if(contacts[key].message_height == undefined){
+        contacts[key].message_height = contact.messages.length;
+    }
+    console.log("contacts[" + key + "].message_height == (length = " + contact.messages.length +")  == " +  contacts[key].message_height + "\n"); 
+
+    //change the height to what we're going to load
+    if(contacts[key].message_height > amount_to_load) {
+        contacts[key].message_height = contacts[key].message_height - amount_to_load;
+    } else {
+        //we can't load more messages than we have..
+        amount_to_load = contacts[key].message_height; 
+        contacts[key].message_height = 0;
+    }
+    
+    console.log("contacts[" + key + "].message_height=" +  contacts[key].message_height + "\n");
+    console.log("contacts[" + key + "].messages.length= " +  contacts[key].messages.length + "\n");
+    console.log("amount_to_load= " +  amount_to_load + "\n");
+
+
+    //TODO: display load more messages, segmenting loading from x to x+50 so it does not have to re-do all loaded messages and saves the DOM some time
+    var message_block =  $("<span class='message-block' rand='" + lol + "'></span>").prependTo(".contact-discussion ul");
+
+
+    //loads all messages
+    var index = contact.message_height;
+    while(index < contact.message_height + amount_to_load) {
+
+        //console.log("index=" + index);
+        loadMessageByIndex(key, index, message_block);
+        getOurAddress(key, true);
+        //discussion.children("[title]").on("mouseenter", tooltip);
+
+        index++;
+    };
+
+    if(contact.messages.length == 0) {
+        $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li><span class='message-block'></span>");
+        $("#message-to-address").val(contact.address);
+    }
+
+    /*
+
+    message1
+    message2
+    message3 
+    message4 */
+    
+
+
+}
+
     function processMessageForDisplay(message) {
         return micromarkdown.parse(
             emojione.toImage(message)).replace(
@@ -1974,28 +2045,7 @@ function openConversation(key, click) {
                 '<a class="mmd_shadowcash" onclick="return confirmConversationOpenLink()" target="_blank" href="$1" data-title="$1">$1</a>');
     }
 
-    //TODO: display load more messages, segmenting loading from x to x+50 so it does not have to re-do all loaded messages and saves the DOM some time
-
-
-    var message;
-    var prev_message;
-
-    //loads all messages 
-    contact.messages.forEach(function(message, index) {
-
-        //combine consecutive chat messages into one big message
-        if (index > 0 && combineMessages(prev_message, message)) {
-            $("#"+ prev_message.id).attr("id", message.id);
-            $("#" + message.id + " .message-text").append(processMessageForDisplay(message.message));
-
-            prev_message = message;
-            return;
-         }
-         prev_message = message;
-
-
-
-
+function loadMessage(message, message_block){
         var time  = new Date(message.sent*1000);//.toLocaleString()
         var timeReceived  = new Date(message.received*1000);
 
@@ -2009,10 +2059,10 @@ function openConversation(key, click) {
         else
             label_msg = getContactUsername(message.key_msg);
         //      ^this is to get our own username, we do not load or own addresses in the contacts array
-
+        //contact-key='"+contact.key+"'
         var onclick = (label_msg == message.key_msg) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.key_msg + "')\" " : "";
-        discussion.append(
-            "<li id='"+message.id+"' class='message-wrapper "+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
+        message_block.append(
+            "<li id='"+message.id+"' class='message-wrapper "+(message.type=='S'?'my-message':'other-message')+"'>\
                 <span class='message-content'>\
                     <span class='info'>"+ (message.type=='S'? getAvatar(message.self) : getAvatar(message.them))+ "</span>\
                     <span class='user-name' " + onclick + ">"
@@ -2021,7 +2071,7 @@ function openConversation(key, click) {
                     <span class='title'>\
                     </span>\
                     <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
-                       <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
+                       <span class='delete'><i class='fa fa-minus-circle'></i></span>\
                        <span class='message-text'>"+ processMessageForDisplay(message.message) +  "</span>\
                 </span>\
              </li>");
@@ -2029,23 +2079,46 @@ function openConversation(key, click) {
             .tooltip().find('.message-text')
             .tooltip();
 
+        $("#" + message.id + " .message-content .delete").on("click", function(e) {deleteMessages(current_key, message.id)});
+
         insertTitleHTML(message.id, message.key_msg);
 
         //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
         $('#' + message.id + ' .user-name').attr('data-title', '' + (message.type == "S" ? message.self : message.them)).tooltip();
  
-        getOurAddress(key, true);
-        //discussion.children("[title]").on("mouseenter", tooltip);
+}
 
+function loadMessageByIndex(key, index, message_block){
+    //loadNewMessageByIndex is called when
+    // a) Opening a conversation
+    // b) When receiving a message when the conversation is open
 
-        if(contact.messages.length == 0) {
-             $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li>");
-             $("#message-to-address").val(contact.address);
-        }
-    });
+    var contact = contacts[key];
 
+    var prev_message;
+    var message = contact.messages[index];
 
-    setTimeout(function() {scrollMessages();}, 200);
+        //combine consecutive chat messages into one big message if index > contact.message_height because we can't combine data with an element that does not exist
+        if (index > contact.message_height) {
+            prev_message = contact.messages[index-1];
+            if(checkIfWeNeedToCombineMessages(prev_message, message))
+                return combineMessages(prev_message, message);
+             //continue
+         } 
+
+         loadMessage(message, message_block);
+}
+
+function loadNewMessage(key){
+    var message_block = $(".contact-discussion ul span:last");
+    loadMessageByIndex(key, contacts[key].messages.length-1, message_block);
+    scrollMessages();
+}
+
+function cleanUpAfterCurrentKey(){
+    //remove all current chat messages and reset the message height on the current_key
+    $(".contact-discussion ul").html("<span class='message-block'></span>");
+    contacts[current_key].message_height = undefined;
 }
 
 function getOurAddress(key, set){
@@ -2110,7 +2183,7 @@ function confirmConversationOpenLink() {
     return (confirm('Are you sure you want to open this link?\n\nIt will leak your IP address and other browser metadata, the least we can do is advice you to copy the link and open it in a _Tor Browser_ instead.\n\n You can disable this message in options.'));
 }
 
-function combineMessages(prev_message, message){
+function checkIfWeNeedToCombineMessages(prev_message, message){
     if(prev_message.type != message.type)
         return false;
 
@@ -2121,6 +2194,12 @@ function combineMessages(prev_message, message){
         return true;
 
     return false;
+}
+
+function combineMessages(prev_message, message){
+    $("#"+ prev_message.id).attr("id", message.id);
+    $("#" + message.id + " .message-text").append(processMessageForDisplay(message.message));
+    return true;
 }
 
 function addRandomAvatar(key){ 
