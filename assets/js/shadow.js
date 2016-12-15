@@ -2064,10 +2064,7 @@ function loadMessages(key){
 }
 
     function processMessageForDisplay(message) {
-        return micromarkdown.parse(
-            emojione.toImage(message)).replace(
-                /<a class="mmd_shadowcash" href="(.+)">(.+)<\/a>/g,
-                '<a class="mmd_shadowcash" onclick="return confirmConversationOpenLink()" target="_blank" href="$1" data-title="$1">$1</a>');
+        return micromarkdown.parse(emojione.toImage(message));
     }
 
 function loadMessage(message, message_block){
@@ -2215,6 +2212,18 @@ function insertTitleHTML(id, key){
 function confirmConversationOpenLink() {
     // TODO: Disable convirm option.
     return (confirm('Are you sure you want to open this link?\n\nIt will leak your IP address and other browser metadata, the least we can do is advice you to copy the link and open it in a _Tor Browser_ instead.\n\n You can disable this message in options.'));
+}
+
+
+function confirmConversationShowImage(e){
+
+    if(!confirm('Are you sure you want to view this image?\n\nIt will leak your IP address and other browser metadata, the least we can do is advice you to copy the link and open it in a _Tor Browser_ instead.'))
+        return false;
+
+    var image_url = $(e).data("src");
+    $(e).load(iscrollReload);
+    $(e).attr("src", image_url);
+
 }
 
 function checkIfWeNeedToCombineMessages(prev_message, message){
