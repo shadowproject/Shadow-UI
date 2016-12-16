@@ -1456,7 +1456,7 @@ function appendMessages(messages, reset) {
             break;
         }
         openConversation(contacts[current_key_temp].address, false);
-        scrollMessages(true);
+        setTimeout(function() {scrollMessages(true);}, 200);
     }
 
     $(contacts[current_key].group ? "#contact-group-list" : "#contact-list").addClass("in-conversation");
@@ -1748,8 +1748,9 @@ function updateContact(label, address, contact_address, open_conversation) {
             $("#contact-book-" + contact_address + " .contact-info .contact-name").text(label);
             $("#contact-" + contact_address + " .contact-info .contact-name").text(label);
         }
-        if (openConversation)
+        if (openConversation){
             openConversation(address, true);
+        }
     }
     //check if current key is ==address
     //loop through messages and change label
@@ -2092,8 +2093,7 @@ function loadMessage(message, message_block){
                     <span class='title'>\
                     </span>\
                     <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
-                       <span class='delete'><i class='fa fa-minus-circle'></i></span>\
-                       <span id='" + message.id + "' class='message-text'>"+ processMessageForDisplay(message.message) +  "</span>\
+                       <div id='" + message.id + "'><span class='message-text'>"+ processMessageForDisplay(message.message) +  "</span></div>\
                 </span>\
              </li>").appendTo(message_block);
          
@@ -2109,9 +2109,26 @@ function loadMessage(message, message_block){
         });
     }
 
-    message_wrapper.find(".message-content .delete").on("click", function() {
+    message_wrapper.find("#" + message.id).append(createMessageDeleteButton());
+    message_wrapper.find("#"+ message.id + " .delete")
+    .on("click", function() {
         deleteMessages(current_key, message.id);
     });
+    message_wrapper.find("#"+ message.id).hover(
+        function() {
+            $(this).find(".delete").show();
+        }, function(){
+            $(this).find(".delete").hide(); 
+        }
+    );
+
+    message_wrapper.find(".delete").hover(
+        function() {
+            $("#"+ message.id ).addClass("message-text-selected"); //make the hover do stuff
+        }, function(){
+            $("#"+ message.id).removeClass("message-text-selected"); 
+        }
+    );
 
     insertTitleHTML(message_wrapper, message.key_msg);
 
@@ -2250,10 +2267,34 @@ function checkIfWeNeedToCombineMessages(prev_message, message){
 }
 
 function combineMessages(prev_message, message){
-    $("<span class='message-text'></span>").insertAfter($("#" + prev_message.id))
+    var m = $("<div><span class='message-text'></span></div>").insertAfter($("#" + prev_message.id))
     .attr('id', message.id)
-    .html(processMessageForDisplay(message.message)); //properly escaped
+    .append(createMessageDeleteButton()) //properly escaped
+    .hover(
+        function() {
+            $(this).find(".delete").show();
+        }, function(){
+            $(this).find(".delete").hide(); 
+        }
+    );
+    m.find(".delete").hover(
+        function() {
+            $("#" + message.id).addClass("message-text-selected"); //make the hover do stuff
+        }, function(){
+            $("#" + message.id).removeClass("message-text-selected"); 
+        }
+    ).on("click", function() {
+        deleteMessages(current_key, message.id);
+    });
+
+    m.find(".message-text").append(processMessageForDisplay(message.message));
+
+
     return true;
+}
+
+function createMessageDeleteButton(){
+    return "<span class='delete'><i class='fa fa-minus-circle'></i></span>";
 }
 
 function addRandomAvatar(key){ 

@@ -689,6 +689,19 @@ button {
   background:#fff;  
 }
 
+.contact-discussion ul li .delete {
+  width: 3%;
+  float: right; 
+  display: none;
+  height: 100%;
+}
+
+.contact-discussion ul li .delete i {
+  width: 50%;
+  margin: 0 auto;
+
+}
+
 .contact-discussion .delete:hover {
   color: #E3223C;
 }
@@ -770,11 +783,15 @@ button {
 
 .contact-discussion ul li .message-content .message-text {
   color: #8b898f;
-  display: block;
+  display: inline-block;
+  width: 97%;
   min-height: 1rem;
   line-height: 24px;
   -webkit-user-select: all;
   user-select: all;
+}
+.contact-discussion ul li .message-content .message-text-selected {
+  background-color: rgba(0,0,0,.03);
 }
 
 .contact-discussion ul li .message-content .message-text:after
@@ -790,6 +807,20 @@ button {
   padding-bottom:10px;
 }
 
+/*
+in preparations of time per message
+.contact-discussion ul .message-content{
+  position: relative;
+  padding: .25rem 2rem .1rem 3rem;
+  min-height: 36px;
+  margin-left:25px;
+  padding-top:10px;
+  padding-bottom:10px;
+}
+
+.contact-discussion ul .message-content .first-message{
+  padding: 0rem 0rem 0rem 4.5rem
+}*/
 .chat .chat-history .my-message {
   background: #86BB71;
 }
