@@ -1839,8 +1839,6 @@ function getContactUsername(key, no_key_return){
     return key; //returning address
 }
 
-//console.log("verified list" + verified_list["SVY9s4CySAXjECDUwvMHNM6boAZeYuxgJE"]["username"]);
-//console.log("getContactName" + getContactUsername("SVY9s4CySAXjECDUwvMHNM6boAZeYuxgJE"));
 
 function isStaticVerified(key){
     return (typeof verified_list[key] === "object");
@@ -1936,7 +1934,7 @@ function removeNotificationCount(key) {
 
 }
 
-//OpenConversation is split off to allow for opening conversation automatically without removing notification.
+
 function openConversation(key, click) {
 
     if(click)
@@ -1946,8 +1944,7 @@ function openConversation(key, click) {
     //TODO: detect wether user is typing, if so do not reload page to other conversation..
     //$(this).addClass("selected").siblings("li").removeClass("selected");
     var contact = contacts[key];
-    console.log("current_key=" + current_key);
-    console.log("key=" + key);
+
     if(current_key != key){
         cleanUpAfterCurrentKey();
         loadMessages(key);
@@ -1987,14 +1984,12 @@ function openConversation(key, click) {
     //setTimeout(function() {scrollMessages();}, 200);
 }
 
-var lol = 1;
+
 function loadMessages(key){
 
     if(key == undefined)
         key = current_key;
 
-    lol++;
-    console.log("starting\n");
     var discussion = $(".contact-discussion ul");
     var contact = contacts[key];
     var amount_to_load = 50;
@@ -2014,9 +2009,8 @@ function loadMessages(key){
 
     }
 
-    console.log("contacts[" + key + "].message_height == (length = " + contact.messages.length +")  == " +  contacts[key].message_height + "\n"); 
 
-    var message_block =  $("<span class='message-block' rand='" + lol + "'></span>").insertAfter(".contact-discussion ul .load-more-messages");
+    var message_block =  $("<span class='message-block'></span>").insertAfter(".contact-discussion ul .load-more-messages");
     //change the height to what we're going to load
     if(contacts[key].message_height > amount_to_load) {
         contacts[key].message_height = contacts[key].message_height - amount_to_load;
@@ -2028,9 +2022,6 @@ function loadMessages(key){
         hideLoadMoreMessagesButton();
     }
     
-    console.log("contacts[" + key + "].message_height=" +  contacts[key].message_height + "\n");
-    console.log("contacts[" + key + "].messages.length= " +  contacts[key].messages.length + "\n");
-    console.log("amount_to_load= " +  amount_to_load + "\n");
 
 
     //TODO: display load more messages, segmenting loading from x to x+50 so it does not have to re-do all loaded messages and saves the DOM some time
@@ -2039,8 +2030,6 @@ function loadMessages(key){
     //loads all messages
     var index = contact.message_height;
     while(index < contact.message_height + amount_to_load) {
-
-        //console.log("index=" + index);
         loadMessageByIndex(key, index, message_block);
         getOurAddress(key, true);
         //discussion.children("[title]").on("mouseenter", tooltip);
@@ -2218,7 +2207,7 @@ function insertTitleHTML(message_wrapper, key){
         return false;
 
     var contact = contacts[key];
-    //console.log("insertTitleHTML key=" + key + " title=" + contact.title);
+
     var title = contacts[key].title.toLowerCase();
     message_wrapper.find(".title").addClass(getIconTitle(title) + title + "-mark");
     message_wrapper.find(".title").hover(
@@ -2428,7 +2417,7 @@ function inviteGroupChat(group_address){
     var element = "#invite-modal-tbody";
 
     if(group_address != undefined)
-        element = "group-modal-tbody";
+        element = "#group-modal-tbody";
     else 
         group_address = current_key;
 
@@ -2510,8 +2499,6 @@ function openNewConversationModal(){
     var address = $('#new-contact-address').val();
     var contact_name = $("#new-contact-name").val();
 
-    console.log("newConvo called!");
-    console.log("length=" + $("#contact-"+address).length);
 
     if($("#contact-"+address).length == 1){
 
