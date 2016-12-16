@@ -2068,14 +2068,14 @@ function loadMessages(key){
     }
 
 function loadMessage(message, message_block){
-        var time  = new Date(message.sent*1000);//.toLocaleString()
-        var timeReceived  = new Date(message.received*1000);
+    var time  = new Date(message.sent*1000);//.toLocaleString()
+    var timeReceived  = new Date(message.received*1000);
 
-        //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
-        //TODO: parse with regex to be sure.. do in appendMessage
-        addAvatar(message.them);
+    //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
+    //TODO: parse with regex to be sure.. do in appendMessage
+    addAvatar(message.them);
 
-        var label_msg;
+    var label_msg;
         if(contacts[message.key_msg] != undefined)
             label_msg = contacts[message.key_msg].label;
         else
@@ -2083,30 +2083,40 @@ function loadMessage(message, message_block){
         //      ^this is to get our own username, we do not load or own addresses in the contacts array
         //contact-key='"+contact.key+"'
         var onclick = (label_msg == message.key_msg) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.key_msg + "')\" " : "";
-        message_block.append(
-            "<li id='"+message.id+"' class='message-wrapper "+(message.type=='S'?'my-message':'other-message')+"'>\
+        var message_wrapper = $("<li class='message-wrapper "+(message.type=='S'?'my-message':'other-message')+"'>\
                 <span class='message-content'>\
                     <span class='info'>"+ (message.type=='S'? getAvatar(message.self) : getAvatar(message.them))+ "</span>\
-                    <span class='user-name' " + onclick + ">"
+                    <span class='user-name'>"
                         +(label_msg)+"\
                     </span>\
                     <span class='title'>\
                     </span>\
                     <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
                        <span class='delete'><i class='fa fa-minus-circle'></i></span>\
-                       <span class='message-text'>"+ processMessageForDisplay(message.message) +  "</span>\
+                       <span id='" + message.id + "' class='message-text'>"+ processMessageForDisplay(message.message) +  "</span>\
                 </span>\
-             </li>");
-         $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString())
-            .tooltip().find('.message-text')
-            .tooltip();
+             </li>").appendTo(message_block);
+         
+    message_wrapper.find('.timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString())
+        .tooltip();
 
-        $("#" + message.id + " .message-content .delete").on("click", function(e) {deleteMessages(current_key, message.id)});
+    if(label_msg == message.key_msg){
+        message_wrapper.find(".user-name").attr('data-toggle','modal').attr('data-target','#add-address-modal').on('click', function(){
+            clearSendAddress(); 
+            $('#add-rcv-address').hide();
+            $('#add-send-address').show();
+            $('#new-send-address').val(message.key_msg);
+        });
+    }
 
-        insertTitleHTML(message.id, message.key_msg);
+    message_wrapper.find(".message-content .delete").on("click", function() {
+        deleteMessages(current_key, message.id);
+    });
 
-        //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
-        $('#' + message.id + ' .user-name').attr('data-title', '' + (message.type == "S" ? message.self : message.them)).tooltip();
+    insertTitleHTML(message_wrapper, message.key_msg);
+
+    
+    message_wrapper.find('.user-name').attr('data-title', '' + message.key_msg).tooltip();
  
 }
 
@@ -2185,7 +2195,7 @@ function setSenderAndReceiver(sender, receiver){
     $("#message-to-address").val(receiver);
 }
 
-function insertTitleHTML(id, key){
+function insertTitleHTML(message_wrapper, key){
     //id = message id
     if(!existsContact(key))
         return false;
@@ -2193,8 +2203,8 @@ function insertTitleHTML(id, key){
     var contact = contacts[key];
     //console.log("insertTitleHTML key=" + key + " title=" + contact.title);
     var title = contacts[key].title.toLowerCase();
-    $("#" + id + " .title").addClass(getIconTitle(title) + title + "-mark");
-    $("#" + id + " .title").hover(
+    message_wrapper.find(".title").addClass(getIconTitle(title) + title + "-mark");
+    message_wrapper.find(".title").hover(
         function ()
         {
             //on hover
@@ -2240,8 +2250,9 @@ function checkIfWeNeedToCombineMessages(prev_message, message){
 }
 
 function combineMessages(prev_message, message){
-    $("#"+ prev_message.id).attr("id", message.id);
-    $("#" + message.id + " .message-text").append(processMessageForDisplay(message.message));
+    $("<span class='message-text'></span>").insertAfter($("#" + prev_message.id))
+    .attr('id', message.id)
+    .html(processMessageForDisplay(message.message)); //properly escaped
     return true;
 }
 
