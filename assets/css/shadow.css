@@ -838,13 +838,13 @@ button {
   width: 90%;
   color: #8b898f;
   line-height: 24px;
-  padding: 0rem 0rem 0rem 1.2rem;
+  padding: 0rem 0rem 0rem 1.3rem; /*padding-left: 1.3rem;*/
 }
 
 .contact-discussion ul .message-content .combined-message-timestamp{
   width: 10%;
   color: #8b898f;
-  margin-left: 2%;
+  margin-left: 1.1rem;
   visibility: hidden;
 }
 
