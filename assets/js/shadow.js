@@ -2082,7 +2082,7 @@ function loadMessage(message, message_block){
                     <span class='title'>\
                     </span>\
                     <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
-                       <div id='" + message.id + "'><span class='message-text'>"+ processMessageForDisplay(message.message) +  "</span></div>\
+                       <div id='" + message.id + "'><span class='first-message'>"+ processMessageForDisplay(message.message) +  "</span></div>\
                 </span>\
              </li>").appendTo(message_block);
          
@@ -2256,7 +2256,8 @@ function checkIfWeNeedToCombineMessages(prev_message, message){
 }
 
 function combineMessages(prev_message, message){
-    var m = $("<div><span class='message-text'></span></div>").insertAfter($("#" + prev_message.id))
+    var time  = new Date(message.sent*1000);
+    var m = $("<div><span class='combined-message-timestamp'>" +(time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + "</span><span class='combined-message'></span></div>").insertAfter($("#" + prev_message.id))
     .attr('id', message.id)
     .append(createMessageDeleteButton()) //properly escaped
     .hover(
@@ -2276,7 +2277,15 @@ function combineMessages(prev_message, message){
         deleteMessages(current_key, message.id);
     });
 
-    m.find(".message-text").append(processMessageForDisplay(message.message));
+    m.find(".combined-message").append(processMessageForDisplay(message.message));
+
+    m.hover(
+        function() {
+            $("#" + message.id + " .combined-message-timestamp").css("visibility", "visible"); //make the hover do stuff
+        }, function(){
+            $("#" + message.id + " .combined-message-timestamp").css("visibility", "hidden"); 
+        }
+    );
 
 
     return true;
