@@ -2147,7 +2147,7 @@ function loadMessageByIndex(key, index, message_block){
 
 function loadNewMessage(key){
     //Called when a new message arrives and the conversation of that message is open
-    var message_block = $(".contact-discussion ul span:last");
+    var message_block = $(".contact-discussion ul .message-block:last");
     loadMessageByIndex(key, contacts[key].messages.length-1, message_block);
     scrollMessages();
 }
