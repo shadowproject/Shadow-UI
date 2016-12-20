@@ -1509,7 +1509,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 
         if (group_key != null) {
 
-            if(type = "R") { //If message contains /invite privkey label, insert HTML
+            if(type == "R") { //If message contains /invite privkey label, insert HTML
                 //message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
                 if (!read)
                     addInvite(group_key, group_label, id);
