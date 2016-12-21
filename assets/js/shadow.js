@@ -44,7 +44,7 @@ function updateValue(element) {
     if (addresstype.length === 1)
         addresstype = addresstype.data("value") ? addresstype.data("value") : addresstype.text();
 
-    if(addresstype === "Group")
+    if (addresstype === "Group")
         value.replace("group_", "");
 
     element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + address + '\', this.value);" value="' + value + '" size=60 />'); //
@@ -75,7 +75,7 @@ function updateValueChat(element, key) {
     var value = element.data("value");
     var contact = contacts[key];
 
-    if(contact == undefined)
+    if (contact == undefined)
         return false;
 
     element.html('<input class="new_chat_value" type="text" onchange="bridge.updateAddressLabel(\'' + contact.address + '\', this.value);" value="' + value + '" size=35 style="display:inline;" />'); //
@@ -116,12 +116,12 @@ function updateValueChat(element, key) {
 
     $(document).one('click', function () {
         var localChatheader = $("#chat-header .new_chat_value");
-        if(typeof localChatheader === undefined || localChatheader.val() === undefined)
+        if (typeof localChatheader === undefined || localChatheader.val() === undefined)
             return false;
 
         var newval = localChatheader.val().trim();
 
-        if(newval == undefined)
+        if (newval == undefined)
             return false;
 
         element.html(newval);
@@ -805,9 +805,8 @@ function addSendAddress()
     }
 }
 
-function addSendAddressBackend(arg_sendLabel, arg_sendAddress){
+function addSendAddressBackend(arg_sendLabel, arg_sendAddress) {
     return bridge.newAddress(arg_sendLabel, 0, arg_sendAddress, true);
-
 }
 
 function addressBookInit() {
@@ -935,7 +934,7 @@ function appendAddresses(addresses) {
             // (1) append address to table of invite modal
             if (addrRowInviteModal.length==0) {
 
-                var dataToAppend = 
+                var dataToAppend =
                     "<tr id='invite-modal-"+address.address+"' lbl='"+address.label+"'>\
                    <td style='padding-left:18px;' class='label2' data-value='"+address.label_value+"'>"+address.label+"</td>\
                    <td class='address'>"+address.address+"</td>\
@@ -951,7 +950,7 @@ function appendAddresses(addresses) {
             // (2) append address to table of new group modal
             if (addrRowGroupModal.length==0) {
 
-                var dataToAppend = 
+                var dataToAppend =
                     "<tr  id='group-modal-"+address.address+"' lbl='"+address.label+"'>\
                    <td style='padding-left:18px;' class='label2' data-value='"+address.label_value+"'>"+address.label+"</td>\
                    <td class='address'>"+address.address+"</td>\
@@ -1317,7 +1316,7 @@ function shadowChatInit() {
                 $.each(contacts[selected.attr("contact-key")].messages, function(index){if(this.id == id) copy(this.message, 'copy');});
             }
         },
-        
+
         {
             name: 'Send&nbsp;File',
             fun: function () {
@@ -1445,13 +1444,13 @@ function appendMessages(messages, reset) {
                       reset);
     });
 
-    if(reset){
+    if(reset) {
         //small hack
         console.log("resetting");
         cleanUpAfterCurrentKey();
         current_key = "";
         var current_key_temp;
-        for(var index in contacts){
+        for(var index in contacts) {
             var current_key_temp = index;
             break;
         }
@@ -1527,7 +1526,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     createContact(label_chat, key, group);
 
     //create contact and link it to the group
-    if(group){
+    if(group) {
         createContact(label_msg, them, false, false);
         addContactToGroup(key_msg, key);
     }
@@ -1544,10 +1543,10 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 
         appendContact(key, false);
         if (current_key == key && !initial) //on send of our own message reload convo to add message.
-            loadNewMessage(key); 
+            loadNewMessage(key);
 
         prependContact(key);
-        
+
          if (type == "R" && read == 0)
             addNotificationCount(key, 1);
      }
@@ -1558,7 +1557,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
     VERIFIED LIST
 */
 
- var verified_list = 
+ var verified_list =
         {
             /* TEAM */
             "SdcDevWEbq3CZgZc8UNbST1TaYLA5vLZTS": {
@@ -1617,28 +1616,28 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
                 "username": "litebit",
                 "title": "Contributor",
                 "custom_avatar" : true
-            } 
-            /* Verified */ 
+            }
+            /* Verified */
             ,
             "SZxH6HNYAh9iNaGLdoHYjSN2qWvfjahrF1": {
                 "username": "6ea86b96",
                 "title": "Verified"
-            },           
-            "ShKkz1b6XD4ASgTP9BAh8C3zi4Z9HsCH5F": {               
-                "username": "dadon",               
-                "title": "Verified"           
+            },
+            "ShKkz1b6XD4ASgTP9BAh8C3zi4Z9HsCH5F": {
+                "username": "dadon",
+                "title": "Verified"
             },
             "ScrvNCexThmfctYcLZLwzFCcaH6znW69sj": {
                 "username": "dzarmush",
                 "title": "Verified"
-            },           
-            "SZ8bMXxkBELD6s5jSsBRLCwvkXibwRWw4q": {               
-                "username": "GRE3N",               
-                "title": "Verified"           
-            },         
-            "SPAfq2i8cP1SMcaTT8nMTxa2Fg9LNNJSyk": {              
-                "username": "NGS",              
-                "title": "Verified"          
+            },
+            "SZ8bMXxkBELD6s5jSsBRLCwvkXibwRWw4q": {
+                "username": "GRE3N",
+                "title": "Verified"
+            },
+            "SPAfq2i8cP1SMcaTT8nMTxa2Fg9LNNJSyk": {
+                "username": "NGS",
+                "title": "Verified"
             },
             "ShFr9RAZuMsCUK7ZKDxukCDbCtBER4CHC7": {
                 "username": "rustynailer",
@@ -1676,14 +1675,14 @@ function createContact(label, address, is_group, in_addressbook) {
         contact.avatar_type = 0,
         contact.avatar = "", // TODO: Avatars!!
         contact.messages  = [],
-        contact.mesage_height; //messages are loaded backwards in batches of 100 up until a certain message height. 
+        contact.mesage_height; //messages are loaded backwards in batches of 100 up until a certain message height.
 
-        if(is_group) 
+        if(is_group)
             contact.contacts  = [];
     }
 }
 
-function addContactToGroup(key, group_key){
+function addContactToGroup(key, group_key) {
     //check if group contact exists
     if(contacts[group_key] == undefined)
         return false;
@@ -1693,19 +1692,19 @@ function addContactToGroup(key, group_key){
         return false;
 
     //check if contact is already in group
-    if(!existsContactInGroup(key, group_key)){
+    if(!existsContactInGroup(key, group_key)) {
         contacts[group_key].contacts.push(key);
         return true;
-    } 
+    }
 
     return false;
 }
 
-function existsContact(address){
+function existsContact(address) {
     return (contacts[address] != undefined);
 }
 
-function existsContactInGroup(key, group_key){
+function existsContactInGroup(key, group_key) {
     return(!contacts[group_key].contacts.indexOf(key) == -1);
 }
 
@@ -1748,7 +1747,7 @@ function updateContact(label, address, contact_address, open_conversation) {
             $("#contact-book-" + contact_address + " .contact-info .contact-name").text(label);
             $("#contact-" + contact_address + " .contact-info .contact-name").text(label);
         }
-        if (openConversation){
+        if (openConversation) {
             openConversation(address, true);
         }
     }
@@ -1819,7 +1818,7 @@ function appendContact (key, openconvo, addressbook) {
     }
 }
 
-function getContactUsername(key, no_key_return){
+function getContactUsername(key, no_key_return) {
     //set no_key_return to anything and it won't return the address if no label is found.
 
     var bridge_label;
@@ -1829,7 +1828,7 @@ function getContactUsername(key, no_key_return){
 
     //check if backend has label for it
     bridge_label = bridge.getAddressLabel(key);
-    if(typeof bridge_label == "string" && bridge_label != ""){
+    if(typeof bridge_label == "string" && bridge_label != "") {
             return bridge_label.replace("group_","");
     }
     //no label
@@ -1840,23 +1839,23 @@ function getContactUsername(key, no_key_return){
 }
 
 
-function isStaticVerified(key){
+function isStaticVerified(key) {
     return (typeof verified_list[key] === "object");
 }
 
-function allowCustomAvatar(key){
+function allowCustomAvatar(key) {
     //return false;
     return (typeof verified_list[key] === "object" && typeof verified_list[key].custom_avatar === "boolean" && verified_list[key].custom_avatar);
 }
 
-function getIconTitle(title){
-    if(title == "unverified"){
+function getIconTitle(title) {
+    if(title == "unverified") {
         return "fa fa-cross ";
-    } else if(title == "verified"){
+    } else if(title == "verified") {
         return "fa fa-check ";
-    } else if(title == "contributor"){
+    } else if(title == "contributor") {
         return "fa fa-cog ";
-    } else if(title == "shadowteam"){
+    } else if(title == "shadowteam") {
         return "fa fa-code ";
     }
     return "";
@@ -1865,7 +1864,7 @@ function getIconTitle(title){
 /*
         end
     Contact functions
-    
+
 */
 
 function addNotificationCount(key, unread_count) {
@@ -1915,7 +1914,7 @@ function removeNotificationCount(key) {
 
     notifications_menu.text(notifications_menu_value);
 
-    if(notifications_menu_value==0){
+    if(notifications_menu_value==0) {
         notifications_menu.hide();
         $("#chat-menu-link .details").hide();
     }
@@ -1945,17 +1944,17 @@ function openConversation(key, click) {
     //$(this).addClass("selected").siblings("li").removeClass("selected");
     var contact = contacts[key];
 
-    if(current_key != key){
+    if(current_key != key) {
         cleanUpAfterCurrentKey();
         loadMessages(key);
     }
-    
+
 
     current_key = key;
 
     var is_group = contact.group;
 
-    if(is_group){
+    if(is_group) {
         $("#invite-group-btn").show();
         //$("#leave-group-btn").show();
     } else {
@@ -1985,7 +1984,7 @@ function openConversation(key, click) {
 }
 
 
-function loadMessages(key){
+function loadMessages(key) {
 
     if(key == undefined)
         key = current_key;
@@ -2002,7 +2001,7 @@ function loadMessages(key){
     var prev_message;
 
     //nothing has been loaded yet, initialize the height (loaded = 0)
-    if(contacts[key].message_height == undefined){
+    if(contacts[key].message_height == undefined) {
         opening_conversation = true;
         contacts[key].message_height = contact.messages.length;
     } else {
@@ -2017,11 +2016,11 @@ function loadMessages(key){
         showLoadMoreMessagesButton();
     } else {
         //we can't load more messages than we have..
-        amount_to_load = contacts[key].message_height; 
+        amount_to_load = contacts[key].message_height;
         contacts[key].message_height = 0;
         hideLoadMoreMessagesButton();
     }
-    
+
 
 
     //TODO: display load more messages, segmenting loading from x to x+50 so it does not have to re-do all loaded messages and saves the DOM some time
@@ -2045,7 +2044,7 @@ function loadMessages(key){
 
     if(opening_conversation)
         scrollMessages();
-    else 
+    else
         scrollMessagesTo(old_y);
 
     //messagesScroller.refresh();
@@ -2053,11 +2052,11 @@ function loadMessages(key){
 
 }
 
-    function processMessageForDisplay(message) {
-        return micromarkdown.parse(emojione.toImage(message));
-    }
+function processMessageForDisplay(message) {
+    return micromarkdown.parse(emojione.toImage(message));
+}
 
-function loadMessage(message, message_block){
+function loadMessage(message, message_block) {
     var time  = new Date(message.sent*1000);//.toLocaleString()
     var timeReceived  = new Date(message.received*1000);
 
@@ -2085,13 +2084,13 @@ function loadMessage(message, message_block){
                        <div id='" + message.id + "'><span class='first-message'>"+ processMessageForDisplay(message.message) +  "</span></div>\
                 </span>\
              </li>").appendTo(message_block);
-         
+
     message_wrapper.find('.timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString())
         .tooltip();
 
-    if(label_msg == message.key_msg){
+    if(label_msg == message.key_msg) {
         message_wrapper.find(".user-name").attr('data-toggle','modal').attr('data-target','#add-address-modal').on('click', function(){
-            clearSendAddress(); 
+            clearSendAddress();
             $('#add-rcv-address').hide();
             $('#add-send-address').show();
             $('#new-send-address').val(message.key_msg);
@@ -2106,27 +2105,29 @@ function loadMessage(message, message_block){
     message_wrapper.find("#"+ message.id).hover(
         function() {
             $(this).find(".delete").show();
-        }, function(){
-            $(this).find(".delete").hide(); 
+        },
+        function() {
+            $(this).find(".delete").hide();
         }
     );
 
     message_wrapper.find(".delete").hover(
         function() {
             $("#"+ message.id ).addClass("message-text-selected"); //make the hover do stuff
-        }, function(){
-            $("#"+ message.id).removeClass("message-text-selected"); 
+        },
+        function() {
+            $("#"+ message.id).removeClass("message-text-selected");
         }
     );
 
     insertTitleHTML(message_wrapper, message.key_msg);
 
-    
+
     message_wrapper.find('.user-name').attr('data-title', '' + message.key_msg).tooltip();
- 
+
 }
 
-function loadMessageByIndex(key, index, message_block){
+function loadMessageByIndex(key, index, message_block) {
     //This function takes a key and index, the contact[key].messages[index] will be loaded and checked if it needs to be combined, if not load a new avatar etc
 
     var contact = contacts[key];
@@ -2134,25 +2135,25 @@ function loadMessageByIndex(key, index, message_block){
     var prev_message;
     var message = contact.messages[index];
 
-        //combine consecutive chat messages into one big message if index > contact.message_height because we can't combine data with an element that does not exist
-        if (index > contact.message_height) {
-            prev_message = contact.messages[index-1];
-            if(checkIfWeNeedToCombineMessages(prev_message, message))
-                return combineMessages(prev_message, message);
-             //continue
-         } 
+    //combine consecutive chat messages into one big message if index > contact.message_height because we can't combine data with an element that does not exist
+    if (index > contact.message_height) {
+        prev_message = contact.messages[index-1];
+        if(checkIfWeNeedToCombineMessages(prev_message, message))
+            return combineMessages(prev_message, message);
+            //continue
+    }
 
-         loadMessage(message, message_block);
+    loadMessage(message, message_block);
 }
 
-function loadNewMessage(key){
+function loadNewMessage(key) {
     //Called when a new message arrives and the conversation of that message is open
     var message_block = $(".contact-discussion ul .message-block:last");
     loadMessageByIndex(key, contacts[key].messages.length-1, message_block);
     scrollMessages();
 }
 
-function cleanUpAfterCurrentKey(){
+function cleanUpAfterCurrentKey() {
     //remove all current chat messages and reset the message height on the current_key
     hideLoadMoreMessagesButton();
     $(".contact-discussion ul").html("<span class='load-more-messages' style='width: 100%; display: block;' onclick='loadMessages()'><a class='btn-danger btn btn-cons' style='width: 20%; margin-left: 40%;'>Load more messages</a></span> <span class='message-block'></span>");
@@ -2160,15 +2161,15 @@ function cleanUpAfterCurrentKey(){
         contacts[current_key].message_height = undefined;
 }
 
-function hideLoadMoreMessagesButton(){
+function hideLoadMoreMessagesButton() {
     $(".contact-discussion ul .load-more-messages").hide();
 }
 
-function showLoadMoreMessagesButton(){
+function showLoadMoreMessagesButton() {
     $(".contact-discussion ul .load-more-messages").show();
 }
 
-function getOurAddress(key, set){
+function getOurAddress(key, set) {
     //returns the address to which the message was sent, or in the case of a group check
     // key = address of the other party
     // set = true or false, set the chat receiver and sender addresses for the current session
@@ -2178,7 +2179,7 @@ function getOurAddress(key, set){
     var contact = contacts[key];
     var is_group = contact.group;
 
-    if(contact.messages.length == 0){
+    if(contact.messages.length == 0) {
         //TODO: open up choose sender dialog
         return false;
     }
@@ -2196,12 +2197,12 @@ function getOurAddress(key, set){
     return r;
 }
 
-function setSenderAndReceiver(sender, receiver){
+function setSenderAndReceiver(sender, receiver) {
     $("#message-from-address").val(sender);
     $("#message-to-address").val(receiver);
 }
 
-function insertTitleHTML(message_wrapper, key){
+function insertTitleHTML(message_wrapper, key) {
     //id = message id
     if(!existsContact(key))
         return false;
@@ -2231,7 +2232,7 @@ function confirmConversationOpenLink() {
 }
 
 
-function confirmConversationShowImage(e){
+function confirmConversationShowImage(e) {
 
     if(!confirm('Are you sure you want to view this image?\n\nIt will leak your IP address and other browser metadata, the least we can do is advice you to copy the link and open it in a _Tor Browser_ instead.'))
         return false;
@@ -2242,7 +2243,7 @@ function confirmConversationShowImage(e){
 
 }
 
-function checkIfWeNeedToCombineMessages(prev_message, message){
+function checkIfWeNeedToCombineMessages(prev_message, message) {
     if(prev_message.type != message.type)
         return false;
 
@@ -2255,7 +2256,7 @@ function checkIfWeNeedToCombineMessages(prev_message, message){
     return false;
 }
 
-function combineMessages(prev_message, message){
+function combineMessages(prev_message, message) {
     var time  = new Date(message.sent*1000);
     var m = $("<div><span class='combined-message-timestamp'>" +(time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + "</span><span class='combined-message'></span></div>").insertAfter($("#" + prev_message.id))
     .attr('id', message.id)
@@ -2263,15 +2264,17 @@ function combineMessages(prev_message, message){
     .hover(
         function() {
             $(this).find(".delete").show();
-        }, function(){
-            $(this).find(".delete").hide(); 
+        },
+        function() {
+            $(this).find(".delete").hide();
         }
     );
     m.find(".delete").hover(
         function() {
             $("#" + message.id).addClass("message-text-selected"); //make the hover do stuff
-        }, function(){
-            $("#" + message.id).removeClass("message-text-selected"); 
+        },
+        function() {
+            $("#" + message.id).removeClass("message-text-selected");
         }
     ).on("click", function() {
         deleteMessages(current_key, message.id);
@@ -2282,8 +2285,9 @@ function combineMessages(prev_message, message){
     m.hover(
         function() {
             $("#" + message.id + " .combined-message-timestamp").css("visibility", "visible"); //make the hover do stuff
-        }, function(){
-            $("#" + message.id + " .combined-message-timestamp").css("visibility", "hidden"); 
+        },
+        function() {
+            $("#" + message.id + " .combined-message-timestamp").css("visibility", "hidden");
         }
     );
 
@@ -2291,11 +2295,11 @@ function combineMessages(prev_message, message){
     return true;
 }
 
-function createMessageDeleteButton(){
+function createMessageDeleteButton() {
     return "<span class='delete'><i class='fa fa-minus-circle'></i></span>";
 }
 
-function addRandomAvatar(key){ 
+function addRandomAvatar(key) {
 
     if(!existsContact(key))
         return false;
@@ -2310,7 +2314,7 @@ function addRandomAvatar(key){
         .jdenticon(md5(key)));*/
 }
 
-function generateRandomAvatar(key){
+function generateRandomAvatar(key) {
     var shaObj = new jsSHA("SHA-512", "TEXT");
     shaObj.update(key);
     var hash = shaObj.getHash("HEX");
@@ -2320,14 +2324,14 @@ function generateRandomAvatar(key){
 }
 
 
-function addCustomAvatar(key){
+function addCustomAvatar(key) {
     contacts[key].avatar_type = 2;
     contacts[key].avatar = '<img width=40 height=40 src="assets/img/avatars/' + contacts[key].label + '.png">';
     //load custom avatar html
 }
 
-function addAvatar(key){
-    if(allowCustomAvatar(key)){
+function addAvatar(key) {
+    if(allowCustomAvatar(key)) {
         addCustomAvatar(key);
     }
     else
@@ -2335,14 +2339,14 @@ function addAvatar(key){
 
 }
 
-function getAvatar(key){
+function getAvatar(key) {
     if(allowCustomAvatar(key))
         return '<img width=40 height=40 src="assets/img/avatars/' + verified_list[key].username + '.png">';
 
-    if(!existsContact(key)){
+    if(!existsContact(key)) {
         return generateRandomAvatar(key);
     }
-    
+
     return contacts[key].avatar;
 }
 
@@ -2386,7 +2390,7 @@ function createGroupChat() {
 */
 function addInvite(privkey, label, id) {
     if($("#invite-" + privkey + "-" + id ).length != 0)
-        return false; 
+        return false;
 
 
     $("#group-invite-list").append(
@@ -2421,20 +2425,20 @@ function acceptInvite(key, group_label, id) {
 }
 
 
-function inviteGroupChat(group_address){
+function inviteGroupChat(group_address) {
     var contacts_to_invite = [];
     var element = "#invite-modal-tbody";
 
     if(group_address != undefined)
         element = "#group-modal-tbody";
-    else 
+    else
         group_address = current_key;
 
     $(element + " tr" ).each(function() {
         var address = $(this).find(".address").text();
         var checked = $(this).find(".invite .checkbox").is(':checked');
 
-        if(checked){
+        if(checked) {
             contacts_to_invite.push(address);
             $(this).find(".invite .checkbox").attr("checked", false);
         }
@@ -2446,19 +2450,20 @@ function inviteGroupChat(group_address){
     if(contacts_to_invite.length > 0)
         invited_addresses = bridge.inviteGroupChat(group_address, contacts_to_invite, $("#message-from-address").val());
 
+    /*
     if(invited_addresses.length > 0){
 
     }
-
+    */
 }
 
-function leaveGroupChat(){
+function leaveGroupChat() {
     var result = bridge.leaveGroupChat(current_key);
     return result;
 }
 
-function openInviteModal(){
-    if(current_key.length == 0){
+function openInviteModal() {
+    if(current_key.length == 0) {
         return false;
     }
 
@@ -2466,7 +2471,7 @@ function openInviteModal(){
     $("#existing-group-name").val(label);
 }
 
-function submitInviteModal(){
+function submitInviteModal() {
     //triggered on btn push of invite modal
 
     inviteGroupChat();
@@ -2497,24 +2502,24 @@ function scrollMessages(force) {
     setTimeout(scrollerBottom(old_y, old_max), 100);
 }
 
-function scrollMessagesTo(y){
+function scrollMessagesTo(y) {
     //actually we will scroll to max - y
     messagesScroller.refresh();
     messagesScroller.scrollTo(0,messagesScroller.maxScrollY - y, 100);
 
 }
 
-function openNewConversationModal(){
+function openNewConversationModal() {
     var address = $('#new-contact-address').val();
     var contact_name = $("#new-contact-name").val();
 
 
-    if($("#contact-"+address).length == 1){
+    if($("#contact-"+address).length == 1) {
 
         if(bridge.getAddressLabel(address) != contact_name)
             addSendAddressBackend(contact_name, address);
 
-        setTimeout(function(){
+        setTimeout(function() {
             updateContact(contact_name, address);
             openConversation(address, false);
             cleanNewConversationModal();
@@ -2533,13 +2538,13 @@ function openNewConversationModal(){
 
     $("#new-contact-address").css("background", "").css("color", "");
 
-    
+
     bridge.setPubKey($('#new-contact-address').val(), $("#new-contact-pubkey").val());
     bridge.updateAddressLabel($('#new-contact-address').val(), $("#new-contact-name").val());
     $('#new-contact-modal').modal('hide');
     $("#message-to-address").val($("#new-contact-address").val());
     $("#message-text").focus();
- 
+
 
 
     $("#contact-list ul li").removeClass("selected");
@@ -2561,19 +2566,19 @@ function openNewConversationModal(){
 
 }
 
-function closeNewConversationModal(){
+function closeNewConversationModal() {
     // close up new-contact-modal
     $('#new-contact-modal').modal('hide');
     return true;
 }
-function cleanNewConversationModal(){
+function cleanNewConversationModal() {
     // clean up new-contact-modal
     $("#new-contact-address").val("");
     $("#new-contact-name").val("");
     $("#new-contact-pubkey").val("");
 }
 
-function openPickSenderMsgAddrModal(){
+function openPickSenderMsgAddrModal() {
     //This function opens the dialog and copies all the identities from the original select input (#message-from-address)
     var select_html = "<option title='Please select and address to send from' value='none'>Select identity</option>" + $("#message-from-address").html();
     $("#pick-sender-msg-selector").html(select_html);
@@ -2620,7 +2625,7 @@ function deleteMessages(key, messageid) {
 
     removeNotificationCount(key);
 
-    if(messageid == undefined){
+    if(messageid == undefined) {
         cleanUpAfterCurrentKey();
         current_key = "";
     }
