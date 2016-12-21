@@ -689,6 +689,19 @@ button {
   background:#fff;  
 }
 
+.contact-discussion ul li .delete {
+  width: 3%;
+  float: right; 
+  display: none;
+  height: 100%;
+}
+
+.contact-discussion ul li .delete i {
+  width: 50%;
+  margin: 0 auto;
+
+}
+
 .contact-discussion .delete:hover {
   color: #E3223C;
 }
@@ -744,6 +757,8 @@ button {
   margin-left: 0;
   font-style: normal;
   text-decoration: none;
+  -webkit-user-select: all;
+  user-select: all;
 }
 
 .contact-discussion ul li .message-content .timestamp {
@@ -758,6 +773,8 @@ button {
   width: 36px;
   margin-right: 5px;
   margin-left: 0;
+  -webkit-user-select: all;
+  user-select: all;
 }
 
 .contact-discussion ul li.user-message .message-content .timestamp {
@@ -766,9 +783,15 @@ button {
 
 .contact-discussion ul li .message-content .message-text {
   color: #8b898f;
-  display: block;
+  display: inline-block;
+  width: 97%;
   min-height: 1rem;
   line-height: 24px;
+  -webkit-user-select: all;
+  user-select: all;
+}
+.contact-discussion ul li .message-content .message-text-selected {
+  background-color: rgba(0,0,0,.03);
 }
 
 .contact-discussion ul li .message-content .message-text:after
@@ -776,12 +799,53 @@ button {
 }
 
 .contact-discussion ul .message-wrapper {
+ /* position: relative;
+  padding: .25rem 2rem .1rem 3rem;
+  min-height: 36px;
+  margin-left:25px;
+  padding-top:10px;
+  padding-bottom:10px;*/
+}
+
+
+.contact-discussion ul .message-content{
   position: relative;
   padding: .25rem 2rem .1rem 3rem;
   min-height: 36px;
   margin-left:25px;
   padding-top:10px;
   padding-bottom:10px;
+}
+
+.contact-discussion ul .message-content .first-message{
+  padding: 0rem 0rem 0rem 4.5rem;
+  color: #8b898f;
+  display: inline-block;
+  width: 90%;
+  min-height: 1rem;
+  line-height: 24px;
+  -webkit-user-select: all;
+}
+
+.contact-discussion ul .message-content .combined-message{
+  color: #8b898f;
+  display: inline-block;
+  width: 90%;
+  min-height: 1rem;
+  line-height: 24px;
+  -webkit-user-select: all;
+  user-select: all;
+  width: 90%;
+  color: #8b898f;
+  line-height: 24px;
+  padding: 0rem 0rem 0rem 1.3rem; /*padding-left: 1.3rem;*/
+}
+
+.contact-discussion ul .message-content .combined-message-timestamp{
+  width: 10%;
+  color: #8b898f;
+  margin-left: 1.1rem;
+  visibility: hidden;
 }
 
 .chat .chat-history .my-message {

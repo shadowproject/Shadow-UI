@@ -1445,8 +1445,19 @@ function appendMessages(messages, reset) {
                       reset);
     });
 
-    if(reset)
-        openConversation(contacts[current_key].address, false);
+    if(reset){
+        //small hack
+        console.log("resetting");
+        cleanUpAfterCurrentKey();
+        current_key = "";
+        var current_key_temp;
+        for(var index in contacts){
+            var current_key_temp = index;
+            break;
+        }
+        openConversation(contacts[current_key_temp].address, false);
+        setTimeout(function() {scrollMessages(true);}, 200);
+    }
 
     $(contacts[current_key].group ? "#contact-group-list" : "#contact-list").addClass("in-conversation");
 }
@@ -1498,7 +1509,7 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 
         if (group_key != null) {
 
-            if(type = "R") { //If message contains /invite privkey label, insert HTML
+            if(type == "R") { //If message contains /invite privkey label, insert HTML
                 //message = 'You\'ve been invited to a group named \'' + group_label + '\'! <a class="btn btn-danger btn-cons" onclick="//bridge.joinGroupChat(\'' + group_key + '\',\'group_' + group_label + '\')"><i class="fa fa-plus"></i>Join group</a>';
                 if (!read)
                     addInvite(group_key, group_label, id);
@@ -1533,16 +1544,13 @@ function appendMessage(id, type, sent_date, received_date, label_value, label, l
 
         appendContact(key, false);
         if (current_key == key && !initial) //on send of our own message reload convo to add message.
-            openConversation(key, false); //hmm
+            loadNewMessage(key); 
 
         prependContact(key);
         
          if (type == "R" && read == 0)
             addNotificationCount(key, 1);
      }
-
-     if(current_key == "")
-        current_key = key;
 
 }
 
@@ -1667,7 +1675,8 @@ function createContact(label, address, is_group, in_addressbook) {
         contact.title = (isStaticVerified(address) ? verified_list[address].title : (is_group ? "Untrusted" : (contact.addressbook ? "Verified" : "Unverified"))), //If message sent from group address mark it as untrusted as it is impossible to do with GUI. Manipulation
         contact.avatar_type = 0,
         contact.avatar = "", // TODO: Avatars!!
-        contact.messages  = [];
+        contact.messages  = [],
+        contact.mesage_height; //messages are loaded backwards in batches of 100 up until a certain message height. 
 
         if(is_group) 
             contact.contacts  = [];
@@ -1739,8 +1748,9 @@ function updateContact(label, address, contact_address, open_conversation) {
             $("#contact-book-" + contact_address + " .contact-info .contact-name").text(label);
             $("#contact-" + contact_address + " .contact-info .contact-name").text(label);
         }
-        if (openConversation)
+        if (openConversation){
             openConversation(address, true);
+        }
     }
     //check if current key is ==address
     //loop through messages and change label
@@ -1829,8 +1839,6 @@ function getContactUsername(key, no_key_return){
     return key; //returning address
 }
 
-//console.log("verified list" + verified_list["SVY9s4CySAXjECDUwvMHNM6boAZeYuxgJE"]["username"]);
-//console.log("getContactName" + getContactUsername("SVY9s4CySAXjECDUwvMHNM6boAZeYuxgJE"));
 
 function isStaticVerified(key){
     return (typeof verified_list[key] === "object");
@@ -1926,20 +1934,24 @@ function removeNotificationCount(key) {
 
 }
 
-//OpenConversation is split off to allow for opening conversation automatically without removing notification.
+
 function openConversation(key, click) {
 
     if(click)
          $("#chat-menu-link").click();//open chat window when on other page
 
-    current_key = key;
+
     //TODO: detect wether user is typing, if so do not reload page to other conversation..
     //$(this).addClass("selected").siblings("li").removeClass("selected");
-    var discussion = $(".contact-discussion ul");
     var contact = contacts[key];
 
-    discussion.html("");
+    if(current_key != key){
+        cleanUpAfterCurrentKey();
+        loadMessages(key);
+    }
+    
 
+    current_key = key;
 
     var is_group = contact.group;
 
@@ -1962,79 +1974,198 @@ function openConversation(key, click) {
         updateValueChat($(this), contact.key);
     }).attr("data-title", "Double click to edit").tooltip();
 
-    var message;
-    var prev_message;
 
     if(click)
         removeNotificationCount(contact.key);
+
+
+    //loadMessages(key);
+
+    //setTimeout(function() {scrollMessages();}, 200);
+}
+
+
+function loadMessages(key){
+
+    if(key == undefined)
+        key = current_key;
+
+    var discussion = $(".contact-discussion ul");
+    var contact = contacts[key];
+    var amount_to_load = 50;
+
+    //vars for setting the scrollbar
+    var opening_conversation = false;
+    var old_y = messagesScroller.maxScrollY;
+
+    var message;
+    var prev_message;
+
+    //nothing has been loaded yet, initialize the height (loaded = 0)
+    if(contacts[key].message_height == undefined){
+        opening_conversation = true;
+        contacts[key].message_height = contact.messages.length;
+    } else {
+
+    }
+
+
+    var message_block =  $("<span class='message-block'></span>").insertAfter(".contact-discussion ul .load-more-messages");
+    //change the height to what we're going to load
+    if(contacts[key].message_height > amount_to_load) {
+        contacts[key].message_height = contacts[key].message_height - amount_to_load;
+        showLoadMoreMessagesButton();
+    } else {
+        //we can't load more messages than we have..
+        amount_to_load = contacts[key].message_height; 
+        contacts[key].message_height = 0;
+        hideLoadMoreMessagesButton();
+    }
+    
+
+
+    //TODO: display load more messages, segmenting loading from x to x+50 so it does not have to re-do all loaded messages and saves the DOM some time
+
+
+    //loads all messages
+    var index = contact.message_height;
+    while(index < contact.message_height + amount_to_load) {
+        loadMessageByIndex(key, index, message_block);
+        getOurAddress(key, true);
+        //discussion.children("[title]").on("mouseenter", tooltip);
+
+        index++;
+    };
+
+    if(contact.messages.length == 0) {
+
+        $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li><span class='load-more-messages' onclick='loadMessages()' style='display: none;'><a class='btn-danger btn btn-cons'>Load more messages</a></span><span class='message-block'></span>");
+        $("#message-to-address").val(contact.address);
+    }
+
+    if(opening_conversation)
+        scrollMessages();
+    else 
+        scrollMessagesTo(old_y);
+
+    //messagesScroller.refresh();
+
+
+}
 
     function processMessageForDisplay(message) {
         return micromarkdown.parse(emojione.toImage(message));
     }
 
-    contact.messages.forEach(function(message, index) {
+function loadMessage(message, message_block){
+    var time  = new Date(message.sent*1000);//.toLocaleString()
+    var timeReceived  = new Date(message.received*1000);
 
-        if (index > 0 && combineMessages(prev_message, message)) {
-            $("#"+ prev_message.id).attr("id", message.id);
-            $("#" + message.id + " .message-text").append(processMessageForDisplay(message.message));
+    //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
+    //TODO: parse with regex to be sure.. do in appendMessage
+    addAvatar(message.them);
 
-            prev_message = message;
-            return;
-         }
-         prev_message = message;
-
-
-
-
-        var time  = new Date(message.sent*1000);//.toLocaleString()
-        var timeReceived  = new Date(message.received*1000);
-
-        //title='"+(message.type=='S'? message.self : message.them)+"' taken out below.. titles getting in the way..
-        //TODO: parse with regex to be sure.. do in appendMessage
-        addAvatar(message.them);
-
-        var label_msg;
+    var label_msg;
         if(contacts[message.key_msg] != undefined)
             label_msg = contacts[message.key_msg].label;
         else
             label_msg = getContactUsername(message.key_msg);
-
+        //      ^this is to get our own username, we do not load or own addresses in the contacts array
+        //contact-key='"+contact.key+"'
         var onclick = (label_msg == message.key_msg) ? " data-toggle=\"modal\" data-target=\"#add-address-modal\" onclick=\"clearSendAddress(); $('#add-rcv-address').hide(); $('#add-send-address').show(); $('#new-send-address').val('" + message.key_msg + "')\" " : "";
-        discussion.append(
-            "<li id='"+message.id+"' class='message-wrapper "+(message.type=='S'?'my-message':'other-message')+"' contact-key='"+contact.key+"'>\
+        var message_wrapper = $("<li class='message-wrapper "+(message.type=='S'?'my-message':'other-message')+"'>\
                 <span class='message-content'>\
                     <span class='info'>"+ (message.type=='S'? getAvatar(message.self) : getAvatar(message.them))+ "</span>\
-                    <span class='user-name' " + onclick + ">"
+                    <span class='user-name'>"
                         +(label_msg)+"\
                     </span>\
                     <span class='title'>\
                     </span>\
                     <span class='timestamp'>"+((time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + ":" +(time.getSeconds() < 10 ? "0" : "")  + time.getSeconds())+"</span>\
-                       <span class='delete' onclick='deleteMessages(\""+contact.key+"\", \""+message.id+"\");'><i class='fa fa-minus-circle'></i></span>\
-                       <span class='message-text'>"+ processMessageForDisplay(message.message) +  "</span>\
+                       <div id='" + message.id + "'><span class='first-message'>"+ processMessageForDisplay(message.message) +  "</span></div>\
                 </span>\
-             </li>");
-         $('#' + message.id + ' .timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString())
-            .tooltip().find('.message-text')
-            .tooltip();
+             </li>").appendTo(message_block);
+         
+    message_wrapper.find('.timestamp').attr('data-title', 'Sent: ' + time.toLocaleString() + '\n Received: ' + timeReceived.toLocaleString())
+        .tooltip();
 
-        insertTitleHTML(message.id, message.key_msg);
+    if(label_msg == message.key_msg){
+        message_wrapper.find(".user-name").attr('data-toggle','modal').attr('data-target','#add-address-modal').on('click', function(){
+            clearSendAddress(); 
+            $('#add-rcv-address').hide();
+            $('#add-send-address').show();
+            $('#new-send-address').val(message.key_msg);
+        });
+    }
 
-        //Check if group message, if we sent a message in the past and make sure we assigned the same sender address to the chat.
-        $('#' + message.id + ' .user-name').attr('data-title', '' + (message.type == "S" ? message.self : message.them)).tooltip();
- 
-        getOurAddress(key, true);
-        //discussion.children("[title]").on("mouseenter", tooltip);
-
-
-        if(contact.messages.length == 0) {
-             $(".contact-discussion ul").html("<li id='remove-on-send'>Starting Conversation with "+contact.label+" - "+contact.address+"</li>");
-             $("#message-to-address").val(contact.address);
-        }
+    message_wrapper.find("#" + message.id).append(createMessageDeleteButton());
+    message_wrapper.find("#"+ message.id + " .delete")
+    .on("click", function() {
+        deleteMessages(current_key, message.id);
     });
+    message_wrapper.find("#"+ message.id).hover(
+        function() {
+            $(this).find(".delete").show();
+        }, function(){
+            $(this).find(".delete").hide(); 
+        }
+    );
 
+    message_wrapper.find(".delete").hover(
+        function() {
+            $("#"+ message.id ).addClass("message-text-selected"); //make the hover do stuff
+        }, function(){
+            $("#"+ message.id).removeClass("message-text-selected"); 
+        }
+    );
 
-    setTimeout(function() {scrollMessages();}, 200);
+    insertTitleHTML(message_wrapper, message.key_msg);
+
+    
+    message_wrapper.find('.user-name').attr('data-title', '' + message.key_msg).tooltip();
+ 
+}
+
+function loadMessageByIndex(key, index, message_block){
+    //This function takes a key and index, the contact[key].messages[index] will be loaded and checked if it needs to be combined, if not load a new avatar etc
+
+    var contact = contacts[key];
+
+    var prev_message;
+    var message = contact.messages[index];
+
+        //combine consecutive chat messages into one big message if index > contact.message_height because we can't combine data with an element that does not exist
+        if (index > contact.message_height) {
+            prev_message = contact.messages[index-1];
+            if(checkIfWeNeedToCombineMessages(prev_message, message))
+                return combineMessages(prev_message, message);
+             //continue
+         } 
+
+         loadMessage(message, message_block);
+}
+
+function loadNewMessage(key){
+    //Called when a new message arrives and the conversation of that message is open
+    var message_block = $(".contact-discussion ul .message-block:last");
+    loadMessageByIndex(key, contacts[key].messages.length-1, message_block);
+    scrollMessages();
+}
+
+function cleanUpAfterCurrentKey(){
+    //remove all current chat messages and reset the message height on the current_key
+    hideLoadMoreMessagesButton();
+    $(".contact-discussion ul").html("<span class='load-more-messages' style='width: 100%; display: block;' onclick='loadMessages()'><a class='btn-danger btn btn-cons' style='width: 20%; margin-left: 40%;'>Load more messages</a></span> <span class='message-block'></span>");
+    if(current_key != "")
+        contacts[current_key].message_height = undefined;
+}
+
+function hideLoadMoreMessagesButton(){
+    $(".contact-discussion ul .load-more-messages").hide();
+}
+
+function showLoadMoreMessagesButton(){
+    $(".contact-discussion ul .load-more-messages").show();
 }
 
 function getOurAddress(key, set){
@@ -2070,16 +2201,16 @@ function setSenderAndReceiver(sender, receiver){
     $("#message-to-address").val(receiver);
 }
 
-function insertTitleHTML(id, key){
+function insertTitleHTML(message_wrapper, key){
     //id = message id
     if(!existsContact(key))
         return false;
 
     var contact = contacts[key];
-    //console.log("insertTitleHTML key=" + key + " title=" + contact.title);
+
     var title = contacts[key].title.toLowerCase();
-    $("#" + id + " .title").addClass(getIconTitle(title) + title + "-mark");
-    $("#" + id + " .title").hover(
+    message_wrapper.find(".title").addClass(getIconTitle(title) + title + "-mark");
+    message_wrapper.find(".title").hover(
         function ()
         {
             //on hover
@@ -2099,6 +2230,7 @@ function confirmConversationOpenLink() {
     return (confirm('Are you sure you want to open this link?\n\nIt will leak your IP address and other browser metadata, the least we can do is advice you to copy the link and open it in a _Tor Browser_ instead.\n\n You can disable this message in options.'));
 }
 
+
 function confirmConversationShowImage(e){
 
     if(!confirm('Are you sure you want to view this image?\n\nIt will leak your IP address and other browser metadata, the least we can do is advice you to copy the link and open it in a _Tor Browser_ instead.'))
@@ -2110,7 +2242,7 @@ function confirmConversationShowImage(e){
 
 }
 
-function combineMessages(prev_message, message){
+function checkIfWeNeedToCombineMessages(prev_message, message){
     if(prev_message.type != message.type)
         return false;
 
@@ -2121,6 +2253,46 @@ function combineMessages(prev_message, message){
         return true;
 
     return false;
+}
+
+function combineMessages(prev_message, message){
+    var time  = new Date(message.sent*1000);
+    var m = $("<div><span class='combined-message-timestamp'>" +(time.getHours() < 10 ? "0" : "")  + time.getHours() + ":" +(time.getMinutes() < 10 ? "0" : "")  + time.getMinutes() + "</span><span class='combined-message'></span></div>").insertAfter($("#" + prev_message.id))
+    .attr('id', message.id)
+    .append(createMessageDeleteButton()) //properly escaped
+    .hover(
+        function() {
+            $(this).find(".delete").show();
+        }, function(){
+            $(this).find(".delete").hide(); 
+        }
+    );
+    m.find(".delete").hover(
+        function() {
+            $("#" + message.id).addClass("message-text-selected"); //make the hover do stuff
+        }, function(){
+            $("#" + message.id).removeClass("message-text-selected"); 
+        }
+    ).on("click", function() {
+        deleteMessages(current_key, message.id);
+    });
+
+    m.find(".combined-message").append(processMessageForDisplay(message.message));
+
+    m.hover(
+        function() {
+            $("#" + message.id + " .combined-message-timestamp").css("visibility", "visible"); //make the hover do stuff
+        }, function(){
+            $("#" + message.id + " .combined-message-timestamp").css("visibility", "hidden"); 
+        }
+    );
+
+
+    return true;
+}
+
+function createMessageDeleteButton(){
+    return "<span class='delete'><i class='fa fa-minus-circle'></i></span>";
 }
 
 function addRandomAvatar(key){ 
@@ -2254,7 +2426,7 @@ function inviteGroupChat(group_address){
     var element = "#invite-modal-tbody";
 
     if(group_address != undefined)
-        element = "group-modal-tbody";
+        element = "#group-modal-tbody";
     else 
         group_address = current_key;
 
@@ -2307,29 +2479,35 @@ function submitInviteModal(){
     All code related to "inviting" to groupchat
 */
 
-function scrollMessages() {
+function scrollMessages(force) {
 
     var old_y = messagesScroller.y;
     var old_max = messagesScroller.maxScrollY;
 
     messagesScroller.refresh();
 
+    //decides if we should scroll to the bottom or not
     var scrollerBottom = function(old_y, old_max) {
         var new_max = messagesScroller.maxScrollY;
 
-        if(old_max > new_max && old_max == old_y)
+        if((old_max > new_max && old_max == old_y) || (force != undefined && force))
             messagesScroller.scrollTo(0, messagesScroller.maxScrollY, 100);
     };
 
     setTimeout(scrollerBottom(old_y, old_max), 100);
 }
 
+function scrollMessagesTo(y){
+    //actually we will scroll to max - y
+    messagesScroller.refresh();
+    messagesScroller.scrollTo(0,messagesScroller.maxScrollY - y, 100);
+
+}
+
 function openNewConversationModal(){
     var address = $('#new-contact-address').val();
     var contact_name = $("#new-contact-name").val();
 
-    console.log("newConvo called!");
-    console.log("length=" + $("#contact-"+address).length);
 
     if($("#contact-"+address).length == 1){
 
@@ -2340,7 +2518,6 @@ function openNewConversationModal(){
             updateContact(contact_name, address);
             openConversation(address, false);
             cleanNewConversationModal();
-            console.log("cleaned");
         }, 500);
 
         return closeNewConversationModal();
@@ -2385,11 +2562,12 @@ function openNewConversationModal(){
 }
 
 function closeNewConversationModal(){
-    // clean up new new-contact-modal and close it.
+    // close up new-contact-modal
     $('#new-contact-modal').modal('hide');
     return true;
 }
 function cleanNewConversationModal(){
+    // clean up new-contact-modal
     $("#new-contact-address").val("");
     $("#new-contact-name").val("");
     $("#new-contact-pubkey").val("");
@@ -2442,8 +2620,10 @@ function deleteMessages(key, messageid) {
 
     removeNotificationCount(key);
 
-    if(messageid == undefined)
+    if(messageid == undefined){
+        cleanUpAfterCurrentKey();
         current_key = "";
+    }
 
     for(var i=0;i<contact.messages.length;i++) {
 
